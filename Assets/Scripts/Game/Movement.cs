@@ -59,7 +59,7 @@ public class Movement : MonoBehaviour
 	[Space]
 	public PhysicMaterial defaultMaterial;
 
-	[HideInInspector] public float marbleRadius;
+	private float marbleRadius;
 	private Vector2 inputMovement()
 	{
 		Vector2 movement = fakeInput;
@@ -112,7 +112,7 @@ public class Movement : MonoBehaviour
 
 	private Rigidbody rigidBody;
 	private SphereCollider sphereCollider;
-	[HideInInspector] public Vector3 lastNormal = Vector3.zero;
+	private Vector3 lastNormal = Vector3.zero;
 
 	Vector3 position;
 	Vector3 oldPos;

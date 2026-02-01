@@ -16,7 +16,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: f8faa632762f9bf45b2abd1908e58ff5, type: 3}
   - {fileID: 2800000, guid: d0e32e55b29cd8940912dbde2e14a2c5, type: 3}
   - {fileID: 2800000, guid: eae3cdc1a3df3eb42b8674008d97136a, type: 3}
-  friction: -1
+  friction: -2.5
   restitution: 1
   bounce: -1
   isRandom: 1
