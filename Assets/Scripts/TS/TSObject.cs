@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,6 +23,13 @@ namespace TS
                     yield return i;
                 }
             }
+        }
+
+        public IEnumerable<TSObject> GetFirstChildrens()
+        {
+            // Shallow traversal ONLY
+            foreach (var child in Children)
+                yield return child;
         }
 
         public string GetField(string field)

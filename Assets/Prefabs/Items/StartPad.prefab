@@ -64,7 +64,7 @@ Transform:
   - {fileID: 2332283807032606476}
   - {fileID: 5414802381078647524}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!1 &2167507285422836094
 GameObject:
   m_ObjectHideFlags: 0
@@ -115,7 +115,7 @@ MonoBehaviour:
   animationFrames:
   - material:
     - index: 1
-      texture: {fileID: 2800000, guid: e1ae450b147a04c41ac04f33beebf90a, type: 3}
+      texture: {fileID: 2800000, guid: 3147f3e87024d6843a2b5e69e77c4fae, type: 3}
     - index: 2
       texture: {fileID: 2800000, guid: e5cb2c90a2df84d4fafa9fd1fd7acbdd, type: 3}
     frames: 15
@@ -123,7 +123,7 @@ MonoBehaviour:
     - index: 1
       texture: {fileID: 2800000, guid: e5cb2c90a2df84d4fafa9fd1fd7acbdd, type: 3}
     - index: 2
-      texture: {fileID: 2800000, guid: e1ae450b147a04c41ac04f33beebf90a, type: 3}
+      texture: {fileID: 2800000, guid: 3147f3e87024d6843a2b5e69e77c4fae, type: 3}
     frames: 15
 --- !u!23 &4334410944908913384
 MeshRenderer:

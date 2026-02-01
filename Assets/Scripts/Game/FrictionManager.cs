@@ -27,6 +27,8 @@ public class FrictionManager : MonoBehaviour
     // Cache of currently applied friction
     private FrictionSO currentFriction;
 
+    private bool isOnRandomForce;
+
     public void Start()
     {   
         movement = GetComponent<Movement>();
@@ -42,6 +44,8 @@ public class FrictionManager : MonoBehaviour
         defaultPhysicMaterial.staticFriction = 1.1f;
         defaultPhysicMaterial.dynamicFriction = 0.7f;
         defaultPhysicMaterial.bounciness = 1;
+
+        isOnRandomForce = false;
     }
 
     public void RevertMaterial()
@@ -65,6 +69,8 @@ public class FrictionManager : MonoBehaviour
         defaultPhysicMaterial.staticFriction = 1.1f;
         defaultPhysicMaterial.dynamicFriction = 0.7f;
         defaultPhysicMaterial.bounciness = 1;
+
+        isOnRandomForce = false;
     }
 
     public void ApplyMaterial(FrictionSO frictionSO)
@@ -74,17 +80,27 @@ public class FrictionManager : MonoBehaviour
         // Only apply if it's different from the current one
         if (currentFriction == frictionSO) return;
 
+        RevertMaterial();
+
         currentFriction = frictionSO;
 
-        if (frictionSO.friction != -1)
+        if (frictionSO.isRandom) 
         {
-            movement.staticFriction = frictionSO.friction * 1.1f;
-            movement.kineticFriction = frictionSO.friction * 0.7f;
-
-            defaultPhysicMaterial.staticFriction = frictionSO.friction * 1.1f;
-            defaultPhysicMaterial.dynamicFriction = frictionSO.friction * 0.7f;
+            isOnRandomForce = true;
         }
+        else
+        {
+            isOnRandomForce = false;
+            if (frictionSO.friction != -1)
+            {
+                movement.staticFriction = frictionSO.friction * 1.1f;
+                movement.kineticFriction = frictionSO.friction * 0.7f;
 
+                defaultPhysicMaterial.staticFriction = frictionSO.friction * 1.1f;
+                defaultPhysicMaterial.dynamicFriction = frictionSO.friction * 0.7f;
+            }
+        }
+        
         if (frictionSO.restitution != -1)
         {
             movement.bounceRestitution = frictionSO.restitution * 0.5f;
@@ -113,5 +129,34 @@ public class FrictionManager : MonoBehaviour
             }
         }
         return null; // No match found
+    }
+
+    public float fac = 4.5f;
+    public void FixedUpdate()
+    {
+        if (isOnRandomForce)
+        {
+            // Clone angular velocity
+            Vector3 angVel = movement.marbleAngularVelocity;
+
+            // Cross product
+            Vector3 movementVec = Vector3.Cross(angVel, movement.lastNormal);
+
+            if (GetHorizontalMagnitude(movement.marbleVelocity) < 2f)
+                movement.marbleVelocity += movementVec * (-0.15f * fac);
+            else
+                movement.marbleVelocity += movementVec * (-0.0015f * fac);
+
+            // Scale angular velocity
+            movement.marbleAngularVelocity *= (1f + (0.07f * (movement.marbleRadius * 0.2f) * fac));
+
+        }
+    }
+
+    float GetHorizontalMagnitude(Vector3 vel)
+    {
+        Vector3 up = GravitySystem.GravityDir.normalized;
+
+        return Vector3.ProjectOnPlane(vel, up).magnitude;
     }
 }

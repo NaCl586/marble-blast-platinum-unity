@@ -26,7 +26,6 @@ public class Marble : MonoBehaviour
 
     public Movement movement;
     public FrictionManager frictionManager;
-    public Transform startPoint;
     public class OnRespawn : UnityEvent { };
     public static OnRespawn onRespawn = new OnRespawn();
 
@@ -89,7 +88,7 @@ public class Marble : MonoBehaviour
 
     public void Respawn()
     {
-        movement.SetPosition(startPoint.position);
+        movement.SetPosition(GameManager.instance.activeCheckpoint.position);
     }
 
     public void PlaySound(PowerupType _powerup)

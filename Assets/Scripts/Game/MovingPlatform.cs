@@ -18,7 +18,7 @@ public enum MovementMode
 public class SequenceNumber
 {
     public GameObject marker;
-    [HideInInspector] public Vector3 markerPos;
+    public Vector3 markerPos;
     public float secondsToNext;
 }
 

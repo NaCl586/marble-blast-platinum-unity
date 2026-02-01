@@ -21,6 +21,7 @@ public class CameraController : MonoBehaviour
     public void Awake()
     {
         instance = this;
+        instance = this;
     }
 
     public void Start()
@@ -212,7 +213,7 @@ public class CameraController : MonoBehaviour
 
     public void ResetCam() 
     {
-        Transform startPad = GameManager.instance.startPad.transform;
+        Transform startPad = GameManager.instance.activeCheckpoint.transform.parent;
         offset = (startPad.GetChild(0).position - startPad.GetChild(1).position);
     }
 

@@ -18,6 +18,8 @@ public class GameManager : MonoBehaviour
         onCollectGem.AddListener(UpdateGem);
 
         Marble.onRespawn.AddListener(Respawn);
+
+        activeCheckpoint = startPad.transform.Find("Spawn");
     }
 
     [Header("Level Objects")]
@@ -35,6 +37,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioClip puOutOfBounds;
     [SerializeField] AudioClip puHelp;
     [SerializeField] AudioClip puMissingGems;
+    [SerializeField] AudioClip checkpointSfx;
 
     public void PlayJumpAudio() => audioSource.PlayOneShot(jump);
     public void PlaySpawnAudio() => audioSource.PlayOneShot(puSpawn);
@@ -86,7 +89,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button okayButton;
     [SerializeField] TMP_InputField nameInputField;
 
-    [HideInInspector] public GameObject activeCheckpoint;
+    public Transform activeCheckpoint;
+    [HideInInspector] public List<GameObject> recentGems = new List<GameObject>();
+    [HideInInspector] public PowerupType tempPowerup;
     bool useCheckpoint;
 
     [Space]
@@ -115,9 +120,6 @@ public class GameManager : MonoBehaviour
     public GameObject finishParticles;
     GameObject finishParticleInstance;
 
-    //checkpoint properties
-    PowerupType tempPowerup;
-
     //game state
     [Space]
     [HideInInspector] public static bool gameFinish = false;
@@ -131,6 +133,8 @@ public class GameManager : MonoBehaviour
     public static OnOutOfBounds onOutOfBounds = new OnOutOfBounds();
     public class OnCollectGem : UnityEvent<int> { };
     public static OnCollectGem onCollectGem = new OnCollectGem();
+    public class OnReachCheckpoint : UnityEvent<Transform> { };
+    public static OnReachCheckpoint onReachCheckpoint = new OnReachCheckpoint();
 
     void Start()
     {
@@ -160,6 +164,9 @@ public class GameManager : MonoBehaviour
         UpdateBestTimes();
 
         spawnAudioPlayed = false;
+
+        onReachCheckpoint.AddListener(ReachCheckpoint);
+        useCheckpoint = false;
     }
 
     public void InitGemCount()
@@ -301,6 +308,10 @@ public class GameManager : MonoBehaviour
     public void RestartLevel()
     {
         TogglePause();
+
+        activeCheckpoint = startPad.transform.Find("Spawn");
+        useCheckpoint = false;
+
         Marble.onRespawn?.Invoke();
     }
 
@@ -311,6 +322,21 @@ public class GameManager : MonoBehaviour
 
         finishMenu.SetActive(false);
         Marble.onRespawn?.Invoke();
+    }
+
+    public void ReachCheckpoint(Transform checkpoint)
+    {
+        if (checkpoint == activeCheckpoint) return;
+
+        useCheckpoint = true;
+
+        GameUIManager.instance.SetBottomText("Checkpoint reached!");
+        activeCheckpoint = checkpoint;
+        tempPowerup = activePowerup;
+
+        PlayAudioClip(checkpointSfx);
+
+        recentGems.Clear();
     }
 
     bool spawnAudioPlayed = false;
@@ -337,14 +363,29 @@ public class GameManager : MonoBehaviour
         {
             Movement.instance.StopAllMovement();
             Movement.instance.StopAllbutJumping();
+
             GameStateStart();
         }
         else
         {
             Movement.instance.StopAllMovement();
             Movement.instance.StartMoving();
+
+            foreach (GameObject gem in recentGems)
+            {
+                gem.SetActive(true);
+                currentGems--;
+            }
+
+            GameUIManager.instance.SetCurrentGem(currentGems);
+
+            activePowerup = tempPowerup;
+            GameUIManager.instance.SetPowerupIcon(activePowerup);
+
+            GameUIManager.instance.SetCenterImage(-1);
         }
 
+        recentGems.Clear();
         Marble.instance.RevertMaterial();
         Marble.instance.ToggleGyrocopterBlades(false);
         if (gyrocopterIsActive)
@@ -358,7 +399,7 @@ public class GameManager : MonoBehaviour
         startTimer = false;
         UpdateGem(0);
         elapsedTime = bonusTime = 0;
-
+        
         foreach (Gem gem in gems)
             gem.gameObject.SetActive(true);
 
@@ -373,7 +414,10 @@ public class GameManager : MonoBehaviour
             mp.ResetMP();
 
         GameUIManager.instance.SetTimerText(elapsedTime);
-        GameUIManager.instance.SetCenterText(MissionInfo.instance.startHelpText);
+
+        string startHelpText = MissionInfo.instance.startHelpText;
+        if (!string.IsNullOrEmpty(startHelpText))
+            GameUIManager.instance.SetCenterText(startHelpText);
 
         if (finishParticleInstance)
             Destroy(finishParticleInstance);
@@ -425,6 +469,7 @@ public class GameManager : MonoBehaviour
         //Finish
         else
         {
+            CancelInvoke();
             PlayFinishAudio();
 
             startTimer = false;

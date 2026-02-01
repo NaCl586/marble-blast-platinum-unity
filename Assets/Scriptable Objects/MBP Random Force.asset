@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1494983f2bc3ce47bbf47c50c53aa92, type: 3}
+  m_Name: MBP Random Force
+  m_EditorClassIdentifier: 
+  textures:
+  - {fileID: 2800000, guid: f8faa632762f9bf45b2abd1908e58ff5, type: 3}
+  - {fileID: 2800000, guid: d0e32e55b29cd8940912dbde2e14a2c5, type: 3}
+  - {fileID: 2800000, guid: eae3cdc1a3df3eb42b8674008d97136a, type: 3}
+  friction: -1
+  restitution: 1
+  bounce: -1
+  isRandom: 1

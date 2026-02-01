@@ -63,7 +63,7 @@ public class MissionInfo : MonoBehaviour
     {
         string basePath = Path.Combine(
             Application.streamingAssetsPath,
-            "marble/data/missions",
+            "marble/data/missions_mbg/",
             difficulty.ToString()
         );
 
@@ -116,7 +116,7 @@ public class MissionInfo : MonoBehaviour
             Mission newMission = new Mission
             {
                 levelImage = sprite,
-                directory = "marble/data/missions/" + difficulty.ToString() + "/" + levelName + ".mis",
+                directory = "marble/data/missions_mbg/" + difficulty.ToString() + "/" + levelName + ".mis",
                 levelNumber = -1,
             };
 
@@ -147,7 +147,7 @@ public class MissionInfo : MonoBehaviour
                 return;
 
             var mission = MissionObjects[0];
-            foreach (var obj in mission.RecursiveChildren())
+            foreach (var obj in mission.GetFirstChildrens())
             {
                 //Mission info
                 if (obj.ClassName == "ScriptObject" && obj.Name == "MissionInfo")
@@ -164,7 +164,10 @@ public class MissionInfo : MonoBehaviour
                     newMission.missionName = levelName.Replace("\\", "");
                     newMission.levelName = (obj.GetField("name").Replace("\\", ""));
                     newMission.description = (obj.GetField("desc").Replace("\\", ""));
-                    newMission.startHelpText = (obj.GetField("startHelpText").Replace("\\", ""));
+
+                    string startHelpText = obj.GetField("startHelpText");
+                    if(!string.IsNullOrEmpty(startHelpText))
+                        newMission.startHelpText = startHelpText.Replace("\\", "");
 
                     int _level = 0;
                     if (int.TryParse(obj.GetField("level"), out _level))

@@ -9,6 +9,9 @@ TagManager:
   - Gem
   - OutOfBounds
   - InBounds
+  - Powerup
+  - TimeTravel
+  - Checkpoint
   layers:
   - Default
   - TransparentFX

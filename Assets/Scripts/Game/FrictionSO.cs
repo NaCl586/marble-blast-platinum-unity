@@ -12,4 +12,5 @@ public class FrictionSO : ScriptableObject
     public float friction;
     public float restitution;
     public float bounce;
+    public bool isRandom;
 }
