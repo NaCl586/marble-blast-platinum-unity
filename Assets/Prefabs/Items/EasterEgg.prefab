@@ -150,8 +150,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eff08ef200aa4ef4ab0fecb915a01e1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerupType: 10
-  powerupName: an Easter Egg!
+  powerupType: 8
+  powerupName: 
   autoUse: 1
   respawnTime: Infinity
   pickupSound: {fileID: 0}
@@ -159,6 +159,7 @@ MonoBehaviour:
   meshRenderer: {fileID: 4890906071314716582}
   skinnedMeshRenderer: {fileID: 0}
   isActive: 1
+  rotateMesh: 1
   showHelpOnPickup: 0
   gotEasterEggSfx: {fileID: 8300000, guid: 7c44e34f0232b5d45b2127e825ea6197, type: 3}
   alreadyGotEggSfx: {fileID: 8300000, guid: e6d804f30dcc8184597ff3baef34e3e0, type: 3}
