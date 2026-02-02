@@ -218,14 +218,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   powerupType: 1
-  powerupName: Super Jump PowerUp!
+  powerupName: Jump Boost PowerUp!
   autoUse: 0
   respawnTime: 7
   pickupSound: {fileID: 8300000, guid: 39fc930f5da6328488d019c0a1d8bb28, type: 3}
   useSound: {fileID: 8300000, guid: 78b9999d0faa9154dbc863f058507492, type: 3}
   meshRenderer: {fileID: 0}
   skinnedMeshRenderer: {fileID: 5186047847707935262}
-  anim: {fileID: 0}
   isActive: 1
   rotateMesh: 1
   showHelpOnPickup: 0

@@ -166,7 +166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   powerupType: 3
-  powerupName: Super Bounce PowerUp!
+  powerupName: Marble Recoil PowerUp!
   autoUse: 0
   respawnTime: 7
   pickupSound: {fileID: 8300000, guid: ceb776ed8b5657749bb2de2b60a39817, type: 3}
@@ -175,6 +175,8 @@ MonoBehaviour:
   skinnedMeshRenderer: {fileID: 3377025804464704474}
   anim: {fileID: 0}
   isActive: 1
+  rotateMesh: 1
+  showHelpOnPickup: 0
 --- !u!1 &2957402393579878677
 GameObject:
   m_ObjectHideFlags: 0

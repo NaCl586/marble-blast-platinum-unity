@@ -300,9 +300,9 @@ public class GameManager : MonoBehaviour
 
         string remainingGemMsg;
 
-        if (currentGems + 1 == totalGems) remainingGemMsg = "You picked up a gem! Only one more gem to go!";
-        else if (currentGems == totalGems) remainingGemMsg = "You picked up all gems! Head for the finish!";
-        else remainingGemMsg = "You picked up a gem! " + (totalGems - currentGems) + " gems to go!";
+        if (currentGems + 1 == totalGems) remainingGemMsg = "You picked up a diamond! Only one more diamond to go!";
+        else if (currentGems == totalGems) remainingGemMsg = "You picked up all diamonds! Head for the finish!";
+        else remainingGemMsg = "You picked up a diamond! " + (totalGems - currentGems) + " diamonds to go!";
 
         if (_count > 0)
             GameUIManager.instance.SetBottomText(remainingGemMsg);
@@ -427,7 +427,8 @@ public class GameManager : MonoBehaviour
 
         //reset powerups
         foreach (Powerups po in FindObjectsOfType<Powerups>())
-            po.Activate(false);
+            if(po.powerupType != PowerupType.EasterEgg)
+                po.Activate(false);
 
         //reset moving platforms
         foreach (MovingPlatform mp in FindObjectsOfType<MovingPlatform>())

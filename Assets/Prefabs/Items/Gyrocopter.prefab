@@ -282,7 +282,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   powerupType: 9
-  powerupName: Gyrocopter PowerUp!
+  powerupName: Helicopter PowerUp!
   autoUse: 0
   respawnTime: 7
   pickupSound: {fileID: 8300000, guid: 002008bdbb3c5094b82e3cee52a5e0ef, type: 3}
@@ -291,3 +291,5 @@ MonoBehaviour:
   skinnedMeshRenderer: {fileID: 7979797148077187550}
   anim: {fileID: 0}
   isActive: 1
+  rotateMesh: 1
+  showHelpOnPickup: 0

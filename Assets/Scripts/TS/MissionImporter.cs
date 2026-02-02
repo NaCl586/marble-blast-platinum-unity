@@ -170,7 +170,6 @@ namespace TS
                     {
                         var gobj = Instantiate(superJumpPrefab, transform, false);
                         gobj.name = "SuperJumpItem";
-                        gobj.GetComponent<Powerups>().rotateMesh = false;
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                         var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
@@ -194,7 +193,6 @@ namespace TS
                     {
                         var gobj = Instantiate(superSpeedPrefab, transform, false);
                         gobj.name = "SuperSpeedItem";
-                        gobj.GetComponent<Powerups>().rotateMesh = false;
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                         var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
@@ -218,7 +216,6 @@ namespace TS
                     {
                         var gobj = Instantiate(superBouncePrefab, transform, false);
                         gobj.name = "SuperBounceItem";
-                        gobj.GetComponent<Powerups>().rotateMesh = false;
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                         var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
@@ -242,7 +239,6 @@ namespace TS
                     {
                         var gobj = Instantiate(shockAbsorberPrefab, transform, false);
                         gobj.name = "ShockAbsorberItem";
-                        gobj.GetComponent<Powerups>().rotateMesh = false;
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                         var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
@@ -266,7 +262,6 @@ namespace TS
                     {
                         var gobj = Instantiate(gyrocopterPrefab, transform, false);
                         gobj.name = "HelicopterItem";
-                        gobj.GetComponent<Powerups>().rotateMesh = false;
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                         var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
@@ -290,7 +285,6 @@ namespace TS
                     {
                         var gobj = Instantiate(timeTravelPrefab, transform, false);
                         gobj.name = "TimeTravelItem";
-                        gobj.GetComponent<Powerups>().rotateMesh = false;
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                         var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
@@ -307,6 +301,38 @@ namespace TS
                             gobj.GetComponent<TimeTravel>().timeBonus = (float)int.Parse(timeBonus) / 1000;
                         else
                             gobj.GetComponent<TimeTravel>().timeBonus = 5;
+                    }
+
+                    else if (objectName == "EasterEgg")
+                    {
+                        var gobj = Instantiate(easterEggPrefab, transform, false);
+                        gobj.name = "EasterEgg";
+
+                        var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
+                        var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+
+                        var localScale = gobj.transform.localScale;
+
+                        gobj.transform.localPosition = position;
+                        gobj.transform.localRotation = rotation;
+                        gobj.transform.localScale = new Vector3(scale.x * localScale.x, scale.y * localScale.y, scale.z * localScale.z);
+                    }
+
+                    else if (objectName == "RandomPowerUpItem")
+                    {
+                        var gobj = Instantiate(randomPowerupPrefab, transform, false);
+                        gobj.name = "RandomPowerUpItem";
+
+                        var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
+                        var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+
+                        var localScale = gobj.transform.localScale;
+
+                        gobj.transform.localPosition = position;
+                        gobj.transform.localRotation = rotation;
+                        gobj.transform.localScale = new Vector3(scale.x * localScale.x, scale.y * localScale.y, scale.z * localScale.z);
                     }
                 }
 

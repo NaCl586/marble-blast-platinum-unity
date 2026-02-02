@@ -21,6 +21,7 @@ public class CollisionInfo
 	public Collider collider;
 	public float friction;
 	public float restitution;
+	public float bounce;
 	public float contactDistance;
 }
 
@@ -349,6 +350,7 @@ public class Movement : MonoBehaviour
 								contactDistance = Mathf.Sqrt(contactDist),
 								restitution = _meshCollider.gameObject.GetComponent<FrictionComponent>()?.restitution ?? 1.0f,
 								friction = _meshCollider.gameObject.GetComponent<FrictionComponent>()?.friction ?? 1.0f,
+								bounce = _meshCollider.gameObject.GetComponent<FrictionComponent>()?.bounce ?? 0.0f,
 								velocity = colliderVelocity
 							};
 
@@ -811,7 +813,7 @@ public class Movement : MonoBehaviour
 		}
 
 		//bouncy floor
-		if (contacts.Count > 0 && bounce > 0)
+		if (contacts.Count > 0 && contacts[0].bounce > 0)
         {
 			Vector3 n = contacts[0].normal.normalized;
 
@@ -820,7 +822,7 @@ public class Movement : MonoBehaviour
 
 			// remove it
 			marbleVelocity -= normalComponent * n;
-			marbleVelocity += n * bounce;
+			marbleVelocity += n * contacts[0].bounce;
 			return;
         }
 

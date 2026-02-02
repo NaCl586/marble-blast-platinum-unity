@@ -199,7 +199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   powerupType: 2
-  powerupName: Super Speed PowerUp!
+  powerupName: Speed Booster PowerUp!
   autoUse: 0
   respawnTime: 7
   pickupSound: {fileID: 8300000, guid: ad1709c1a2174104ebfb5348b1c167fc, type: 3}

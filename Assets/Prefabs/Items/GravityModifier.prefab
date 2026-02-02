@@ -141,17 +141,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a974e7a6b7f89f745bcf363db3718d55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  powerupType: 8
-  powerupName: Gravity Modifier!
+  powerupType: 6
+  powerupName: Gravity Defyer!
   autoUse: 1
   respawnTime: 7
   pickupSound: {fileID: 8300000, guid: 050a81174f2e7054d8a1c8a78ef94dca, type: 3}
   useSound: {fileID: 0}
   meshRenderer: {fileID: 0}
   skinnedMeshRenderer: {fileID: 3577531354476464539}
-  anim: {fileID: 96301081124053331}
   isActive: 1
   rotateMesh: 1
+  showHelpOnPickup: 0
   upVectorFrom: {fileID: 96301081830777587}
   upVectorTo: {fileID: 989020652508248212}
   transitionTime: 0.25
