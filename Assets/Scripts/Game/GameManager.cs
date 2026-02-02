@@ -19,12 +19,30 @@ public class GameManager : MonoBehaviour
 
         Marble.onRespawn.AddListener(Respawn);
 
+        StartCoroutine(AssignReferences());
+    }
+
+    public GameObject mainCam;
+    public GameObject gameUIManager;
+
+    IEnumerator AssignReferences()
+    {
+        while (!Marble.instance)
+        {
+            yield return null;
+        }
+
+        startPad = GameObject.Find("StartPad");
+        finishPad = GameObject.Find("EndPad");
+
+        mainCam.SetActive(true);
+        gameUIManager.SetActive(true);
+
         activeCheckpoint = startPad.transform.Find("Spawn");
     }
 
-    [Header("Level Objects")]
-    public GameObject startPad;
-    public GameObject finishPad;
+    [HideInInspector] public GameObject startPad;
+    [HideInInspector] public GameObject finishPad;
 
     [Space]
     [Header("Audio Clips")]
@@ -193,6 +211,8 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        if (activeCheckpoint == null) return;
+
         //Handle Timer
         if (startTimer && !timeTravelActive)
         {

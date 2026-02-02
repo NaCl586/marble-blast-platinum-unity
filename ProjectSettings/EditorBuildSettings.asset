@@ -26,4 +26,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Game.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/Skybox/advanced_sky.unity
+    guid: 80f0557c1170c3949b4305f0dcbb14c2
+  - enabled: 1
+    path: Assets/Scenes/Skybox/expert_sky.unity
+    guid: c83ff6b801b6eca4b916c905a7b14a70
   m_configObjects: {}

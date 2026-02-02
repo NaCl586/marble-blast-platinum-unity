@@ -20,110 +20,12 @@ public class Dif : MonoBehaviour {
     [Header("Collision / Chunking")]
     public int maxTrianglesPerChunk = 1000;
 
-    public bool GenerateMovingPlatformMesh(int interiorIndex)
-    {
-        // Ensure MeshFilter and MeshRenderer exist
-        var meshFilter = gameObject.GetComponent<MeshFilter>() ?? gameObject.AddComponent<MeshFilter>();
-        var meshRenderer = gameObject.GetComponent<MeshRenderer>() ?? gameObject.AddComponent<MeshRenderer>();
-
-        // Load DIF resource
-        var resource = DifResourceManager.getResource(Path.Combine(Application.streamingAssetsPath, filePath), interiorIndex);
-
-        if (resource == null)
-        {
-            Debug.LogError("Dif decode failed");
-            return false;
-        }
-
-        if (resource.vertices == null ||
-            resource.normals == null ||
-            resource.tangents == null ||
-            resource.uvs == null)
-        {
-            Debug.LogError(
-                $"Invalid DIF resource\n" +
-                $"verts: {resource.vertices != null}\n" +
-                $"normals: {resource.normals != null}\n" +
-                $"tangents: {resource.tangents != null}\n" +
-                $"uvs: {resource.uvs != null}"
-            );
-
-            return false;
-        }
-
-
-        // Torque (Z-up) → Unity (Y-up)
-        Quaternion torqueToUnity = Quaternion.Euler(90f, 0f, 0f);
-
-        // --- Render Mesh (visuals) ---
-        Mesh renderMesh = new Mesh();
-        renderMesh.name = Path.GetFileNameWithoutExtension(filePath);
-
-        renderMesh.vertices = resource.vertices
-            .Select(p => torqueToUnity * new Vector3(p.x, -p.y, p.z))
-            .ToArray();
-
-        renderMesh.normals = resource.normals
-            .Select(n => torqueToUnity * new Vector3(n.x, -n.y, n.z))
-            .ToArray();
-
-        renderMesh.uv = resource.uvs;
-
-        renderMesh.tangents = resource.tangents
-            .Select(t =>
-            {
-                Vector3 v = torqueToUnity * new Vector3(t.x, -t.y, t.z);
-                return new Vector4(v.x, v.y, v.z, t.w);
-            })
-            .ToArray();
-
-        renderMesh.subMeshCount = resource.triangleIndices.Length;
-        for (int i = 0; i < resource.triangleIndices.Length; i++)
-            renderMesh.SetTriangles(resource.triangleIndices[i], i);
-
-        renderMesh.RecalculateBounds();
-        meshFilter.mesh = renderMesh;
-
-        // --- Physics Mesh (collider) ---
-        Mesh physicsMesh = new Mesh();
-        physicsMesh.vertices = renderMesh.vertices;
-        physicsMesh.triangles = renderMesh.triangles;
-
-        physicsMesh = WeldPhysicsMesh(physicsMesh, 0.0001f);
-        physicsMesh = FlatShadePhysicsMesh(physicsMesh);
-
-        physicsMesh.RecalculateNormals();
-        physicsMesh.RecalculateTangents();
-        physicsMesh.RecalculateBounds();
-
-        var meshCollider = gameObject.GetComponent<MeshCollider>() ?? gameObject.AddComponent<MeshCollider>();
-        meshCollider.sharedMesh = physicsMesh;
-        meshCollider.convex = false;
-
-        // --- Materials ---
-        Material[] materials = new Material[resource.triangleIndices.Length];
-        for (int i = 0; i < materials.Length; i++)
-        {
-            var materialPath = ResolveTexturePath(resource.materials[i]);
-            materials[i] = DefaultMaterial;
-
-            if (File.Exists(materialPath))
-            {
-                var tex = new Texture2D(2, 2);
-                tex.LoadImage(File.ReadAllBytes(materialPath));
-
-                materials[i] = Instantiate(DefaultMaterial);
-                materials[i].mainTexture = tex;
-                materials[i].name = resource.materials[i];
-            }
-        }
-        meshRenderer.materials = materials;
-
-        return true;
-    }
+    bool isMovingPlatform;
 
     public bool GenerateMesh(int interiorIndex)
     {
+        isMovingPlatform = (interiorIndex != -1);
+
         // Load DIF resource
         var resource = DifResourceManager.getResource(Path.Combine(Application.streamingAssetsPath, filePath), interiorIndex);
 
@@ -158,6 +60,8 @@ public class Dif : MonoBehaviour {
 
         int chunkIndex = 0;
 
+        var materialTriMap = new Dictionary<string, List<int>>();
+
         for (int mat = 0; mat < resource.triangleIndices.Length; mat++)
         {
             int[] materialTris = resource.triangleIndices[mat];
@@ -167,39 +71,28 @@ public class Dif : MonoBehaviour {
             string matName = resource.materials[mat];
             Material material = ResolveMaterial(matName);
 
-            List<int> triangleBuffer = new List<int>(maxTrianglesPerChunk * 3);
+            if (!materialTriMap.ContainsKey(matName))
+                materialTriMap[matName] = new List<int>();
+            materialTriMap[matName].AddRange(materialTris);
+        }
 
-            for (int i = 0; i < materialTris.Length; i += 3)
+        // Create chunks
+        foreach (var kvp in materialTriMap)
+        {
+            string matName = kvp.Key;
+            List<int> allTris = kvp.Value;
+            Material material = ResolveMaterial(matName);
+
+            for (int i = 0; i < allTris.Count; i += maxTrianglesPerChunk * 3)
             {
-                triangleBuffer.Add(materialTris[i]);
-                triangleBuffer.Add(materialTris[i + 1]);
-                triangleBuffer.Add(materialTris[i + 2]);
+                int triCount = Mathf.Min(maxTrianglesPerChunk * 3, allTris.Count - i);
+                int[] tris = allTris.GetRange(i, triCount).ToArray();
 
-                if (triangleBuffer.Count >= maxTrianglesPerChunk * 3)
-                {
-                    CreateChunk(
-                        chunkIndex++,
-                        triangleBuffer.ToArray(),
-                        torqueToUnity,
-                        resource,
-                        material
-                    );
-                    triangleBuffer.Clear();
-                }
-            }
-
-            // Flush remainder
-            if (triangleBuffer.Count > 0)
-            {
-                CreateChunk(
-                    chunkIndex++,
-                    triangleBuffer.ToArray(),
-                    torqueToUnity,
-                    resource,
-                    material
-                );
+                CreateChunk(chunkIndex, tris, torqueToUnity, resource, material);
+                chunkIndex++;
             }
         }
+
         return true;
     }
 
@@ -234,6 +127,13 @@ public class Dif : MonoBehaviour {
         var mf = chunk.AddComponent<MeshFilter>();
         var mr = chunk.AddComponent<MeshRenderer>();
 
+        if(isMovingPlatform)
+        {
+            var rb = chunk.AddComponent<Rigidbody>();
+            rb.isKinematic = true;
+            rb.useGravity = false;
+        }
+
         mf.sharedMesh = mesh;
         mr.sharedMaterial = material; // ✅ CORRECT MATERIAL
 
@@ -247,9 +147,22 @@ public class Dif : MonoBehaviour {
         var mc = chunk.AddComponent<MeshCollider>();
         mc.sharedMesh = physicsMesh;
         mc.convex = false;
+
+        // Friction
+        var friction = chunk.AddComponent<FrictionComponent>();
+        // Resolve friction
+        if (materialDict.TryGetValue(material.name, out var matProps))
+        {
+            friction.friction = matProps.friction;
+            friction.restitution = matProps.restitution;
+            friction.bounce = matProps.force;
+        }
+        else
+        {
+            friction.friction = 1.0f;
+            friction.restitution = 1.0f;
+        }
     }
-
-
 
     Material ResolveMaterial(string materialName)
     {
@@ -408,4 +321,37 @@ public class Dif : MonoBehaviour {
 
 		return texture;
 	}
+
+    static Dictionary<string, (float friction, float restitution, float force)> materialDict = new Dictionary<string, (float, float, float)>()
+    {
+        {"friction_none", (0.01f, 0.5f, 0f)},
+        {"friction_low", (0.2f, 0.5f, 0f)},
+        {"friction_low_shadow", (0.2f, 0.5f, 0f)},
+        {"friction_high", (4.5f, 0.5f, 0f)},
+        {"friction_high_shadow", (4.5f, 0.5f, 0f)},
+        {"friction_ultrahigh", (4.5f, 0.5f, 0f)},
+        {"friction_ramp_yellow", (2.0f, 1.0f, 0f)},
+        {"oilslick", (0.05f, 0.5f, 0f)},
+        {"base.slick", (0.05f, 0.5f, 0f)},
+        {"ice.slick", (0.05f, 0.5f, 0f)},
+        {"grass", (1.5f, 0.35f, 0f)},
+        {"ice1", (0.03f, 0.95f, 0f)},
+        {"rug", (6.0f, 0.5f, 0f)},
+        {"tarmac", (0.35f, 0.7f, 0f)},
+        {"carpet", (6.0f, 0.5f, 0f)},
+        {"sand", (4.0f, 0.1f, 0f)},
+        {"water", (6.0f, 0.0f, 0f)},
+        {"floor_bounce", (0.2f, 0.0f, 15f)},
+        {"mbp_chevron_friction", (-1.0f, 1.0f, 0f)},
+        {"mbp_chevron_friction2", (-1.0f, 1.0f, 0f)},
+        {"mbp_chevron_friction3", (-1.0f, 1.0f, 0f)},
+        {"mmg_grass", (0.9f, 0.5f, 0f)},
+        {"mmg_sand", (6.0f, 0.1f, 0f)},
+        {"mmg_water", (6.0f, 0.0f, 0f)},
+        {"mmg_ice", (0.03f, 0.95f, 0f)},
+        {"mmg_ice_shadow", (0.03f, 0.95f, 0f)},
+        {"friction_mp_high", (6f, 0.3f, 0f)},
+        {"friction_mp_high_shadow", (6f, 0.3f, 0f)},
+        {"friction_bouncy", (0.2f, 2.0f, 15f)}
+    };
 }

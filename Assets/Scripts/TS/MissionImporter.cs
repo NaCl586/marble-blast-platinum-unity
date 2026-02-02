@@ -7,6 +7,7 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
 using System.Globalization;
+using UnityEngine.SceneManagement;
 
 namespace TS
 {
@@ -75,6 +76,8 @@ namespace TS
         List<GameObject> destinationTriggers = new List<GameObject>();
         List<GameObject> teleportTriggers = new List<GameObject>();
 
+        private float[] sunColor;
+
         void Start()
         {
             ImportMission();
@@ -119,22 +122,13 @@ namespace TS
                 if (obj.ClassName == "Sun")
                 {
                     var direction = ConvertDirection(ParseVectorString(obj.GetField("direction")));
-                    var color = ConvertColor(ParseVectorString(obj.GetField("color")));
-                    var ambient = ConvertAmbient(ParseVectorString(obj.GetField("ambient")));
+                    sunColor = ParseVectorString(obj.GetField("color"));
+                    var ambient = ParseVectorString(obj.GetField("ambient"));
 
                     directionalLight.transform.localRotation = direction;
-                    directionalLight.color = color;
-                    RenderSettings.ambientLight = ambient;
-                }
-
-                else if(obj.ClassName == "Sky")
-                {
-                    var skybox = ResolvePath(obj.GetField("materialList"), MissionInfo.instance.MissionPath);
-
-                    float intensity;
-                    SkyboxManager.instance.ApplySkybox(Path.GetFileNameWithoutExtension(skybox).ToLower(), out intensity);
-
-                    directionalLight.intensity = ConvertIntensity(directionalLight.color, intensity);
+                    directionalLight.color = new Color(sunColor[0], sunColor[1], sunColor[2], 1f);
+                    
+                    RenderSettings.ambientLight = new Color(ambient[0], ambient[1], ambient[2], 1f);
                 }
 
                 //Gem
@@ -948,7 +942,7 @@ namespace TS
 
                         // Parse interiorIndex from mission file
                         indexStr = int.Parse(pathedInterior.GetField("interiorIndex"));
-                        dif.GenerateMovingPlatformMesh(indexStr);
+                        dif.GenerateMesh(indexStr);
 
                         movingPlatform = gobj.GetComponent<MovingPlatform>();
 
@@ -1048,6 +1042,14 @@ namespace TS
                 }
             }
 
+            StartCoroutine(DelayBeforeRespawn());
+        }
+
+        IEnumerator DelayBeforeRespawn()
+        {
+            while (!GameManager.instance.startPad)
+                yield return null;
+
             globalMarble.GetComponent<Movement>().GenerateMeshData();
 
             Time.timeScale = 1f;
@@ -1057,57 +1059,48 @@ namespace TS
             GameManager.instance.PlayLevelMusic();
 
             directionalLight.GetComponent<Light>().shadows = PlayerPrefs.GetInt("Graphics_Shadow", 1) == 1 ? LightShadows.Soft : LightShadows.None;
+            directionalLight.intensity = ConvertIntensity(sunColor);
+
+            AsyncOperation unloadOp = SceneManager.UnloadSceneAsync("Loading");
+            while (!unloadOp.isDone)
+                yield return null;
+
+            SceneManager.SetActiveScene(SceneManager.GetSceneByName(MissionInfo.instance.skybox));
+
+            CameraController.instance.GetComponent<Camera>().enabled = true;
+            GameUIManager.instance.GetComponent<Canvas>().enabled = true;
+
+            Invoke(nameof(EnableSounds), 0.1f);
 
             Marble.onRespawn?.Invoke();
+        }
+
+        void EnableSounds()
+        {
+            var sounds = Marble.instance.transform.Find("Sounds");
+            var audioSources = sounds.GetComponentsInChildren<AudioSource>(true);
+            var rolling = audioSources.First(a => a.name == "Rolling");
+            var sliding = audioSources.First(a => a.name == "Sliding");
+            rolling.Play();
+            sliding.Play();
         }
 
         // -------------------------    
         // Conversion helpers
         // -------------------------
-
-        Color ConvertColor(float[] torqueRGBA)
-        {
-            if (torqueRGBA == null || torqueRGBA.Length < 3)
-                return Color.white;
-
-            float r = torqueRGBA[0];
-            float g = torqueRGBA[1];
-            float b = torqueRGBA[2];
-            float a = torqueRGBA.Length > 3 ? torqueRGBA[3] : 1f;
-
-            float intensity = Mathf.Max(r, g, b);
-            if (intensity <= 0f)
-                intensity = 1f;
-
-            return new Color(r / intensity, g / intensity, b / intensity, a);
-        }
-
-        float ConvertIntensity(Color torqueColor, float intensityScale = 1.0f)
+        float ConvertIntensity(float[] torqueColor)
         {
             // Torque stores brightness in RGB
             float intensity = Mathf.Max(
-                torqueColor.r,
-                torqueColor.g,
-                torqueColor.b
+                torqueColor[0],
+                torqueColor[1],
+                torqueColor[2]
             );
 
             if (intensity <= 0f)
                 intensity = 1f;
 
-            return intensity * intensityScale;
-        }
-
-        Color ConvertAmbient(float[] torqueRGBA)
-        {
-            if (torqueRGBA == null || torqueRGBA.Length < 3)
-                return Color.black;
-
-            return new Color(
-                torqueRGBA[0],
-                torqueRGBA[1],
-                torqueRGBA[2],
-                1f
-            );
+            return intensity;
         }
 
         Quaternion ConvertDirection(float[] torqueDir)

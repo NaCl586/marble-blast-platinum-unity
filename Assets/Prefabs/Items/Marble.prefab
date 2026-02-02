@@ -436,7 +436,6 @@ GameObject:
   - component: {fileID: 5528955957562662288}
   - component: {fileID: 6222272426371884095}
   - component: {fileID: 2259544043996708080}
-  - component: {fileID: 4115090105305160933}
   - component: {fileID: 3094592717009676412}
   m_Layer: 0
   m_Name: Marble
@@ -570,8 +569,6 @@ MonoBehaviour:
   marbleAngularVelocity: {x: 0, y: 0, z: 0}
   collidedTexture: {fileID: 0}
   defaultMaterial: {fileID: 13400000, guid: 9f602b3fd3a59419e8822de779a930ea, type: 2}
-  marbleRadius: 0
-  lastNormal: {x: 0, y: 0, z: 0}
 --- !u!114 &2259544043996708080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -601,42 +598,7 @@ MonoBehaviour:
   bounceParticle: {fileID: 2747320370206154753, guid: 99e7300f735da1546ad1571b44ea5c84,
     type: 3}
   movement: {fileID: 6222272426371884095}
-  frictionManager: {fileID: 4115090105305160933}
---- !u!114 &4115090105305160933
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2419521798252407534}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e489c2c315299b740962e3e49a1eab31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  frictions:
-  - {fileID: 11400000, guid: 7c376d57190d77b4aa7fe04f605d9082, type: 2}
-  - {fileID: 11400000, guid: 4bd3b3fc5198f77488609f2ab68403f3, type: 2}
-  - {fileID: 11400000, guid: 45bde35a947462b4da02b0c156eaaa38, type: 2}
-  - {fileID: 11400000, guid: 700211cb0a28a974ca9f12cf673ac75b, type: 2}
-  - {fileID: 11400000, guid: 0d80b976a83403d41882e403512c61ed, type: 2}
-  - {fileID: 11400000, guid: bb72f734d4351e741ac9c395078f1f36, type: 2}
-  - {fileID: 11400000, guid: 4c63ea64589eee044b2243fa7ede7bc2, type: 2}
-  - {fileID: 11400000, guid: 67fcf06cff2a205428c3b141c6c4d27e, type: 2}
-  - {fileID: 11400000, guid: 45badb080a1e63f4e9d2f4404c55c881, type: 2}
-  - {fileID: 11400000, guid: 651d555b8bf2a3a408a19406ea069107, type: 2}
-  - {fileID: 11400000, guid: bbcc5949ea605f941af37ee93cc0df46, type: 2}
-  - {fileID: 11400000, guid: fe88b55fb87e04c45b6294e69a490c37, type: 2}
-  - {fileID: 11400000, guid: c752d692d77fbaf438a432303190e6a6, type: 2}
-  - {fileID: 11400000, guid: 39b89bf9bab863240a18e3b1325501ef, type: 2}
-  - {fileID: 11400000, guid: 3e4fa24ddf5ee0943aab4b51907ae978, type: 2}
-  - {fileID: 11400000, guid: bff97a9f0cdb07f43a8035525350950b, type: 2}
-  - {fileID: 11400000, guid: dd3bfdd9ce0af6347981dbbf3cdde76a, type: 2}
-  - {fileID: 11400000, guid: 668cb370579c0e249b73370cced16658, type: 2}
-  defaultPhysicMaterial: {fileID: 13400000, guid: 9f602b3fd3a59419e8822de779a930ea,
-    type: 2}
-  m_restitution: 0
-  fac: 4
+  frictionManager: {fileID: 0}
 --- !u!82 &3094592717009676412
 AudioSource:
   m_ObjectHideFlags: 0

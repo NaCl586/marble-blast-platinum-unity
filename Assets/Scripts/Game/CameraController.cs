@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class CameraController : MonoBehaviour
 {
@@ -21,18 +22,25 @@ public class CameraController : MonoBehaviour
     public void Awake()
     {
         instance = this;
-        instance = this;
     }
 
     public void Start()
     {
-        marble = Marble.instance.transform;
-        offset = marble.position - transform.position;
-
         lastGravityDir = GravitySystem.GravityDir;
 
         onCameraFinish.AddListener(FinishCameraPan);
         GravityModifier.onGravityChanged.AddListener(OnGravityChanged);
+
+        StartCoroutine(AssignReferences());
+    }
+
+    IEnumerator AssignReferences()
+    {
+        while (!Marble.instance)
+            yield return null;
+
+        marble = Marble.instance.transform;
+        offset = marble.position - transform.position;
     }
 
     public void OnGravityChanged(Vector3 oldDir, Vector3 newDir)

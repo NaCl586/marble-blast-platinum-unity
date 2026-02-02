@@ -25,7 +25,6 @@ public class Marble : MonoBehaviour
     public GameObject bounceParticle;
 
     public Movement movement;
-    public FrictionManager frictionManager;
     public class OnRespawn : UnityEvent { };
     public static OnRespawn onRespawn = new OnRespawn();
 
@@ -148,9 +147,9 @@ public class Marble : MonoBehaviour
         GameManager.instance.shockAbsorberIsActive = false;
 
         if (GameManager.instance.shockAbsorberIsActive)
-            movement.bounceRestitution = 0;
+            movement.bounceRestitution = 0.01f;
         else if (GameManager.instance.superBounceIsActive)
-            movement.bounceRestitution = 1;
+            movement.bounceRestitution = 0.9f;
         else
             movement.bounceRestitution = 0.5f;
     }
@@ -168,8 +167,7 @@ public class Marble : MonoBehaviour
             GameManager.instance.superBounceIsActive = true;
 
             //marble is changed into super bounce material
-            frictionManager.RevertMaterial();
-            movement.bounceRestitution = 1f;
+            movement.bounceRestitution = 0.9f;
         }
     }
 
@@ -187,8 +185,7 @@ public class Marble : MonoBehaviour
             GameManager.instance.shockAbsorberIsActive = true;
 
             //marble is changed into super bounce material
-            frictionManager.RevertMaterial();
-            movement.bounceRestitution = 0f;
+            movement.bounceRestitution = 0.01f;
         }
     }
 

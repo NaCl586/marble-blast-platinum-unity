@@ -44,13 +44,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5e842bfe8d947ec4eb686982352eaab3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  MissionPath: 
+  highScoreName: 
+  MissionPath: marble/data/missions_mbp/expert/Stamina.mis
   missionName: 
   time: 0
   levelName: 
   description: 
   startHelpText: 
-  level: 0
+  level: 24
   artist: 
   goldTime: 0
   ultimateTime: 0
+  skybox: expert_sky
+  missionsBeginner: []
+  missionsIntermediate: []
+  missionsAdvanced: []
+  missionsCustom: []
