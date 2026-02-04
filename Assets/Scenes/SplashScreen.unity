@@ -240,6 +240,8 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 4a4d33c5cf159d749a442e965d5bb5e5, type: 3}
   - {fileID: 21300000, guid: 7d20b80ab2e2b12409d3d3020c29af83, type: 3}
   - {fileID: 21300000, guid: 1db98f4bc217dcf4bbc7b12b2b5878e8, type: 3}
+  numbersGreen: []
+  numbersRed: []
   timerNumbers:
   - {fileID: 0}
   - {fileID: 0}
@@ -250,6 +252,7 @@ MonoBehaviour:
   - {fileID: 0}
   centerText: {fileID: 0}
   bottomText: {fileID: 0}
+  fpsText: {fileID: 0}
   powerupIcon:
   - {fileID: 8400000, guid: 767cb85301f1cd542bc130902b99e5f6, type: 2}
   - {fileID: 8400000, guid: 4f95d9a135be3b144aa44be0cbeaf305, type: 2}
@@ -692,9 +695,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   image: {fileID: 1519295543}
-  production: {fileID: 21300000, guid: cabd90001942c00439842ff19e04f47b, type: 3}
-  presents: {fileID: 21300000, guid: e6d0412b043a412458c2fa460253b793, type: 3}
-  title: {fileID: 21300000, guid: 4494c71fe5bf5854690a03e8ff6c4031, type: 3}
+  production: {fileID: 21300000, guid: d67faaf2c9ed0ff4d99709500b9399f9, type: 3}
+  presents: {fileID: 21300000, guid: 45975b1e734129446a88e924a3baa7fa, type: 3}
+  title: {fileID: 21300000, guid: 35d0afab02ea0ea41a5a59b35ccb7ad4, type: 3}
 --- !u!1001 &1896716833
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -819,9 +822,9 @@ Camera:
   m_NormalizedViewPortRect:
     serializedVersion: 2
     x: 0
-    y: 0
+    y: 0.000053048134
     width: 1
-    height: 1
+    height: 0.9998939
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 60

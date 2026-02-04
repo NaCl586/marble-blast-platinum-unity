@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -144,7 +145,7 @@ public class GameUIManager : MonoBehaviour
     {
         centerTextFade?.Kill();
 
-        _text = Utils.Resolve(_text).Replace("\\", "");
+        _text = Regex.Unescape(_text);
 
         centerText.color = Color.white;
         centerText.text = _text;

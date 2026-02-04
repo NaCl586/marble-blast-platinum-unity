@@ -27,6 +27,9 @@ public class Marble : MonoBehaviour
     public GameObject bounceParticle;
 
     public Movement movement;
+    public GameObject normalMesh;
+    public GameObject teleportMesh;
+
     public class OnRespawn : UnityEvent { };
     public static OnRespawn onRespawn = new OnRespawn();
 

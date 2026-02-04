@@ -328,7 +328,7 @@ public class GameManager : MonoBehaviour
             yield return null; // wait exactly one frame
         }
 
-        GameUIManager.instance.SetCenterText("The clock has passed the par time.");
+        GameUIManager.instance.SetCenterText("The clock has passed the Par Time - please retry the level.");
         Marble.instance.alarmSound.Stop();
         PlayAudioClip(overParTimeSfx);
     }
@@ -565,7 +565,7 @@ public class GameManager : MonoBehaviour
         //Missing gems
         if (totalGems != 0 && totalGems != currentGems)
         {
-            GameUIManager.instance.SetBottomText("You can't finish without all gems!");
+            GameUIManager.instance.SetBottomText("You can't finish without all diamonds!");
 
             PlayMissingGemAudio();
         }

@@ -42,7 +42,10 @@ public class HelpCreditsManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene("MainMenu");
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            SceneManager.LoadScene("MainMenu");
+        }
     }
 
     public void UpdateHUDMaterial()
@@ -81,6 +84,8 @@ public class HelpCreditsManager : MonoBehaviour
 
     public void Start()
     {
+        MenuMusic.instance.PlayQuietLab();
+
         Time.timeScale = 1f;
         UpdateHUDMaterial();
 

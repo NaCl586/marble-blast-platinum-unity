@@ -21,7 +21,7 @@ public class Teleport : MonoBehaviour
     void Start()
     {
         player = Marble.instance.gameObject;
-        material = player.transform.Find("U3DMesh").GetComponent<SkinnedMeshRenderer>().material;
+        material = Marble.instance.teleportMesh.GetComponent<SkinnedMeshRenderer>().material;
         originalColor = material.color;
     }
 
@@ -29,17 +29,25 @@ public class Teleport : MonoBehaviour
     {
         if (other.gameObject.TryGetComponent<Movement>(out var movement))
         {
-            teleporting = true;
+            if (destination)
+            {
+                teleporting = true;
 
-            teleportTime = initTime = time;
-            Invoke("TeleportMarble", time);
+                teleportTime = initTime = time;
+                Invoke("TeleportMarble", time);
 
-            Marble.instance.teleportSound.volume = PlayerPrefs.GetFloat("Audio_SoundVolume", 0.5f);
-            Marble.instance.teleportSound.Play();
+                Marble.instance.teleportSound.volume = PlayerPrefs.GetFloat("Audio_SoundVolume", 0.5f);
+                Marble.instance.teleportSound.Play();
 
-            GameUIManager.instance.SetBottomText("Teleporter has been activated, please wait.", teleportTime);
+                GameUIManager.instance.SetBottomText("Teleporter has been activated, please wait.", teleportTime);
 
-            StartCoroutine(TeleportFade());
+                SetTransparent();
+                StartCoroutine(TeleportFade());
+            }
+            else
+            {
+                GameUIManager.instance.SetBottomText("Teleporter has no destination.");
+            }
         }
     }
 
@@ -48,7 +56,8 @@ public class Teleport : MonoBehaviour
         if (other.gameObject.TryGetComponent<Movement>(out var movement))
         {
             teleporting = false;
-            material.color = originalColor;
+
+            SetOpaque();
 
             Marble.instance.teleportSound.DOFade(0, 0.5f);
 
@@ -73,6 +82,8 @@ public class Teleport : MonoBehaviour
         cameraPos.transform.position = targetPos;
         player.GetComponent<Movement>().SetPosition(targetPos);
         Camera.main.GetComponent<CameraController>().SetCameraPosition(cameraPos.transform.GetChild(0).position, cameraPos.transform.GetChild(1).position);
+        
+        SetOpaque();
         material.color = originalColor;
     }
 
@@ -92,5 +103,17 @@ public class Teleport : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    void SetTransparent()
+    {
+        Marble.instance.normalMesh.SetActive(false);
+        Marble.instance.teleportMesh.SetActive(true);
+    }
+
+    void SetOpaque()
+    {
+        Marble.instance.normalMesh.SetActive(true);
+        Marble.instance.teleportMesh.SetActive(false);
     }
 }

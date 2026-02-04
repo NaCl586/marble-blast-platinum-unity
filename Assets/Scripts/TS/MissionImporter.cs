@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Antlr4.Runtime;
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using Antlr4.Runtime;
 using UnityEngine;
-using System.Collections;
-using UnityEngine.UI;
-using System.Globalization;
 using UnityEngine.SceneManagement;
 
 namespace TS
@@ -127,7 +126,7 @@ namespace TS
 
                     directionalLight.transform.localRotation = direction;
                     directionalLight.color = new Color(sunColor[0], sunColor[1], sunColor[2], 1f);
-                    
+
                     RenderSettings.ambientLight = new Color(ambient[0], ambient[1], ambient[2], 1f);
                 }
 
@@ -442,7 +441,7 @@ namespace TS
                             checkpoint.hasAddOrSub = true;
                             checkpoint.offset = ConvertPoint(ParseVectorString(offset));
                         }
-                        
+
                         var subOffset = obj.GetField("sub");
                         if (string.IsNullOrEmpty(subOffset))
                         {
@@ -984,7 +983,7 @@ namespace TS
                     else if (objectName == "TeleportTrigger")
                     {
                         var telObj = Instantiate(teleportTrigger, transform, false);
-                        telObj.name = "TeleportTrigger";
+                        telObj.name = string.IsNullOrEmpty(obj.Name) ? "TeleportTrigger" : obj.Name;
 
                         var time = obj.GetField("time");
                         telObj.GetComponent<Teleport>().time = string.IsNullOrEmpty(time) ? 2 : (float.Parse(time) / 1000);
@@ -1002,12 +1001,14 @@ namespace TS
                         telObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
 
                         teleportTriggers.Add(telObj);
+                        if (!string.IsNullOrEmpty(obj.Name))
+                            destinationTriggers.Add(telObj);
                     }
 
                     else if (objectName == "DestinationTrigger")
                     {
                         var destObj = Instantiate(destinationTrigger, transform, false);
-                        destObj.name = string.IsNullOrEmpty(obj.Name) ? "Checkpoint" : obj.Name;
+                        destObj.name = string.IsNullOrEmpty(obj.Name) ? "DestinationTrigger" : obj.Name;
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                         var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
@@ -1126,7 +1127,7 @@ namespace TS
                     movingPlatform.sequenceNumbers = new SequenceNumber[markers.Count];
                     List<SmoothingType> smoothingTypes = new List<SmoothingType>();
 
-                    for(int i = 0; i < markers.Count; i++)
+                    for (int i = 0; i < markers.Count; i++)
                     {
                         Vector3 pos = ConvertPoint(ParseVectorString(markers[i].GetField("position")));
                         int seq = i;
@@ -1162,9 +1163,9 @@ namespace TS
             {
                 Teleport tele = go.GetComponent<Teleport>();
                 string destination = tele.destinationGameObjectName;
-                foreach(GameObject dest in destinationTriggers)
+                foreach (GameObject dest in destinationTriggers)
                 {
-                    if(dest.name == destination)
+                    if (dest.name == destination)
                     {
                         tele.destination = dest;
                         break;
@@ -1177,17 +1178,15 @@ namespace TS
             {
                 if (obj.ClassName == "Trigger" && obj.GetField("dataBlock") == "CheckpointTrigger")
                 {
-                    foreach(GameObject go in checkpoints)
+                    foreach (GameObject go in checkpoints)
                     {
-                        if(obj.GetField("respawnPoint") == go.name)
+                        if (obj.GetField("respawnPoint") == go.name)
                         {
                             var cpTrigger = go.transform.Find("Trigger");
 
                             var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
                             var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
                             var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
-
-                            Debug.Log(position);
 
                             var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
@@ -1294,7 +1293,7 @@ namespace TS
             Vector3 axis = new Vector3(torqueRotation[0], -torqueRotation[1], torqueRotation[2]);
             Quaternion rot = Quaternion.AngleAxis(angle, axis);
 
-            if(additionalRotate) 
+            if (additionalRotate)
                 rot = Quaternion.Euler(-90.0f, 0, 0) * rot;
 
             return rot;

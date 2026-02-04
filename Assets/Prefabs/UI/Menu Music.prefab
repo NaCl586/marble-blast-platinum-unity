@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f578259bf06ee14a8946412f12b48e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pianoforte: {fileID: 8300000, guid: 2fdeda6837993854596041d19673d721, type: 3}
+  quietLab: {fileID: 8300000, guid: 3d1efe5a95ebab842b16f05ffb914fae, type: 3}
 --- !u!82 &6282470756204499560
 AudioSource:
   m_ObjectHideFlags: 0

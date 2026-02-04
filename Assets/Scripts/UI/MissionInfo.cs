@@ -8,6 +8,7 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TS;
+using System.Text.RegularExpressions;
 
 public class MissionInfo : MonoBehaviour
 {
@@ -43,6 +44,7 @@ public class MissionInfo : MonoBehaviour
     public int alarmTime;
     public string music;
     public string skybox;
+    public bool hasEgg;
 
     [Header("Load Mission")]
     public List<Mission> missionsPlatinumBeginner = new List<Mission>();
@@ -130,13 +132,14 @@ public class MissionInfo : MonoBehaviour
             {
                 sprite = null;
             }
-            
+
 
             Mission newMission = new Mission
             {
                 levelImage = sprite,
                 directory = path + difficulty.ToString() + "/" + levelName + ".mis",
                 levelNumber = -1,
+                hasEgg = false
             };
 
             var lexer = new TSLexer(
@@ -180,13 +183,13 @@ public class MissionInfo : MonoBehaviour
                     else
                         newMission.time = -1;
 
-                    newMission.missionName = levelName.Replace("\\", "");
-                    newMission.levelName = (obj.GetField("name").Replace("\\", ""));
-                    newMission.description = (obj.GetField("desc").Replace("\\", ""));
+                    newMission.missionName = Regex.Unescape(levelName);
+                    newMission.levelName = Regex.Unescape(obj.GetField("name"));
+                    newMission.description = Regex.Unescape(obj.GetField("desc"));
 
                     string startHelpText = obj.GetField("startHelpText");
-                    if(!string.IsNullOrEmpty(startHelpText))
-                        newMission.startHelpText = startHelpText.Replace("\\", "");
+                    if (!string.IsNullOrEmpty(startHelpText))
+                        newMission.startHelpText = Regex.Unescape(startHelpText);
 
                     int _level = 0;
                     if (int.TryParse(obj.GetField("level"), out _level))
@@ -221,6 +224,10 @@ public class MissionInfo : MonoBehaviour
                     var skybox = ResolvePath(obj.GetField("materialList"), MissionInfo.instance.MissionPath);
 
                     newMission.skyboxName = Path.GetFileNameWithoutExtension(skybox);
+                }
+                else if(obj.ClassName == "Item" && obj.GetField("dataBlock") == "EasterEgg")
+                {
+                    newMission.hasEgg = true;
                 }
             }
 

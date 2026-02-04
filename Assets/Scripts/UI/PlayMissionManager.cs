@@ -24,6 +24,7 @@ public class Mission
     public int alarmTime;
     public string music;
     public string skyboxName;
+    public bool hasEgg;
 }
 
 public enum Type
@@ -65,6 +66,9 @@ public class PlayMissionManager : MonoBehaviour
     public Button next;
     public Button play;
     public Button home;
+    public Image eggImage;
+    public Sprite egg;
+    public Sprite egg_nf;
     [Space]
     public bool debug = false;
 
@@ -325,6 +329,7 @@ public class PlayMissionManager : MonoBehaviour
         MissionInfo.instance.goldTime = missions[number].goldTime;
         MissionInfo.instance.ultimateTime = missions[number].ultimateTime;
         MissionInfo.instance.alarmTime = missions[number].alarmTime;
+        MissionInfo.instance.hasEgg = missions[number].hasEgg;
 
         string musicName = missions[number].music;
         musicName = string.IsNullOrEmpty(musicName) ? string.Empty : Path.GetFileNameWithoutExtension(musicName.Trim());
@@ -368,6 +373,19 @@ public class PlayMissionManager : MonoBehaviour
             {
                 bestTimesText.text += "\t" + Utils.FormatTime(_time) + "\n";
             }
+        }
+
+        if (missions[number].hasEgg)
+        {
+            eggImage.gameObject.SetActive(true);
+            if (PlayerPrefs.GetInt(MissionInfo.instance.levelName + "_EasterEgg", 0) == 1)
+                eggImage.sprite = egg;
+            else
+                eggImage.sprite = egg_nf;
+        }
+        else
+        {
+            eggImage.gameObject.SetActive(false);
         }
     }
 

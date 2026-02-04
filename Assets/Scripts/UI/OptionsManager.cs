@@ -161,25 +161,15 @@ public class OptionsManager : MonoBehaviour
         graphicsMenu.SetActive(false);
         audioMenu.SetActive(false);
         controlsMenu.SetActive(false);
-
-        graphicsButton.transform.SetAsFirstSibling();
-        audioButton.transform.SetAsFirstSibling();
-        controlsButton.transform.SetAsFirstSibling();
-
         switch (index)
         {
             case 0:
-                graphicsButton.transform.SetAsLastSibling();
                 graphicsMenu.SetActive(true); 
                 break;
             case 1:
-                audioButton.transform.SetAsLastSibling();
                 audioMenu.SetActive(true); 
                 break;
             case 2:
-                controlsButton.transform.SetAsLastSibling();
-                controlsMenu.transform.SetAsLastSibling();
-                homeButton.transform.SetAsLastSibling();
                 controlsMenu.SetActive(true); 
                 break;
         }
