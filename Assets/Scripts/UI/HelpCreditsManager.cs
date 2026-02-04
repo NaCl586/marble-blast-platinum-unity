@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-using TMPro;
+using UnityEngine.UI;
 
 public class HelpCreditsManager : MonoBehaviour
 {
@@ -44,6 +42,7 @@ public class HelpCreditsManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            MenuMusic.instance.PlayPianoforte();
             SceneManager.LoadScene("MainMenu");
         }
     }
@@ -91,7 +90,11 @@ public class HelpCreditsManager : MonoBehaviour
 
         next.onClick.AddListener(NextPage);
         prev.onClick.AddListener(PrevPage);
-        home.onClick.AddListener(() => SceneManager.LoadScene("MainMenu"));
+        home.onClick.AddListener(() =>
+        {
+            MenuMusic.instance.PlayPianoforte();
+            SceneManager.LoadScene("MainMenu");
+        });
 
         initOffset = captionText.GetComponent<RectTransform>().offsetMin.x;
 

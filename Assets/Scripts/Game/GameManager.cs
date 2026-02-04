@@ -238,7 +238,7 @@ public class GameManager : MonoBehaviour
             GameUIManager.instance.SetTimerText(elapsedTime);
         }
 
-        if (MissionInfo.instance.time != -1 && elapsedTime >= (MissionInfo.instance.time - MissionInfo.instance.alarmTime))
+        if (MissionInfo.instance.time != -1 && elapsedTime >= (MissionInfo.instance.time - MissionInfo.instance.alarmTime * 1000))
         {
             if (elapsedTime >= MissionInfo.instance.time)
             {
@@ -310,7 +310,7 @@ public class GameManager : MonoBehaviour
     public IEnumerator AlarmCoroutine()
     {
         GameUIManager.instance.SetCenterText(
-            "You have " + (MissionInfo.instance.alarmTime / 1000f) + " seconds remaining."
+            "You have " + (MissionInfo.instance.alarmTime) + " seconds remaining."
         );
 
         Marble.instance.alarmSound.Play();

@@ -17,8 +17,6 @@ public class MainMenuManager : MonoBehaviour
 
     public void Start()
     {
-        MenuMusic.instance.PlayPianoforte();
-
         playButton.onClick.AddListener(() => SceneManager.LoadScene("PlayMission"));
         helpButton.onClick.AddListener(() => SceneManager.LoadScene("HelpCredits"));
         optionsButton.onClick.AddListener(() => SceneManager.LoadScene("Options"));
