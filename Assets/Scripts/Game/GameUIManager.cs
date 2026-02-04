@@ -145,7 +145,7 @@ public class GameUIManager : MonoBehaviour
     {
         centerTextFade?.Kill();
 
-        _text = Regex.Unescape(_text);
+        _text = Utils.Resolve(Regex.Unescape(_text));
 
         centerText.color = Color.white;
         centerText.text = _text;
