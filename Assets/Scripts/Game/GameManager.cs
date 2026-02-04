@@ -741,7 +741,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < 3; i++)
         {
-            string _name = PlayerPrefs.GetString(MissionInfo.instance.levelName + "_Name_" + i, "Nardo Polo");
+            string _name = PlayerPrefs.GetString(MissionInfo.instance.levelName + "_Name_" + i, "Matan W.");
             float _time = PlayerPrefs.GetFloat(MissionInfo.instance.levelName + "_Time_" + i, -1);
             namesCaption.text += _name + "\n";
 
@@ -801,7 +801,7 @@ public class GameManager : MonoBehaviour
 
         for (int i = 1; i >= pos; i--)
         {
-            string playerName = PlayerPrefs.GetString(MissionInfo.instance.levelName + "_Name_" + i, "Nardo Polo");
+            string playerName = PlayerPrefs.GetString(MissionInfo.instance.levelName + "_Name_" + i, "Matan W.");
             float playerTime = PlayerPrefs.GetFloat(MissionInfo.instance.levelName + "_Time_" + i, -1);
             PlayerPrefs.SetString(MissionInfo.instance.levelName + "_Name_" + (i + 1), playerName);
             PlayerPrefs.SetFloat(MissionInfo.instance.levelName + "_Time_" + (i + 1), playerTime);
