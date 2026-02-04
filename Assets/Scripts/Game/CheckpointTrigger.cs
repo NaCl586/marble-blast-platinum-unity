@@ -17,6 +17,7 @@ public class CheckpointTrigger : MonoBehaviour
     void TriggerEnter()
     {
         CancelInvoke();
-        GameManager.onReachCheckpoint?.Invoke(baseCheckpoint.transform);
+        GameManager.onReachCheckpoint?.Invoke(baseCheckpoint.spawn, baseCheckpoint.checkpointGravityDir);
     }
 }
+    

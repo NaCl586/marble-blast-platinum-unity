@@ -66,4 +66,3 @@ MonoBehaviour:
   initialTargetPosition: 0
   initialPosition: 0
   resolution: 0.1
-  platformVelocity: {x: 0, y: 0, z: 0}

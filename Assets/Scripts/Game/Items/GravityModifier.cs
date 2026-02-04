@@ -44,6 +44,25 @@ public class GravityModifier : Powerups
         onGravityChanged?.Invoke(Vector3.down, Vector3.down);
     }
 
+    public static void ResetGravityGlobal(Vector3 targetDir)
+    {
+        if (targetDir.sqrMagnitude < 0.001f)
+            return;
+
+        targetDir.Normalize();
+
+        Vector3 startGravity = GravitySystem.GravityDir.normalized;
+
+        // Apply gravity immediately
+        GravitySystem.GravityDir = targetDir;
+
+        if (Marble.instance != null)
+            Marble.instance.gyrocopterBlades.transform.up = -targetDir;
+
+        // Notify listeners (single final event)
+        onGravityChanged?.Invoke(startGravity, targetDir);
+    }
+
     protected override void UsePowerup()
     {
         if (triggered || isRotating)

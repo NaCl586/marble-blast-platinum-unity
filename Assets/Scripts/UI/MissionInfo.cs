@@ -40,13 +40,19 @@ public class MissionInfo : MonoBehaviour
     public string artist;
     public int goldTime;
     public int ultimateTime;
+    public int alarmTime;
+    public string music;
     public string skybox;
 
     [Header("Load Mission")]
-    public List<Mission> missionsBeginner = new List<Mission>();
-    public List<Mission> missionsIntermediate = new List<Mission>();
-    public List<Mission> missionsAdvanced = new List<Mission>();
-    public List<Mission> missionsCustom = new List<Mission>();
+    public List<Mission> missionsPlatinumBeginner = new List<Mission>();
+    public List<Mission> missionsPlatinumIntermediate = new List<Mission>();
+    public List<Mission> missionsPlatinumAdvanced = new List<Mission>();
+    public List<Mission> missionsPlatinumExpert = new List<Mission>();
+    public List<Mission> missionsGoldBeginner = new List<Mission>();
+    public List<Mission> missionsGoldIntermediate = new List<Mission>();
+    public List<Mission> missionsGoldAdvanced = new List<Mission>();
+    public List<Mission> missionsGoldCustom = new List<Mission>();
 
     List<TSObject> MissionObjects;
 
@@ -54,17 +60,29 @@ public class MissionInfo : MonoBehaviour
     {
         highScoreName = PlayerPrefs.GetString("HighScoreName", "");
 
-        LoadMissions(Type.beginner);
-        LoadMissions(Type.intermediate);
-        LoadMissions(Type.advanced);
-        LoadMissions(Type.custom);
+        LoadMissions(Type.beginner, Game.platinum);
+        LoadMissions(Type.intermediate, Game.platinum);
+        LoadMissions(Type.advanced, Game.platinum);
+        LoadMissions(Type.expert, Game.platinum);
+        LoadMissions(Type.beginner, Game.gold);
+        LoadMissions(Type.intermediate, Game.gold);
+        LoadMissions(Type.advanced, Game.gold);
+        LoadMissions(Type.custom, Game.gold);
     }
 
-    public void LoadMissions(Type difficulty)
+    public void LoadMissions(Type difficulty, Game game)
     {
+        string path = string.Empty;
+        if (difficulty == Type.custom)
+            path = "marble/data/missions/";
+        else if (game == Game.platinum)
+            path = "marble/data/missions_mbp/";
+        else if(game == Game.gold)
+            path = "marble/data/missions_mbg/";
+
         string basePath = Path.Combine(
             Application.streamingAssetsPath,
-            "marble/data/missions_mbg/",
+            path,
             difficulty.ToString()
         );
 
@@ -117,7 +135,7 @@ public class MissionInfo : MonoBehaviour
             Mission newMission = new Mission
             {
                 levelImage = sprite,
-                directory = "marble/data/missions_mbg/" + difficulty.ToString() + "/" + levelName + ".mis",
+                directory = path + difficulty.ToString() + "/" + levelName + ".mis",
                 levelNumber = -1,
             };
 
@@ -189,6 +207,14 @@ public class MissionInfo : MonoBehaviour
                         newMission.ultimateTime = _ultimateTime;
                     else
                         newMission.ultimateTime = -1;
+
+                    int _alarmTime = 15;
+                    if (int.TryParse(obj.GetField("AlarmStartTime"), out _alarmTime))
+                        newMission.alarmTime = _alarmTime * 1000;
+                    else
+                        newMission.alarmTime = 15;
+
+                    newMission.music = obj.GetField("music");
                 }
                 else if (obj.ClassName == "Sky")
                 {
@@ -201,24 +227,53 @@ public class MissionInfo : MonoBehaviour
             if(newMission.levelImage)
                 newMission.levelImage.name = levelName;
 
-            if (difficulty == Type.beginner)
-                missionsBeginner.Add(newMission);
-            else if (difficulty == Type.intermediate)
-                missionsIntermediate.Add(newMission);
-            else if (difficulty == Type.advanced)
-                missionsAdvanced.Add(newMission);
-            else if (difficulty == Type.custom)
-                missionsCustom.Add(newMission);
+            if(game == Game.gold)
+            {
+                if (difficulty == Type.beginner)
+                    missionsGoldBeginner.Add(newMission);
+                else if (difficulty == Type.intermediate)
+                    missionsGoldIntermediate.Add(newMission);
+                else if (difficulty == Type.advanced)
+                    missionsGoldAdvanced.Add(newMission);
+                else if (difficulty == Type.custom)
+                    missionsGoldCustom.Add(newMission);
+            }
+            else if(game == Game.platinum)
+            {
+                if (difficulty == Type.beginner)
+                    missionsPlatinumBeginner.Add(newMission);
+                else if (difficulty == Type.intermediate)
+                    missionsPlatinumIntermediate.Add(newMission);
+                else if (difficulty == Type.advanced)
+                    missionsPlatinumAdvanced.Add(newMission);
+                else if (difficulty == Type.expert)
+                    missionsPlatinumExpert.Add(newMission);
+            }
+            
         }
 
-        if (difficulty == Type.beginner)
-            missionsBeginner = SortMissionsByLevelNumber(missionsBeginner);
-        else if (difficulty == Type.intermediate)
-            missionsIntermediate = SortMissionsByLevelNumber(missionsIntermediate);
-        else if (difficulty == Type.advanced)
-            missionsAdvanced = SortMissionsByLevelNumber(missionsAdvanced);
-        else if (difficulty == Type.custom)
-            missionsCustom = SortMissionsByLevelNumber(missionsCustom);
+        if (game == Game.gold)
+        {
+            if (difficulty == Type.beginner)
+                missionsGoldBeginner = SortMissionsByLevelNumber(missionsGoldBeginner);
+            else if (difficulty == Type.intermediate)
+                missionsGoldIntermediate = SortMissionsByLevelNumber(missionsGoldIntermediate);
+            else if (difficulty == Type.advanced)
+                missionsGoldAdvanced = SortMissionsByLevelNumber(missionsGoldAdvanced);
+            else if (difficulty == Type.custom)
+                missionsGoldCustom = SortMissionsByLevelNumber(missionsGoldCustom);
+        }
+        else if (game == Game.platinum)
+        {
+            if (difficulty == Type.beginner)
+                missionsPlatinumBeginner = SortMissionsByLevelNumber(missionsPlatinumBeginner);
+            else if (difficulty == Type.intermediate)
+                missionsPlatinumIntermediate = SortMissionsByLevelNumber(missionsPlatinumIntermediate);
+            else if (difficulty == Type.advanced)
+                missionsPlatinumAdvanced = SortMissionsByLevelNumber(missionsPlatinumAdvanced);
+            else if (difficulty == Type.expert)
+                missionsPlatinumExpert = SortMissionsByLevelNumber(missionsPlatinumExpert);
+        }
     }
 
     public static List<Mission> SortMissionsByLevelNumber(List<Mission> missions)

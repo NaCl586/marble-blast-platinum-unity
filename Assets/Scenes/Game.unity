@@ -500,16 +500,22 @@ MonoBehaviour:
   puHelp: {fileID: 8300000, guid: 07c110ced645a49439b009fff14440dd, type: 3}
   puMissingGems: {fileID: 8300000, guid: 14006ae21e199684b92b8ef1c9228871, type: 3}
   checkpointSfx: {fileID: 8300000, guid: 18e5fc5336b4c3d42be8fec2f6ef95b3, type: 3}
+  overParTimeSfx: {fileID: 8300000, guid: 7993d2e5375cbeb4d8a068a71576a509, type: 3}
   levelMusic: {fileID: 183422030}
   pauseMenu: {fileID: 2617693736690512310}
   finishMenu: {fileID: 2617693738300280073}
   enterNameMenu: {fileID: 2617693737966993587}
   finalTime: {fileID: 2617693736721038872}
   finishCaption: {fileID: 2617693738214849246}
-  rightCaption: {fileID: 2617693736463467851}
   namesCaption: {fileID: 2617693736307086953}
   timesCaption: {fileID: 2617693736727850860}
   enterNameCaption: {fileID: 2617693737388066596}
+  platinumTimeBox: {fileID: 178892578877145499}
+  ultimateTimeBox: {fileID: 178892578877145498}
+  goldTimeBox: {fileID: 178892578877145497}
+  parTimeText: {fileID: 2617693736463467851}
+  timePassedText: {fileID: 178892578877145496}
+  clockBonusesText: {fileID: 178892578877145495}
   replayButton: {fileID: 2617693736384321915}
   continueButton: {fileID: 2617693737777177686}
   noButton: {fileID: 2617693737100431551}
@@ -534,6 +540,7 @@ MonoBehaviour:
   timeTravelBonus: 0
   finishParticles: {fileID: 8285649748157849879, guid: e154bf5a1b0c7ad4a8468754518554b6,
     type: 3}
+  alarmCoroutineStarted: 0
 --- !u!4 &1466247739
 Transform:
   m_ObjectHideFlags: 0
@@ -978,6 +985,48 @@ PrefabInstance:
 --- !u!1 &178892578877145494 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1888083759243391420, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+    type: 3}
+  m_PrefabInstance: {fileID: 178892578877145493}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &178892578877145495 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1545847625163324670, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+    type: 3}
+  m_PrefabInstance: {fileID: 178892578877145493}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &178892578877145496 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4492734917454164027, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+    type: 3}
+  m_PrefabInstance: {fileID: 178892578877145493}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &178892578877145497 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6999953342367327651, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+    type: 3}
+  m_PrefabInstance: {fileID: 178892578877145493}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &178892578877145498 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1873262459223124533, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+    type: 3}
+  m_PrefabInstance: {fileID: 178892578877145493}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &178892578877145499 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7500683491667754053, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
     type: 3}
   m_PrefabInstance: {fileID: 178892578877145493}
   m_PrefabAsset: {fileID: 0}

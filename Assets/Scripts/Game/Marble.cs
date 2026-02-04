@@ -17,6 +17,8 @@ public class Marble : MonoBehaviour
     [SerializeField] AudioSource useSuperBounceSound;
     [SerializeField] AudioSource gyroSound;
     [SerializeField] AudioSource TTActiveSound;
+    public AudioSource teleportSound;
+    public AudioSource alarmSound;
 
     //things that stick to the marble
     public GameObject gyrocopterBlades;
@@ -88,6 +90,7 @@ public class Marble : MonoBehaviour
     public void Respawn()
     {
         movement.SetPosition(GameManager.instance.activeCheckpoint.position);
+        GravityModifier.ResetGravityGlobal(GameManager.instance.activeCheckpointGravityDir);
     }
 
     public void PlaySound(PowerupType _powerup)
@@ -222,7 +225,7 @@ public class Marble : MonoBehaviour
         {
             if (GameManager.instance.timeTravelActive)
             {
-                GameManager.instance.timeTravelBonus -= _timeBonus;
+                GameManager.instance.timeTravelBonus += _timeBonus;
                 if (GameManager.instance.timeTravelBonus < 0)
                 {
                     GameManager.instance.elapsedTime -= GameManager.instance.timeTravelBonus * 1000f;
@@ -231,7 +234,7 @@ public class Marble : MonoBehaviour
             }
             else
             {
-                GameManager.instance.elapsedTime += _timeBonus * 1000f;
+                GameManager.instance.elapsedTime -= _timeBonus * 1000f;
             }
         }
         

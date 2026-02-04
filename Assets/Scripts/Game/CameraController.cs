@@ -225,6 +225,11 @@ public class CameraController : MonoBehaviour
         offset = (startPad.GetChild(0).position - startPad.GetChild(1).position);
     }
 
+    public void SetCameraPosition(Vector3 marblePos, Vector3 cameraPos)
+    {
+        offset = marblePos - cameraPos;
+    }
+
     public void FinishCameraPan()
     {
         StartCoroutine(PanCamera());

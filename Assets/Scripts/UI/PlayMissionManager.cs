@@ -1,14 +1,10 @@
-﻿using System;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Antlr4.Runtime;
-using UnityEngine;
-using System.Collections;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
-using TS;
 using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 [System.Serializable]
 public class Mission
@@ -25,10 +21,12 @@ public class Mission
     public string artist;
     public int goldTime;
     public int ultimateTime;
+    public int alarmTime;
+    public string music;
     public string skyboxName;
 }
 
-public enum Type 
+public enum Type
 {
     none,
     beginner,
@@ -38,13 +36,18 @@ public enum Type
     custom
 }
 
+public enum Game
+{
+    none,
+    gold,
+    platinum
+}
+
 public class PlayMissionManager : MonoBehaviour
 {
     public List<Mission> missions = new List<Mission>();
-
     [Header("UI References")]
     public Image levelImage;
-    public TextMeshProUGUI levelText;
     public TextMeshProUGUI levelDescriptionText;
     public TextMeshProUGUI bestTimesText;
     public TextMeshProUGUI currentLevelText;
@@ -54,7 +57,9 @@ public class PlayMissionManager : MonoBehaviour
     public GameObject beginnerButton;
     public GameObject intermediateButton;
     public GameObject advancedButton;
+    public GameObject expertButton;
     public GameObject customButton;
+    public GameObject switchGameButton;
     public GameObject[] spaces;
     public Button prev;
     public Button next;
@@ -65,6 +70,7 @@ public class PlayMissionManager : MonoBehaviour
 
     int selectedLevelNum;
     public static Type currentlySelectedType = Type.none;
+    public static Game selectedGame = Game.none;
 
     public void FixedUpdate()
     {
@@ -83,15 +89,47 @@ public class PlayMissionManager : MonoBehaviour
 
     IEnumerator WaitUntilFinishLoading()
     {
-        while (MissionInfo.instance.missionsBeginner == null || MissionInfo.instance.missionsBeginner.Count == 0)
+        while (MissionInfo.instance.missionsPlatinumBeginner == null || MissionInfo.instance.missionsPlatinumBeginner.Count == 0)
             yield return null;
 
         Time.timeScale = 1;
 
-        beginnerButton.GetComponent<Button>().onClick.AddListener(() => LoadMissions(Type.beginner));
-        intermediateButton.GetComponent<Button>().onClick.AddListener(() => LoadMissions(Type.intermediate));
-        advancedButton.GetComponent<Button>().onClick.AddListener(() => LoadMissions(Type.advanced));
-        customButton.GetComponent<Button>().onClick.AddListener(() => LoadMissions(Type.custom));
+        if (selectedGame == Game.none)
+            selectedGame = Game.platinum;
+
+        beginnerButton.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (selectedGame == Game.platinum)
+                LoadMissions(Type.beginner, Game.platinum);
+            else if (selectedGame == Game.gold)
+                LoadMissions(Type.beginner, Game.gold);
+        });
+        intermediateButton.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (selectedGame == Game.platinum)
+                LoadMissions(Type.intermediate, Game.platinum);
+            else if (selectedGame == Game.gold)
+                LoadMissions(Type.intermediate, Game.gold);
+        });
+        advancedButton.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (selectedGame == Game.platinum)
+                LoadMissions(Type.advanced, Game.platinum);
+            else if (selectedGame == Game.gold)
+                LoadMissions(Type.advanced, Game.gold);
+        });
+        expertButton.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (selectedGame == Game.platinum)
+                LoadMissions(Type.expert, Game.platinum);
+        });
+        customButton.GetComponent<Button>().onClick.AddListener(() =>
+        {
+            if (selectedGame == Game.gold)
+                LoadMissions(Type.custom, Game.gold);
+        });
+        switchGameButton.GetComponent<Button>().onClick.AddListener(() => SwitchGame());
+
 
         home.onClick.AddListener(() => SceneManager.LoadScene("MainMenu"));
 
@@ -102,41 +140,70 @@ public class PlayMissionManager : MonoBehaviour
         if (currentlySelectedType == Type.none)
             currentlySelectedType = Type.beginner;
 
-        LoadMissions(currentlySelectedType);
+        LoadMissions(currentlySelectedType, selectedGame);
+
+        if (selectedGame == Game.gold)
+        {
+            expertButton.SetActive(false);
+            customButton.SetActive(true);
+        }
+        else if (selectedGame == Game.platinum)
+        {
+            expertButton.SetActive(true);
+            customButton.SetActive(false);
+        }
     }
 
-    void LoadMissions(Type difficulty)
+    void SwitchGame()
     {
-        beginnerButton.transform.SetAsFirstSibling();
-        intermediateButton.transform.SetAsFirstSibling();
-        advancedButton.transform.SetAsFirstSibling();
-        customButton.transform.SetAsFirstSibling();
+        if (selectedGame == Game.gold)
+        {
+            selectedGame = Game.platinum;
+            expertButton.SetActive(true);
+            customButton.SetActive(false);
+            currentlySelectedType = Type.beginner;
+            LoadMissions(Type.beginner, Game.platinum);
+        }
+        else if (selectedGame == Game.platinum)
+        {
+            selectedGame = Game.gold;
+            expertButton.SetActive(false);
+            customButton.SetActive(true);
+            currentlySelectedType = Type.beginner;
+            LoadMissions(Type.beginner, Game.gold);
+        }
+    }
 
-        if (difficulty == Type.beginner)
+    void LoadMissions(Type difficulty, Game game)
+    {
+        if (game == Game.gold)
         {
-            beginnerButton.transform.SetAsLastSibling();
-            missions = MissionInfo.instance.missionsBeginner;
+            if (difficulty == Type.beginner)
+                missions = MissionInfo.instance.missionsGoldBeginner;
+            else if (difficulty == Type.intermediate)
+                missions = MissionInfo.instance.missionsGoldIntermediate;
+            else if (difficulty == Type.advanced)
+                missions = MissionInfo.instance.missionsGoldAdvanced;
+            else if (difficulty == Type.custom)
+                missions = MissionInfo.instance.missionsGoldCustom;
         }
-        else if (difficulty == Type.intermediate)
+        else if (game == Game.platinum)
         {
-            intermediateButton.transform.SetAsLastSibling();
-            missions = MissionInfo.instance.missionsIntermediate;
+            if (difficulty == Type.beginner)
+                missions = MissionInfo.instance.missionsPlatinumBeginner;
+            else if (difficulty == Type.intermediate)
+                missions = MissionInfo.instance.missionsPlatinumIntermediate;
+            else if (difficulty == Type.advanced)
+                missions = MissionInfo.instance.missionsPlatinumAdvanced;
+            else if (difficulty == Type.expert)
+                missions = MissionInfo.instance.missionsPlatinumExpert;
         }
-        else if (difficulty == Type.advanced)
-        {
-            advancedButton.transform.SetAsLastSibling();
-            missions = MissionInfo.instance.missionsAdvanced;
-        }
-        else if (difficulty == Type.custom)
-        {
-            customButton.transform.SetAsLastSibling();
-            missions = MissionInfo.instance.missionsCustom;
-        }
+
 
         currentlySelectedType = difficulty;
 
-        int qualifiedLevel = PlayerPrefs.GetInt("QualifiedLevel" + CapitalizeFirst(currentlySelectedType.ToString()), 0);
-        selectedLevelNum = PlayerPrefs.GetInt("SelectedLevel" + CapitalizeFirst(currentlySelectedType.ToString()), qualifiedLevel);
+        int qualifiedLevel = PlayerPrefs.GetInt("QualifiedLevel" + CapitalizeFirst(currentlySelectedType.ToString()) + CapitalizeFirst(selectedGame.ToString()), 0);
+        selectedLevelNum = PlayerPrefs.GetInt("SelectedLevel" + CapitalizeFirst(currentlySelectedType.ToString()) + CapitalizeFirst(selectedGame.ToString()), qualifiedLevel);
         if (selectedLevelNum < 0) selectedLevelNum = 0;
         if (selectedLevelNum >= missions.Count) selectedLevelNum = missions.Count - 1;
 
@@ -147,7 +214,7 @@ public class PlayMissionManager : MonoBehaviour
     {
         next.interactable = true;
         selectedLevelNum--;
-        if(selectedLevelNum <= 0)
+        if (selectedLevelNum <= 0)
         {
             selectedLevelNum = 0;
             prev.interactable = false;
@@ -172,9 +239,8 @@ public class PlayMissionManager : MonoBehaviour
         foreach (GameObject g in spaces)
             g.SetActive(missions.Count != 0);
 
-        if(missions.Count == 0)
+        if (missions.Count == 0)
         {
-            levelText.gameObject.SetActive(false);
             levelDescriptionText.gameObject.SetActive(false);
 
             levelImage.color = Color.clear;
@@ -190,7 +256,7 @@ public class PlayMissionManager : MonoBehaviour
             bestTimesText.text = string.Empty;
             for (int i = 0; i < 3; i++)
             {
-                string _name = "Nardo Polo";
+                string _name = "Matan W.";
                 float _time = -1;
                 bestTimesText.text += (i + 1) + ". " + _name;
                 bestTimesText.text += "\t" + Utils.FormatTime(_time) + "\n";
@@ -199,7 +265,7 @@ public class PlayMissionManager : MonoBehaviour
             return;
         }
 
-        int qualifiedLevel = debug ? 9999 : PlayerPrefs.GetInt("QualifiedLevel" + CapitalizeFirst(currentlySelectedType.ToString()), 0);
+        int qualifiedLevel = debug ? 9999 : PlayerPrefs.GetInt("QualifiedLevel" + CapitalizeFirst(currentlySelectedType.ToString()) + CapitalizeFirst(selectedGame.ToString()), 0);
 
         if (currentlySelectedType.ToString().ToLower().Equals("custom"))
             qualifiedLevel = 9999;
@@ -209,7 +275,7 @@ public class PlayMissionManager : MonoBehaviour
         next.interactable = true;
 
         int lastQualifiedLevel = number > qualifiedLevel ? qualifiedLevel : number;
-        PlayerPrefs.SetInt("SelectedLevel" + CapitalizeFirst(currentlySelectedType.ToString()), lastQualifiedLevel);
+        PlayerPrefs.SetInt("SelectedLevel" + CapitalizeFirst(currentlySelectedType.ToString()) + CapitalizeFirst(selectedGame.ToString()), lastQualifiedLevel);
 
         if (number >= missions.Count - 1)
             next.interactable = false;
@@ -217,18 +283,16 @@ public class PlayMissionManager : MonoBehaviour
         if (number <= 0)
             prev.interactable = false;
 
-        levelText.gameObject.SetActive(true);
         levelDescriptionText.gameObject.SetActive(true);
 
-        levelText.text = missions[number].levelName;
-        levelDescriptionText.text = missions[number].description;
+        levelDescriptionText.text = missions[number].description + "\n" +
+            "<b>Author:</b> " + missions[number].artist;
 
         if (missions[number].time != -1)
-            timeToQualifyText.text = "Time to Qualify: " + Utils.FormatTime(missions[number].time);
+            timeToQualifyText.text = "Par Time: " + Utils.FormatTime(missions[number].time);
         else
             timeToQualifyText.text = string.Empty;
 
-        RefreshTMPLayout(levelText);
         RefreshTMPLayout(levelDescriptionText);
         RefreshTMPLayout(timeToQualifyText);
 
@@ -245,7 +309,7 @@ public class PlayMissionManager : MonoBehaviour
             levelImage.color = Color.clear;
         }
 
-        currentLevelText.text = CapitalizeFirst(currentlySelectedType.ToString()) + " Level " + (number + 1);
+        currentLevelText.text = missions[number].levelName + " - " + CapitalizeFirst(currentlySelectedType.ToString()) + " Level " + (number + 1);
 
         notQualifiedImage.SetActive(qualifiedLevel < number);
         notQualifiedText.SetActive(qualifiedLevel < number);
@@ -260,19 +324,50 @@ public class PlayMissionManager : MonoBehaviour
         MissionInfo.instance.artist = missions[number].artist;
         MissionInfo.instance.goldTime = missions[number].goldTime;
         MissionInfo.instance.ultimateTime = missions[number].ultimateTime;
-        MissionInfo.instance.skybox = missions[number].skyboxName;
+        MissionInfo.instance.alarmTime = missions[number].alarmTime;
+
+        string musicName = missions[number].music;
+        musicName = string.IsNullOrEmpty(musicName) ? string.Empty : Path.GetFileNameWithoutExtension(musicName.Trim());
+        musicName = musicName.Replace(".ogg", "");
+        MissionInfo.instance.music = musicName;
+
+        string skyboxName = missions[number].skyboxName;
+        skyboxName = string.IsNullOrEmpty(skyboxName) ? "intermediate_sky" : skyboxName;
+        MissionInfo.instance.skybox = Application.CanStreamedLevelBeLoaded(skyboxName) ? skyboxName : "intermediate_sky";
 
         bestTimesText.text = string.Empty;
         for (int i = 0; i < 3; i++)
         {
-            string _name = PlayerPrefs.GetString(MissionInfo.instance.levelName + "_Name_" + i, "Nardo Polo");
+            string _name = PlayerPrefs.GetString(MissionInfo.instance.levelName + "_Name_" + i, "Matan W.");
             float _time = PlayerPrefs.GetFloat(MissionInfo.instance.levelName + "_Time_" + i, -1);
-            bestTimesText.text += (i+1) + ". " + _name;
+            bestTimesText.text += (i + 1) + ". " + _name;
 
-            if (_time < MissionInfo.instance.goldTime && _time != -1)
+            if (selectedGame == Game.gold && currentlySelectedType != Type.custom && _time < MissionInfo.instance.goldTime && _time != -1)
+            {
                 bestTimesText.text += "\t" + Utils.FormatTime(_time) + "<sprite name=\"gold\">\n";
+            }
+            else if (selectedGame == Game.gold && currentlySelectedType == Type.custom)
+            {
+                if (_time < MissionInfo.instance.ultimateTime && _time != -1)
+                    bestTimesText.text += "\t" + Utils.FormatTime(_time) + "<sprite name=\"ultimate\">\n";
+                else if (_time < MissionInfo.instance.goldTime && _time != -1)
+                    bestTimesText.text += "\t" + Utils.FormatTime(_time) + "<sprite name=\"platinum\">\n";
+                else
+                    bestTimesText.text += "\t" + Utils.FormatTime(_time) + "\n";
+            }
+            else if (selectedGame == Game.platinum)
+            {
+                if (_time < MissionInfo.instance.ultimateTime && _time != -1)
+                    bestTimesText.text += "\t" + Utils.FormatTime(_time) + "<sprite name=\"ultimate\">\n";
+                else if (_time < MissionInfo.instance.goldTime && _time != -1)
+                    bestTimesText.text += "\t" + Utils.FormatTime(_time) + "<sprite name=\"platinum\">\n";
+                else
+                    bestTimesText.text += "\t" + Utils.FormatTime(_time) + "\n";
+            }
             else
+            {
                 bestTimesText.text += "\t" + Utils.FormatTime(_time) + "\n";
+            }
         }
     }
 

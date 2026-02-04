@@ -120,10 +120,6 @@ public class CheckCollision : MonoBehaviour
 
     private void OnManualCollisionStay(Collider collider, RaycastHit hit) { 
         ApplyCollision(hit);
-
-        Trapdoor t;
-        if (hit.collider.TryGetComponent<Trapdoor>(out t))
-            t.OnCollisionWithMarble();
     }
 
     private void OnManualCollisionExit(Collider collider)

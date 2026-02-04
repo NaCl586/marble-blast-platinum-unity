@@ -1,10 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using TMPro;
-using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
 {
@@ -39,6 +39,7 @@ public class GameManager : MonoBehaviour
         gameUIManager.SetActive(true);
 
         activeCheckpoint = startPad.transform.Find("Spawn");
+        activeCheckpointGravityDir = Vector3.down;
     }
 
     [HideInInspector] public GameObject startPad;
@@ -56,6 +57,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] AudioClip puHelp;
     [SerializeField] AudioClip puMissingGems;
     [SerializeField] AudioClip checkpointSfx;
+    [SerializeField] AudioClip overParTimeSfx;
 
     public void PlayJumpAudio() => audioSource.PlayOneShot(jump);
     public void PlaySpawnAudio() => audioSource.PlayOneShot(puSpawn);
@@ -77,7 +79,7 @@ public class GameManager : MonoBehaviour
         if (MenuMusic.instance)
             Destroy(MenuMusic.instance.gameObject);
 
-        LevelMusic.instance.SetMusic(MissionInfo.instance.level);
+        LevelMusic.instance.SetMusic(MissionInfo.instance.music, MissionInfo.instance.level, PlayMissionManager.selectedGame, PlayMissionManager.currentlySelectedType);
         levelMusic.volume = PlayerPrefs.GetFloat("Audio_MusicVolume", 0.5f);
         levelMusic.Play();
     }
@@ -95,10 +97,15 @@ public class GameManager : MonoBehaviour
     [SerializeField] GameObject enterNameMenu;
     [SerializeField] TextMeshProUGUI finalTime;
     [SerializeField] TextMeshProUGUI finishCaption;
-    [SerializeField] TextMeshProUGUI rightCaption;
     [SerializeField] TextMeshProUGUI namesCaption;
     [SerializeField] TextMeshProUGUI timesCaption;
     [SerializeField] TextMeshProUGUI enterNameCaption;
+    [SerializeField] GameObject platinumTimeBox;
+    [SerializeField] GameObject ultimateTimeBox;
+    [SerializeField] GameObject goldTimeBox;
+    [SerializeField] TextMeshProUGUI parTimeText;
+    [SerializeField] TextMeshProUGUI timePassedText;
+    [SerializeField] TextMeshProUGUI clockBonusesText;
     [SerializeField] Button replayButton;
     [SerializeField] Button continueButton;
     [SerializeField] Button noButton;
@@ -108,6 +115,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] TMP_InputField nameInputField;
 
     public Transform activeCheckpoint;
+    public Vector3 activeCheckpointGravityDir;
     [HideInInspector] public List<GameObject> recentGems = new List<GameObject>();
     [HideInInspector] public PowerupType tempPowerup;
     bool useCheckpoint;
@@ -140,9 +148,12 @@ public class GameManager : MonoBehaviour
 
     //game state
     [Space]
-    [HideInInspector] public static bool gameFinish = false;
-    [HideInInspector] public static bool gameStart = false;
-    [HideInInspector] public static bool isPaused = false;
+    public static bool gameFinish = false;
+    public static bool gameStart = false;
+    public static bool isPaused = false;
+    public static bool alarmIsPlaying = false;
+    public static bool notQualified = false;
+    [HideInInspector] public bool alarmCoroutineStarted = false;
 
     //events
     public class OnFinish : UnityEvent { };
@@ -151,8 +162,10 @@ public class GameManager : MonoBehaviour
     public static OnOutOfBounds onOutOfBounds = new OnOutOfBounds();
     public class OnCollectGem : UnityEvent<int> { };
     public static OnCollectGem onCollectGem = new OnCollectGem();
-    public class OnReachCheckpoint : UnityEvent<Transform> { };
+    public class OnReachCheckpoint : UnityEvent<Transform, Vector3> { };
     public static OnReachCheckpoint onReachCheckpoint = new OnReachCheckpoint();
+
+    Coroutine alarmCoroutine;
 
     void Start()
     {
@@ -161,10 +174,6 @@ public class GameManager : MonoBehaviour
         startTimer = false;
         timeTravelActive = false;
         activePowerup = PowerupType.None;
-
-        //disable cursor visibility
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
 
         //disable UI
         finishMenu.SetActive(false);
@@ -185,6 +194,10 @@ public class GameManager : MonoBehaviour
 
         onReachCheckpoint.AddListener(ReachCheckpoint);
         useCheckpoint = false;
+
+        gameStart = false;
+        gameFinish = false;
+        alarmCoroutineStarted = false;
     }
 
     public void InitGemCount()
@@ -198,7 +211,7 @@ public class GameManager : MonoBehaviour
             GameUIManager.instance.ShowGemCountUI(false);
     }
 
-#region Game
+    #region Game
     public PowerupType ConsumePowerup()
     {
         PowerupType powerup = activePowerup;
@@ -219,6 +232,34 @@ public class GameManager : MonoBehaviour
             elapsedTime += Time.deltaTime * 1000f;
             elapsedTime = Mathf.RoundToInt(elapsedTime);
             GameUIManager.instance.SetTimerText(elapsedTime);
+        }
+        else if (timeTravelActive)
+        {
+            GameUIManager.instance.SetTimerText(elapsedTime);
+        }
+
+        if (MissionInfo.instance.time != -1 && elapsedTime >= (MissionInfo.instance.time - MissionInfo.instance.alarmTime))
+        {
+            if (elapsedTime >= MissionInfo.instance.time)
+            {
+                alarmIsPlaying = false;
+                notQualified = true;
+            }
+            else
+            {
+                alarmIsPlaying = true;
+                notQualified = false;
+
+                if (!alarmCoroutineStarted)
+                {
+                    alarmCoroutineStarted = true;
+                    alarmCoroutine = StartCoroutine(AlarmCoroutine());
+                }
+            }
+        }
+        else
+        {
+            notQualified = false;
         }
 
         //Handle Shock Absorber and Super Bounce timer
@@ -265,6 +306,33 @@ public class GameManager : MonoBehaviour
                 ReturnToMenu();
         }
     }
+
+    public IEnumerator AlarmCoroutine()
+    {
+        GameUIManager.instance.SetCenterText(
+            "You have " + (MissionInfo.instance.alarmTime / 1000f) + " seconds remaining."
+        );
+
+        Marble.instance.alarmSound.Play();
+
+        float time = 0f;
+
+        while (!notQualified)
+        {
+            if (!timeTravelActive)
+                time += Time.deltaTime;
+
+            int seconds = Mathf.FloorToInt(time);
+            GameUIManager.instance.SetTimerColor(seconds % 2 == 0);
+
+            yield return null; // wait exactly one frame
+        }
+
+        GameUIManager.instance.SetCenterText("The clock has passed the par time.");
+        Marble.instance.alarmSound.Stop();
+        PlayAudioClip(overParTimeSfx);
+    }
+
 
     public void TogglePause()
     {
@@ -320,7 +388,7 @@ public class GameManager : MonoBehaviour
 
     public void InvokeRespawn() => Marble.onRespawn?.Invoke();
 
-    public IEnumerator ResetSpawnAudio() 
+    public IEnumerator ResetSpawnAudio()
     {
         yield return new WaitForSeconds(0.1f);
         spawnAudioPlayed = false;
@@ -330,6 +398,7 @@ public class GameManager : MonoBehaviour
         TogglePause();
 
         activeCheckpoint = startPad.transform.Find("Spawn");
+        activeCheckpointGravityDir = Vector3.down;
         useCheckpoint = false;
 
         Marble.onRespawn?.Invoke();
@@ -344,7 +413,7 @@ public class GameManager : MonoBehaviour
         Marble.onRespawn?.Invoke();
     }
 
-    public void ReachCheckpoint(Transform checkpoint)
+    public void ReachCheckpoint(Transform checkpoint, Vector3 checkpointGravityDir)
     {
         if (checkpoint == activeCheckpoint) return;
 
@@ -354,6 +423,8 @@ public class GameManager : MonoBehaviour
         activeCheckpoint = checkpoint;
         tempPowerup = activePowerup;
 
+        activeCheckpointGravityDir = checkpointGravityDir;
+
         PlayAudioClip(checkpointSfx);
 
         recentGems.Clear();
@@ -362,7 +433,7 @@ public class GameManager : MonoBehaviour
     bool spawnAudioPlayed = false;
     public void Respawn()
     {
-        if(!spawnAudioPlayed)
+        if (!spawnAudioPlayed)
         {
             PlaySpawnAudio();
             spawnAudioPlayed = true;
@@ -383,6 +454,16 @@ public class GameManager : MonoBehaviour
         {
             Movement.instance.StopAllMovement();
             Movement.instance.StopAllbutJumping();
+
+            alarmIsPlaying = false;
+            GameUIManager.instance.SetTimerText(0);
+
+            alarmCoroutineStarted = false;
+
+            if (alarmCoroutine != null)
+                StopCoroutine(alarmCoroutine);
+
+            Marble.instance.alarmSound.Stop();
 
             GameStateStart();
         }
@@ -416,10 +497,12 @@ public class GameManager : MonoBehaviour
 
     void GameStateStart()
     {
+        gameStart = false;
+
         startTimer = false;
         UpdateGem(0);
         elapsedTime = bonusTime = 0;
-        
+
         foreach (Gem gem in gems)
             gem.gameObject.SetActive(true);
 
@@ -427,7 +510,7 @@ public class GameManager : MonoBehaviour
 
         //reset powerups
         foreach (Powerups po in FindObjectsOfType<Powerups>())
-            if(po.powerupType != PowerupType.EasterEgg)
+            if (po.powerupType != PowerupType.EasterEgg)
                 po.Activate(false);
 
         //reset moving platforms
@@ -443,7 +526,6 @@ public class GameManager : MonoBehaviour
         if (finishParticleInstance)
             Destroy(finishParticleInstance);
 
-        gameStart = false;
         GameUIManager.instance.SetCenterImage(-1);
         Invoke(nameof(GameStateReady), 0.5f);
     }
@@ -503,6 +585,8 @@ public class GameManager : MonoBehaviour
             Marble.instance.InactivateTimeTravel();
 
             gameFinish = true;
+            GameUIManager.instance.SetTimerText(elapsedTime);
+
             CameraController.onCameraFinish?.Invoke();
             Invoke(nameof(StopMarbleMovement), 0.0625f);
             Invoke(nameof(ShowFinishUI), 2f);
@@ -514,9 +598,9 @@ public class GameManager : MonoBehaviour
         Movement.instance.freezeMovement = true;
         Movement.instance.StopMoving();
     }
-#endregion
+    #endregion
 
-#region UI
+    #region UI
     public void ReturnToMenu()
     {
         SceneManager.LoadScene("PlayMission");
@@ -554,6 +638,7 @@ public class GameManager : MonoBehaviour
         continueButton.interactable = true;
 
         bool gold = elapsedTime < MissionInfo.instance.goldTime;
+        bool ultimate = elapsedTime < MissionInfo.instance.ultimateTime;
         bool qualify = !(MissionInfo.instance.time != -1 && elapsedTime >= MissionInfo.instance.time);
         finalTime.text = Utils.FormatTime(elapsedTime);
 
@@ -564,43 +649,89 @@ public class GameManager : MonoBehaviour
             continueButton.interactable = false;
             enterNameMenu.SetActive(true);
             if (pos == 0)
-                enterNameCaption.text = "You got the best time!";
+                enterNameCaption.text = "You got the top time!";
             else if (pos == 1)
-                enterNameCaption.text = "You got the 2nd best time!";
+                enterNameCaption.text = "You got the second top time!";
             else if (pos == 2)
-                enterNameCaption.text = "You got the 3rd best time!";
+                enterNameCaption.text = "You got the third top time!";
 
             nameInputField.SetTextWithoutNotify(MissionInfo.instance.highScoreName);
             UpdateName(MissionInfo.instance.highScoreName);
         }
 
-        if (gold && qualify)
-            finishCaption.text = "You beat the <color=yellow>GOLD</color> time!";
-        else if (qualify)
-            finishCaption.text = "You've qualified!";
-        else
-            finishCaption.text = "<color=red>You failed to qualify!</color>";
-
-        string _qualifyTime, _goldTime;
+        string _qualifyTime, _goldTime, _platinumTime, _ultimateTime;
         if (!qualify)
-            _qualifyTime = "<color=red>" + Utils.FormatTime(MissionInfo.instance.time) + "</color>";
+            _qualifyTime = "<color=#F55555>" + Utils.FormatTime(MissionInfo.instance.time) + "</color>";
         else
             _qualifyTime = Utils.FormatTime(MissionInfo.instance.time);
 
-        _goldTime = "<color=yellow>" + Utils.FormatTime(MissionInfo.instance.goldTime) + "</color>";
+        parTimeText.text = _qualifyTime;
 
-        rightCaption.text = _qualifyTime + "\n" +
-                            _goldTime + "\n" +
-                            Utils.FormatTime(elapsedTime + bonusTime) + "\n" +
-                            Utils.FormatTime(bonusTime);
+        _goldTime = "<color=#FFEE11>" + Utils.FormatTime(MissionInfo.instance.goldTime) + "</color>";
+        _platinumTime = "<color=#CCCCCC>" + Utils.FormatTime(MissionInfo.instance.goldTime) + "</color>";
+        _ultimateTime = "<color=#FFCC33>" + Utils.FormatTime(MissionInfo.instance.ultimateTime) + "</color>";
+
+        goldTimeBox.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = _goldTime;
+        platinumTimeBox.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = _platinumTime;
+        ultimateTimeBox.transform.Find("Text").GetComponent<TextMeshProUGUI>().text = _ultimateTime;
+
+        timePassedText.text = Utils.FormatTime(elapsedTime + bonusTime);
+        clockBonusesText.text = Utils.FormatTime(bonusTime);
+
+        platinumTimeBox.SetActive(false);
+        ultimateTimeBox.SetActive(false);
+        goldTimeBox.SetActive(false);
+
+        if(PlayMissionManager.selectedGame == Game.gold)
+        {
+            if(PlayMissionManager.currentlySelectedType == Type.custom)
+            {
+                platinumTimeBox.SetActive(true);
+                ultimateTimeBox.SetActive(true);
+
+                if (ultimate && qualify)
+                    finishCaption.text = "You beat the <color=#FFCC33>Ultimate</color> Time!";
+                else if (gold && qualify)
+                    finishCaption.text = "You beat the <color=#CCCCCC>Platinum</color> Time!";
+                else if (qualify)
+                    finishCaption.text = "You beat the Par Time";
+                else
+                    finishCaption.text = "<color=#F55555>You did't pass the Par Time!</color>";
+            }
+            else
+            {
+                goldTimeBox.SetActive(true);
+
+                if (gold && qualify)
+                    finishCaption.text = "You beat the <color=#FFEE11>Gold</color> Time!";
+                else if (qualify)
+                    finishCaption.text = "You beat the Par Time";
+                else
+                    finishCaption.text = "<color=#F55555>You did't pass the Par time!</color>";
+            }
+        }
+        else if(PlayMissionManager.selectedGame == Game.platinum)
+        {
+            platinumTimeBox.SetActive(true);
+            ultimateTimeBox.SetActive(true);
+
+            if (ultimate && qualify)
+                finishCaption.text = "You beat the <color=#FFCC33>Ultimate</color> Time!";
+            else if (gold && qualify)
+                finishCaption.text = "You beat the <color=#CCCCCC>Platinum</color> Time!";
+            else if (qualify)
+                finishCaption.text = "You beat the Par Time";
+            else
+                finishCaption.text = "<color=#F55555>You did't pass the Par Time!</color>";
+        }
 
         UpdateBestTimes();
 
-        int qualifiedLevel = PlayerPrefs.GetInt("QualifiedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()), 0);
+        int qualifiedLevel = PlayerPrefs.GetInt("QualifiedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + PlayMissionManager.CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), 0);
         if (qualify && qualifiedLevel + 1 == MissionInfo.instance.level)
-            PlayerPrefs.SetInt("QualifiedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()), (qualifiedLevel + 1));
+            PlayerPrefs.SetInt("QualifiedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + PlayMissionManager.CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), (qualifiedLevel + 1));
 
-        PlayerPrefs.SetInt("SelectedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()), (MissionInfo.instance.level));
+        PlayerPrefs.SetInt("SelectedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + PlayMissionManager.CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), (MissionInfo.instance.level));
     }
 
     void UpdateBestTimes()
@@ -614,10 +745,40 @@ public class GameManager : MonoBehaviour
             float _time = PlayerPrefs.GetFloat(MissionInfo.instance.levelName + "_Time_" + i, -1);
             namesCaption.text += _name + "\n";
 
-            if (_time < MissionInfo.instance.goldTime && _time != -1)
-                timesCaption.text += "<color=yellow>" + Utils.FormatTime(_time) + "</color>" + "\n";
-            else
-                timesCaption.text += Utils.FormatTime(_time) + "\n";
+            bool ultimate = _time < MissionInfo.instance.ultimateTime;
+            bool gold = _time < MissionInfo.instance.goldTime;
+
+            if (PlayMissionManager.selectedGame == Game.gold)
+            {
+                if (PlayMissionManager.currentlySelectedType == Type.custom)
+                {
+                    platinumTimeBox.SetActive(true);
+                    ultimateTimeBox.SetActive(true);
+
+                    if (_time != -1 && ultimate)
+                        timesCaption.text += "<color=#FFCC33>" + Utils.FormatTime(_time) + "</color>" + "\n";
+                    else if (_time != -1 && gold)
+                        timesCaption.text += "<color=#CCCCCC>" + Utils.FormatTime(_time) + "</color>" + "\n";
+                    else
+                        timesCaption.text += Utils.FormatTime(_time) + "\n";
+                }
+                else
+                {
+                    if (_time != -1 && gold)
+                        timesCaption.text += "<color=#FFEE11>" + Utils.FormatTime(_time) + "</color>" + "\n";
+                    else
+                        timesCaption.text += Utils.FormatTime(_time) + "\n";
+                }
+            }
+            else if (PlayMissionManager.selectedGame == Game.platinum)
+            {
+                if (_time != -1 && ultimate)
+                    timesCaption.text += "<color=#FFCC33>" + Utils.FormatTime(_time) + "</color>" + "\n";
+                else if (_time != -1 && gold)
+                    timesCaption.text += "<color=#CCCCCC>" + Utils.FormatTime(_time) + "</color>" + "\n";
+                else
+                    timesCaption.text += Utils.FormatTime(_time) + "\n";
+            }
         }
     }
 

@@ -27,7 +27,7 @@ public class Dif : MonoBehaviour {
         isMovingPlatform = (interiorIndex != -1);
 
         // Load DIF resource
-        var resource = DifResourceManager.getResource(Path.Combine(Application.streamingAssetsPath, filePath), interiorIndex);
+        var resource = DifResourceManager.getResource(Application.streamingAssetsPath + "/" + filePath, interiorIndex);
 
         if (resource == null)
         {
@@ -68,7 +68,7 @@ public class Dif : MonoBehaviour {
             if (materialTris == null || materialTris.Length == 0)
                 continue;
 
-            string matName = resource.materials[mat];
+            string matName = Path.GetFileNameWithoutExtension(resource.materials[mat]);
             Material material = ResolveMaterial(matName);
 
             if (!materialTriMap.ContainsKey(matName))
@@ -79,7 +79,7 @@ public class Dif : MonoBehaviour {
         // Create chunks
         foreach (var kvp in materialTriMap)
         {
-            string matName = kvp.Key;
+            string matName = Path.GetFileNameWithoutExtension(kvp.Key);
             List<int> allTris = kvp.Value;
             Material material = ResolveMaterial(matName);
 

@@ -52,7 +52,7 @@ public class ButtonSound : MonoBehaviour
     }
 
     // --- Button click ---
-    void PlayClickSound()
+    public void PlayClickSound()
     {
         if (!IsInteractable()) return;
 

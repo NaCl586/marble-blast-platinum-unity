@@ -159,7 +159,7 @@ MonoBehaviour:
         m_Calls:
         - m_Target: {fileID: 2090720095444229923}
           m_TargetAssemblyTypeName: ButtonSound, Assembly-CSharp
-          m_MethodName: ClickSound
+          m_MethodName: PlayClickSound
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -277,8 +277,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88bf27d02518914459f3620e6fc0462b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonFx: {fileID: 0}
-  enableSound: 0
-  isToggle: 0
   hoverFx: {fileID: 8300000, guid: 928cf20f5f18e7640bc016c69b56747b, type: 3}
   clickFx: {fileID: 8300000, guid: 7c479d6b33da4404c9bf4a4423050d49, type: 3}
+  playToggleOnOnly: 0

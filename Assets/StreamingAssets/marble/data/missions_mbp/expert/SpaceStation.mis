@@ -58,10 +58,17 @@ new SimGroup(MissionGroup) {
       ambient = "0.100000 0.100000 0.200000 1.000000";
    };
    new InteriorInstance() {
-      position = "0 0 0";
+      position = "-434.25 -1405.5 -182.75";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/interiors_mbp/SpaceStation.dif";
+      interiorFile = "~/data/interiors_mbp/SpaceStationInterior0.dif";
+      showTerrainInside = "0";
+   };
+   new InteriorInstance() {
+      position = "-434.25 -1405.5 -182.75";
+      rotation = "1 0 0 0";
+      scale = "1 1 1";
+      interiorFile = "~/data/interiors_mbp/SpaceStationInterior1.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -904,6 +911,7 @@ new SimGroup(MissionGroup) {
       rotation = "1 0 0 0";
       scale = "0.7 0.7 0.7";
       dataBlock = "checkPoint";
+		add = "0 0 2";
    };
    new Item() {
       position = "-42 -18 1.5";
@@ -1859,7 +1867,7 @@ new SimGroup(MissionGroup) {
    };
    new StaticShape() {
       position = "-63.6 -2 27.5";
-      rotation = "0.710913 0.70328 0 180";
+      rotation = "0.708515 -0.705696 0 180";
       scale = "1 1 1";
       dataBlock = "checkPoint";
          sub = "0 0 2";

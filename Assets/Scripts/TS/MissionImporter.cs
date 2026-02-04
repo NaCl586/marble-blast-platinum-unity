@@ -408,16 +408,14 @@ namespace TS
                         Quaternion rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
                         Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
-                        Transform cpTrigger = cp.transform.Find("Trigger");
-                        Transform cpMesh = cp.transform.Find("Mesh");
-                        Transform forwardPoint = cpMesh.Find("Forward");
+                        var checkpoint = cp.transform.Find("Mesh").Find("pCylinder").GetComponent<Checkpoint>();
 
-                        // Position
+                        Transform cpTrigger = checkpoint.trigger;
+                        Transform cpMesh = checkpoint.mesh;
+                        Transform spawnPos = checkpoint.spawnPos;
+
                         cp.transform.localPosition = position;
-                        cp.transform.localRotation = rotation;
-
                         cpMesh.transform.parent = null;
-                        cpMesh.transform.localRotation = rotation;
 
                         Vector3 localScale = cpMesh.localScale;
                         cpMesh.localScale = new Vector3(
@@ -426,11 +424,38 @@ namespace TS
                             scale.z * localScale.z
                         );
 
-                        cp.transform.LookAt(forwardPoint);
-                        cp.transform.localRotation = Quaternion.Euler(-90, cp.transform.localRotation.eulerAngles.y, cp.transform.localRotation.eulerAngles.z);
+                        cpMesh.transform.localRotation = rotation;
+                        cpMesh.transform.parent = cp.transform;
+                        spawnPos.transform.localRotation = Quaternion.Euler(spawnPos.transform.localRotation.eulerAngles.x, spawnPos.transform.localRotation.eulerAngles.y, -cpMesh.transform.localRotation.eulerAngles.z + 180);
+                        checkpoint.checkpointGravityDir = -checkpoint.transform.up;
 
                         cpTrigger.GetComponent<BoxCollider>().enabled = false;
-                        cpMesh.transform.parent = cp.transform;
+
+                        var offset = obj.GetField("add");
+                        if (string.IsNullOrEmpty(offset))
+                        {
+                            checkpoint.hasAddOrSub = false;
+                            checkpoint.offset = new Vector3(0, 3, 0);
+                        }
+                        else
+                        {
+                            checkpoint.hasAddOrSub = true;
+                            checkpoint.offset = ConvertPoint(ParseVectorString(offset));
+                        }
+                        
+                        var subOffset = obj.GetField("sub");
+                        if (string.IsNullOrEmpty(subOffset))
+                        {
+                            checkpoint.hasAddOrSub = false;
+                            checkpoint.offset = new Vector3(0, 3, 0);
+                        }
+                        else
+                        {
+                            checkpoint.hasAddOrSub = true;
+                            checkpoint.offset = -ConvertPoint(ParseVectorString(subOffset));
+                        }
+
+                        checkpoint.InitCheckpoint();
                         checkpoints.Add(cp);
                     }
 
@@ -833,16 +858,14 @@ namespace TS
                         Quaternion rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
                         Vector3 scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
-                        Transform cpTrigger = cp.transform.Find("Trigger");
-                        Transform cpMesh = cp.transform.Find("Mesh");
-                        Transform forwardPoint = cpMesh.Find("Forward");
+                        var checkpoint = cp.transform.Find("Mesh").Find("pCylinder").GetComponent<Checkpoint>();
 
-                        // Position
+                        Transform cpTrigger = checkpoint.trigger;
+                        Transform cpMesh = checkpoint.mesh;
+                        Transform spawnPos = checkpoint.spawnPos;
+
                         cp.transform.localPosition = position;
-                        cp.transform.localRotation = rotation;
-
                         cpMesh.transform.parent = null;
-                        cpMesh.transform.localRotation = rotation;
 
                         Vector3 localScale = cpMesh.localScale;
                         cpMesh.localScale = new Vector3(
@@ -851,11 +874,39 @@ namespace TS
                             scale.z * localScale.z
                         );
 
-                        cp.transform.LookAt(forwardPoint);
-                        cp.transform.localRotation = Quaternion.Euler(-90, cp.transform.localRotation.eulerAngles.y, cp.transform.localRotation.eulerAngles.z);
+                        cpMesh.transform.localRotation = rotation;
+                        cpMesh.transform.parent = cp.transform;
+                        spawnPos.transform.localRotation = Quaternion.Euler(spawnPos.transform.localRotation.eulerAngles.x, spawnPos.transform.localRotation.eulerAngles.y, -cpMesh.transform.localRotation.eulerAngles.z + 180);
+                        checkpoint.checkpointGravityDir = -checkpoint.transform.up;
 
                         cpTrigger.GetComponent<BoxCollider>().enabled = false;
-                        cpMesh.transform.parent = cp.transform;
+
+                        var offset = obj.GetField("add");
+                        if (string.IsNullOrEmpty(offset))
+                        {
+                            checkpoint.hasAddOrSub = false;
+                            checkpoint.offset = new Vector3(0, 3, 0);
+                        }
+                        else
+                        {
+                            checkpoint.hasAddOrSub = true;
+                            checkpoint.offset = ConvertPoint(ParseVectorString(offset));
+                        }
+
+                        var subOffset = obj.GetField("sub");
+                        if (string.IsNullOrEmpty(subOffset))
+                        {
+                            checkpoint.hasAddOrSub = false;
+                            checkpoint.offset = new Vector3(0, 3, 0);
+                        }
+                        else
+                        {
+                            checkpoint.hasAddOrSub = true;
+                            checkpoint.offset = -ConvertPoint(ParseVectorString(subOffset));
+                        }
+
+                        checkpoint.InitCheckpoint();
+                        checkpoints.Add(cp);
                     }
                     else if (objectName.ToLower() == "teleportpad")
                     {
@@ -912,25 +963,63 @@ namespace TS
                         oobtObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
                     }
 
-                    else
+                    else if (objectName == "HelpTrigger")
                     {
-                        if (objectName == "HelpTrigger")
-                        {
-                            var htObj = Instantiate(helpTriggerInstance, transform, false);
-                            htObj.name = "HelpTrigger";
+                        var htObj = Instantiate(helpTriggerInstance, transform, false);
+                        htObj.name = "HelpTrigger";
 
-                            htObj.GetComponent<HelpTrigger>().helpText = obj.GetField("text");
+                        htObj.GetComponent<HelpTrigger>().helpText = obj.GetField("text");
 
-                            var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                            var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
-                            var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+                        var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
-                            var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
+                        var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
-                            htObj.transform.localPosition = position;
-                            htObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
-                            htObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
-                        }
+                        htObj.transform.localPosition = position;
+                        htObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                        htObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
+                    }
+
+                    else if (objectName == "TeleportTrigger")
+                    {
+                        var telObj = Instantiate(teleportTrigger, transform, false);
+                        telObj.name = "TeleportTrigger";
+
+                        var time = obj.GetField("time");
+                        telObj.GetComponent<Teleport>().time = string.IsNullOrEmpty(time) ? 2 : (float.Parse(time) / 1000);
+
+                        telObj.GetComponent<Teleport>().destinationGameObjectName = obj.GetField("destination");
+
+                        var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+
+                        var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
+
+                        telObj.transform.localPosition = position;
+                        telObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                        telObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
+
+                        teleportTriggers.Add(telObj);
+                    }
+
+                    else if (objectName == "DestinationTrigger")
+                    {
+                        var destObj = Instantiate(destinationTrigger, transform, false);
+                        destObj.name = string.IsNullOrEmpty(obj.Name) ? "Checkpoint" : obj.Name;
+
+                        var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+
+                        var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
+
+                        destObj.transform.localPosition = position;
+                        destObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                        destObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
+
+                        destinationTriggers.Add(destObj);
                     }
                 }
 
@@ -1068,6 +1157,51 @@ namespace TS
                 }
             }
 
+            //assigning destination triggers to teleport
+            foreach (GameObject go in teleportTriggers)
+            {
+                Teleport tele = go.GetComponent<Teleport>();
+                string destination = tele.destinationGameObjectName;
+                foreach(GameObject dest in destinationTriggers)
+                {
+                    if(dest.name == destination)
+                    {
+                        tele.destination = dest;
+                        break;
+                    }
+                }
+            }
+
+            //assigning checkpoint triggers
+            foreach (var obj in mission.RecursiveChildren())
+            {
+                if (obj.ClassName == "Trigger" && obj.GetField("dataBlock") == "CheckpointTrigger")
+                {
+                    foreach(GameObject go in checkpoints)
+                    {
+                        if(obj.GetField("respawnPoint") == go.name)
+                        {
+                            var cpTrigger = go.transform.Find("Trigger");
+
+                            var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                            var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                            var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+
+                            Debug.Log(position);
+
+                            var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
+
+                            cpTrigger.transform.position = position;
+                            cpTrigger.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+                            cpTrigger.transform.localScale = Vector3.Scale(scale, polyhedronScale);
+
+                            cpTrigger.GetComponent<BoxCollider>().enabled = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
             StartCoroutine(DelayBeforeRespawn());
         }
 
@@ -1085,7 +1219,7 @@ namespace TS
             GameManager.instance.PlayLevelMusic();
 
             directionalLight.GetComponent<Light>().shadows = PlayerPrefs.GetInt("Graphics_Shadow", 1) == 1 ? LightShadows.Soft : LightShadows.None;
-            directionalLight.intensity = ConvertIntensity(sunColor);
+            directionalLight.intensity *= ConvertIntensity(sunColor);
 
             AsyncOperation unloadOp = SceneManager.UnloadSceneAsync("Loading");
             while (!unloadOp.isDone)
@@ -1095,6 +1229,10 @@ namespace TS
 
             CameraController.instance.GetComponent<Camera>().enabled = true;
             GameUIManager.instance.GetComponent<Canvas>().enabled = true;
+
+            //disable cursor visibility
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
 
             Invoke(nameof(EnableSounds), 0.1f);
 
