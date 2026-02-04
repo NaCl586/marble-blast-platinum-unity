@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4575377146879440660}
   - component: {fileID: 4969125030955573656}
-  - component: {fileID: 2137431623052030666}
+  - component: {fileID: 1698557585401333725}
   m_Layer: 0
   m_Name: Trigger
   m_TagString: Untagged
@@ -48,7 +48,7 @@ MonoBehaviour:
   radius: 10
   arc: 0.25
   strength: -90
---- !u!82 &2137431623052030666
+--- !u!82 &1698557585401333725
 AudioSource:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,7 +60,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 8300000, guid: 6409a729d2c65ef4b98741b85d33cf7f, type: 3}
   m_PlayOnAwake: 1
-  m_Volume: 0.1
+  m_Volume: 1
   m_Pitch: 1
   Loop: 1
   Mute: 0
@@ -104,7 +104,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0

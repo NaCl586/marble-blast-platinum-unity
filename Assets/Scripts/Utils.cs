@@ -120,7 +120,7 @@ public static class Utils
         { KeyCode.Escape, "Esc" },
         { KeyCode.Backspace, "Backspace" },
         { KeyCode.Delete, "Delete" },
-        { KeyCode.Space, "Space" },
+        { KeyCode.Space, "Space Bar" },
 
         { KeyCode.PageUp, "Page Up" },
         { KeyCode.PageDown, "Page Down" },

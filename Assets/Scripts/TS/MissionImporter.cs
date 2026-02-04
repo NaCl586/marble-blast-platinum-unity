@@ -998,7 +998,11 @@ namespace TS
 
                         telObj.transform.localPosition = position;
                         telObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+
+                        var cameraPos = telObj.transform.Find("CameraPos");
+                        cameraPos.transform.parent = null;
                         telObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
+                        cameraPos.transform.parent = telObj.transform;
 
                         teleportTriggers.Add(telObj);
                         if (!string.IsNullOrEmpty(obj.Name))
@@ -1018,7 +1022,11 @@ namespace TS
 
                         destObj.transform.localPosition = position;
                         destObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+
+                        var cameraPos = destObj.transform.Find("CameraPos");
+                        cameraPos.transform.parent = null;
                         destObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
+                        cameraPos.transform.parent = destObj.transform;
 
                         destinationTriggers.Add(destObj);
                     }
