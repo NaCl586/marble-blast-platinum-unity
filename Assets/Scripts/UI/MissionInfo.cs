@@ -213,7 +213,7 @@ public class MissionInfo : MonoBehaviour
 
                     int _alarmTime = 15;
                     if (int.TryParse(obj.GetField("AlarmStartTime"), out _alarmTime))
-                        newMission.alarmTime = _alarmTime * 1000;
+                        newMission.alarmTime = _alarmTime;
                     else
                         newMission.alarmTime = 15;
 

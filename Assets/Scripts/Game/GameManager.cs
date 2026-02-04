@@ -238,7 +238,7 @@ public class GameManager : MonoBehaviour
             GameUIManager.instance.SetTimerText(elapsedTime);
         }
 
-        if (MissionInfo.instance.time != -1 && elapsedTime >= (MissionInfo.instance.time - MissionInfo.instance.alarmTime * 1000))
+        if (gameStart && MissionInfo.instance.time != -1 && elapsedTime >= (MissionInfo.instance.time - MissionInfo.instance.alarmTime * 1000))
         {
             if (elapsedTime >= MissionInfo.instance.time)
             {
