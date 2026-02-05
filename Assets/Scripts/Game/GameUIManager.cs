@@ -30,6 +30,11 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] GameObject setImage;
     [SerializeField] GameObject goImage;
     [SerializeField] GameObject outOfBoundsImage;
+    [Space]
+    public GameObject oobInsultMenu;
+    [SerializeField] TextMeshProUGUI oobInsultTitleText;
+    [SerializeField] TextMeshProUGUI oobInsultCaptionText;
+    [SerializeField] Button oobInsultCloseButton;
 
     Tween centerTextFade;
     Tween bottomTextFade;
@@ -37,9 +42,19 @@ public class GameUIManager : MonoBehaviour
     Sprite[] timerColor;
     float timer = 0f;
 
-    private void Start()
+    [HideInInspector] public bool isInitialized = false;
+
+    public void Init()
     {
         timerColor = new Sprite[numbers.Length];
+        oobInsultCloseButton.onClick.AddListener(() => {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
+            Time.timeScale = 1;
+            oobInsultMenu.SetActive(false);
+        });
+        isInitialized = true;
     }
 
     private void Update()
@@ -60,6 +75,18 @@ public class GameUIManager : MonoBehaviour
     {
         int decimals = Mathf.Abs(value) >= 1000f ? 0 : 1;
         return (float)System.Math.Round(value, decimals, System.MidpointRounding.AwayFromZero);
+    }
+
+    public void SetOutOfBoundsMessage(int oobCount, string message)
+    {
+        oobInsultMenu.SetActive(true);
+        Time.timeScale = 0;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        oobInsultTitleText.text = "Out of Bounds " + oobCount + " times";
+        oobInsultCaptionText.text = message;
     }
 
     public void UpdateHUDMaterial()

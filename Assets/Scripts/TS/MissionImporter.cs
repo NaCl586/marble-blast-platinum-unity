@@ -1219,6 +1219,8 @@ namespace TS
             while (!GameManager.instance.startPad)
                 yield return null;
 
+            GameUIManager.instance.Init();
+
             globalMarble.GetComponent<Movement>().GenerateMeshData();
 
             Time.timeScale = 1f;

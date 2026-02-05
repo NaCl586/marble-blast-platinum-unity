@@ -253,8 +253,6 @@ public static class Utils
 
     public static string FormatTimeDHMS(double totalSeconds)
     {
-        Debug.Log(totalSeconds);
-
         totalSeconds = Math.Max(0, totalSeconds); // safety
 
         TimeSpan t = TimeSpan.FromSeconds(totalSeconds);
