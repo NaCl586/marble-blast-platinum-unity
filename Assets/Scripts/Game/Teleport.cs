@@ -18,11 +18,12 @@ public class Teleport : MonoBehaviour
     private float initTime;
 
     // Start is called before the first frame update
-    void Start()
+    public void InitTeleporter()
     {
         player = Marble.instance.gameObject;
-        material = Marble.instance.teleportMesh.GetComponent<SkinnedMeshRenderer>().material;
-        originalColor = material.color;
+        material = Marble.instance.teleportMesh.GetComponent<MeshRenderer>().sharedMaterial;
+        material.color = Color.white;
+        originalColor = Color.white;
     }
 
     void OnTriggerEnter(Collider other)

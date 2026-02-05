@@ -57,7 +57,7 @@ public class Movement : MonoBehaviour
 	public Vector3 marbleVelocity;
 	public Vector3 marbleAngularVelocity;
 
-	private float marbleRadius;
+	public float marbleRadius;
 	private Vector2 inputMovement()
 	{
 		Vector2 movement = fakeInput;
@@ -175,13 +175,13 @@ public class Movement : MonoBehaviour
 
 		sphereCollider = GetComponent<SphereCollider>();
 
-		GravitySystem.GravityStrength = gravity;
-
 		marbleRadius = sphereCollider.radius * Mathf.Max(
 			transform.lossyScale.x,
 			transform.lossyScale.y,
 			transform.lossyScale.z
-		);	
+		);
+
+		GravitySystem.GravityStrength = gravity;
 	}
 
 	public void GenerateMeshData()

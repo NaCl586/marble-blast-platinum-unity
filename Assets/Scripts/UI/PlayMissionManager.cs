@@ -70,6 +70,15 @@ public class PlayMissionManager : MonoBehaviour
     public Sprite egg;
     public Sprite egg_nf;
     [Space]
+    public GameObject marbleSelectWindow;
+    public GameObject statisticsWindow;
+    public GameObject achievementsWindow;
+    public GameObject searchWindow;
+    public Button marbleSelectButton;
+    public Button statisticsButton;
+    public Button achievementsButton;
+    public Button searchButton;
+    [Space]
     public bool debug = false;
 
     int selectedLevelNum;
@@ -88,8 +97,20 @@ public class PlayMissionManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
+        marbleSelectWindow.SetActive(false);
+        statisticsWindow.SetActive(false);
+        achievementsWindow.SetActive(false);
+        searchWindow.SetActive(false);
+
+        marbleSelectButton.onClick.AddListener(() => ToggleMarbleSelectWindow(true));
+
         StartCoroutine(WaitUntilFinishLoading());
     }
+
+    public void ToggleMarbleSelectWindow(bool _active) => marbleSelectWindow.SetActive(_active);
+    public void ToggleStatisticsWindow(bool _active) => statisticsWindow.SetActive(_active);
+    public void ToggleAchievementWindow(bool _active) => achievementsWindow.SetActive(_active);
+    public void ToggleSearchWindow(bool _active) => searchWindow.SetActive(_active);
 
     IEnumerator WaitUntilFinishLoading()
     {

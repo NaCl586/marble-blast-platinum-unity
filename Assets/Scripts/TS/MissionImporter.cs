@@ -79,6 +79,7 @@ namespace TS
 
         void Start()
         {
+            MarbleInfo.instance.ApplyMesh();
             ImportMission();
         }
 
@@ -1179,6 +1180,7 @@ namespace TS
                         break;
                     }
                 }
+                tele.InitTeleporter();
             }
 
             //assigning checkpoint triggers

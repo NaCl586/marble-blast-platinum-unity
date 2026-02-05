@@ -698,6 +698,7 @@ MonoBehaviour:
   bounce: 0
   marbleVelocity: {x: 0, y: 0, z: 0}
   marbleAngularVelocity: {x: 0, y: 0, z: 0}
+  marbleRadius: 0.5
 --- !u!114 &2259544043996708080
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -836,7 +837,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4375233829040355428}
-  - component: {fileID: 1113205552768972819}
+  - component: {fileID: 8960454556894533128}
+  - component: {fileID: 1182470347719236630}
   m_Layer: 0
   m_Name: U3DMesh
   m_TagString: Untagged
@@ -859,8 +861,8 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8063354927524803972}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &1113205552768972819
-SkinnedMeshRenderer:
+--- !u!23 &8960454556894533128
+MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -874,7 +876,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 3
+  m_RayTracingMode: 2
   m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
@@ -900,19 +902,15 @@ SkinnedMeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  serializedVersion: 2
-  m_Quality: 0
-  m_UpdateWhenOffscreen: 0
-  m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 1960544099208130213, guid: 0cf36923f2538c34fa4ddc40b8dd1f2e, type: 3}
-  m_Bones:
-  - {fileID: 1291905228155638332}
-  m_BlendShapeWeights: []
-  m_RootBone: {fileID: 1291905228155638332}
-  m_AABB:
-    m_Center: {x: 0, y: 2.3283064e-10, z: 0}
-    m_Extent: {x: 0.002, y: 0.0020000003, z: 0.002}
-  m_DirtyAABB: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1182470347719236630
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2789011888946699525}
+  m_Mesh: {fileID: 6061679838749561100, guid: 3ac078c7b6d8c7b4c8dff6311cb95f62, type: 3}
 --- !u!1 &3021590914276483517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,7 +1324,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5931025251115985379}
-  - component: {fileID: 6483604244498616653}
+  - component: {fileID: 1889693960588121404}
+  - component: {fileID: 8098940541740685813}
   m_Layer: 0
   m_Name: TeleportMesh
   m_TagString: Untagged
@@ -1349,8 +1348,8 @@ Transform:
   m_Children: []
   m_Father: {fileID: 8063354927524803972}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!137 &6483604244498616653
-SkinnedMeshRenderer:
+--- !u!23 &1889693960588121404
+MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -1364,7 +1363,7 @@ SkinnedMeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 3
+  m_RayTracingMode: 2
   m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
@@ -1390,19 +1389,15 @@ SkinnedMeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  serializedVersion: 2
-  m_Quality: 0
-  m_UpdateWhenOffscreen: 0
-  m_SkinnedMotionVectors: 1
-  m_Mesh: {fileID: 1960544099208130213, guid: 0cf36923f2538c34fa4ddc40b8dd1f2e, type: 3}
-  m_Bones:
-  - {fileID: 1291905228155638332}
-  m_BlendShapeWeights: []
-  m_RootBone: {fileID: 1291905228155638332}
-  m_AABB:
-    m_Center: {x: 0, y: 2.3283064e-10, z: 0}
-    m_Extent: {x: 0.002, y: 0.0020000003, z: 0.002}
-  m_DirtyAABB: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &8098940541740685813
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6514363544538391922}
+  m_Mesh: {fileID: 6061679838749561100, guid: 3ac078c7b6d8c7b4c8dff6311cb95f62, type: 3}
 --- !u!1 &6589829571493914625
 GameObject:
   m_ObjectHideFlags: 0
