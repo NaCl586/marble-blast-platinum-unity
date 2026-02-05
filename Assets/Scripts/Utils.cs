@@ -250,4 +250,33 @@ public static class Utils
             .ThenBy(r => r.height)
             .ToList();
     }
+
+    public static string FormatTimeDHMS(double totalSeconds)
+    {
+        Debug.Log(totalSeconds);
+
+        totalSeconds = Math.Max(0, totalSeconds); // safety
+
+        TimeSpan t = TimeSpan.FromSeconds(totalSeconds);
+
+        int days = t.Days;
+        int hours = t.Hours;
+        int minutes = t.Minutes;
+        int seconds = t.Seconds;
+
+        return $"{days:00}:{hours:00}:{minutes:00}:{seconds:00}";
+    }
+
+    public static string FormatMillisecondsToHMS(long milliseconds)
+    {
+        milliseconds = Math.Max(0, milliseconds); // safety
+
+        TimeSpan t = TimeSpan.FromMilliseconds(milliseconds);
+
+        int hours = (int)t.TotalHours; // total hours, not wrapped
+        int minutes = t.Minutes;
+        int seconds = t.Seconds;
+
+        return $"{hours:00}:{minutes:00}:{seconds:00}";
+    }
 }

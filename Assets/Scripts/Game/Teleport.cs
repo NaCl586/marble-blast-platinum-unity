@@ -40,14 +40,17 @@ public class Teleport : MonoBehaviour
                 Marble.instance.teleportSound.volume = PlayerPrefs.GetFloat("Audio_SoundVolume", 0.5f);
                 Marble.instance.teleportSound.Play();
 
-                GameUIManager.instance.SetBottomText("Teleporter has been activated, please wait.", teleportTime);
+                if(teleportTime >= 2)
+                    GameUIManager.instance.SetBottomText("Teleporter has been activated, please wait.", teleportTime);
+                else
+                    GameUIManager.instance.SetBottomText("Teleporter has been activated.", teleportTime);
 
                 SetTransparent();
                 StartCoroutine(TeleportFade());
             }
             else
             {
-                GameUIManager.instance.SetBottomText("Teleporter has no destination.");
+                GameUIManager.instance.SetBottomText("There's no destination specified! Please check the .mis file.");
             }
         }
     }

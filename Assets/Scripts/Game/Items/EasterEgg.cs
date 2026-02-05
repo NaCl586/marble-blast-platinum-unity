@@ -13,7 +13,7 @@ public class EasterEgg : Powerups
     {
         if (PlayerPrefs.GetInt(MissionInfo.instance.levelName + "_EasterEgg", 0) == 1)
         {
-            bottomTextMsg = "You already found this Easter Egg!";
+            bottomTextMsg = "You already found this Easter Egg.";
             pickupSound = alreadyGotEggSfx;
         }
         else
@@ -21,6 +21,10 @@ public class EasterEgg : Powerups
             bottomTextMsg = "You found an Easter Egg!";
             pickupSound = gotEasterEggSfx;
             PlayerPrefs.SetInt(MissionInfo.instance.levelName + "_EasterEgg", 1);
+
+            int easterEggCount = PlayerPrefs.GetInt("EasterEggCollected", 0);
+            easterEggCount++;
+            PlayerPrefs.SetInt("EasterEggCollected", easterEggCount);
         }
     }
 }

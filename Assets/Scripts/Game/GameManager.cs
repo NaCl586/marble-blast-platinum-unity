@@ -378,12 +378,21 @@ public class GameManager : MonoBehaviour
 
     void OutOfBounds()
     {
+        IncrementOutOfBoundsCount();
+
         GameUIManager.instance.SetCenterImage(3);
         PlayOutOfBoundsAudio();
         CameraController.instance.LockCamera(false);
 
         CancelInvoke();
         Invoke(nameof(InvokeRespawn), 2f);
+    }
+
+    public void IncrementOutOfBoundsCount()
+    {
+        int oobCount = PlayerPrefs.GetInt("OutOfBoundsCount", 0);
+        oobCount++;
+        PlayerPrefs.SetInt("OutOfBoundsCount", oobCount);
     }
 
     public void InvokeRespawn() => Marble.onRespawn?.Invoke();
@@ -484,6 +493,8 @@ public class GameManager : MonoBehaviour
             GameUIManager.instance.SetPowerupIcon(activePowerup);
 
             GameUIManager.instance.SetCenterImage(-1);
+
+            GameManager.instance.IncrementOutOfBoundsCount();
         }
 
         recentGems.Clear();
@@ -682,9 +693,9 @@ public class GameManager : MonoBehaviour
         ultimateTimeBox.SetActive(false);
         goldTimeBox.SetActive(false);
 
-        if(PlayMissionManager.selectedGame == Game.gold)
+        if (PlayMissionManager.selectedGame == Game.gold)
         {
-            if(PlayMissionManager.currentlySelectedType == Type.custom)
+            if (PlayMissionManager.currentlySelectedType == Type.custom)
             {
                 platinumTimeBox.SetActive(true);
                 ultimateTimeBox.SetActive(true);
@@ -710,7 +721,7 @@ public class GameManager : MonoBehaviour
                     finishCaption.text = "<color=#F55555>You did't pass the Par time!</color>";
             }
         }
-        else if(PlayMissionManager.selectedGame == Game.platinum)
+        else if (PlayMissionManager.selectedGame == Game.platinum)
         {
             platinumTimeBox.SetActive(true);
             ultimateTimeBox.SetActive(true);

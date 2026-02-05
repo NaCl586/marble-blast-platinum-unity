@@ -118,7 +118,7 @@ public class Powerups : MonoBehaviour
 
         GameManager.instance.PlayAudioClip(pickupSound);
         if (powerupType != PowerupType.TimeTravel && powerupType != PowerupType.EasterEgg)
-            bottomTextMsg = "You picked up a " + powerupName;
+            bottomTextMsg = "You recieved a " + powerupName;
 
         GameUIManager.instance.SetBottomText(bottomTextMsg);
 

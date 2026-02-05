@@ -102,7 +102,28 @@ public class PlayMissionManager : MonoBehaviour
         achievementsWindow.SetActive(false);
         searchWindow.SetActive(false);
 
-        marbleSelectButton.onClick.AddListener(() => ToggleMarbleSelectWindow(true));
+        marbleSelectButton.onClick.AddListener(() => 
+        {
+            foreach (var button in FindObjectsOfType<Button>())
+                button.enabled = false;
+
+            ToggleMarbleSelectWindow(true); 
+        });
+        statisticsButton.onClick.AddListener(() =>
+        {
+            foreach (var button in FindObjectsOfType<Button>())
+                button.enabled = false;
+
+            GetComponent<StatisticsManager>().InitStatistics();
+            ToggleStatisticsWindow(true);
+        });
+        achievementsButton.onClick.AddListener(() =>
+        {
+            foreach (var button in FindObjectsOfType<Button>())
+                button.enabled = false;
+
+            ToggleAchievementWindow(true);
+        });
 
         StartCoroutine(WaitUntilFinishLoading());
     }
@@ -169,11 +190,19 @@ public class PlayMissionManager : MonoBehaviour
 
         if (selectedGame == Game.gold)
         {
+            achievementsButton.gameObject.SetActive(false);
+
+            if (currentlySelectedType == Type.custom)
+                statisticsButton.gameObject.SetActive(false);
+
             expertButton.SetActive(false);
             customButton.SetActive(true);
         }
         else if (selectedGame == Game.platinum)
         {
+            achievementsButton.gameObject.SetActive(true);
+            statisticsButton.gameObject.SetActive(true);
+
             expertButton.SetActive(true);
             customButton.SetActive(false);
         }
@@ -188,6 +217,9 @@ public class PlayMissionManager : MonoBehaviour
             customButton.SetActive(false);
             currentlySelectedType = Type.beginner;
             LoadMissions(Type.beginner, Game.platinum);
+
+            achievementsButton.gameObject.SetActive(true);
+            statisticsButton.gameObject.SetActive(true);
         }
         else if (selectedGame == Game.platinum)
         {
@@ -196,6 +228,11 @@ public class PlayMissionManager : MonoBehaviour
             customButton.SetActive(true);
             currentlySelectedType = Type.beginner;
             LoadMissions(Type.beginner, Game.gold);
+
+            achievementsButton.gameObject.SetActive(false);
+
+            if (currentlySelectedType == Type.custom)
+                statisticsButton.gameObject.SetActive(false);
         }
     }
 
@@ -224,6 +261,10 @@ public class PlayMissionManager : MonoBehaviour
                 missions = MissionInfo.instance.missionsPlatinumExpert;
         }
 
+        if (difficulty == Type.custom)
+            statisticsButton.gameObject.SetActive(false);
+        else
+            statisticsButton.gameObject.SetActive(true);
 
         currentlySelectedType = difficulty;
 
