@@ -44,8 +44,9 @@ public class CustomResolutionManager : MonoBehaviour
         foreach(var res in resolutions)
             InstantiateButton(res.width, res.height);
 
-        width = resolutions[0].width;
-        height = resolutions[0].height;
+        width = 1280;
+        height = 720;
+        
     }
 
     public void ScrollUp()

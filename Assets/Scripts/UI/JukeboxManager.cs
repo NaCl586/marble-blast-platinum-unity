@@ -36,7 +36,7 @@ public class JukeboxManager : MonoBehaviour
         stopButton.onClick.AddListener(Stop);
         playButton.onClick.AddListener(Play);
 
-        audioSource.volume = PlayerPrefs.GetFloat("Audio_SoundVolume", 0.5f);
+        audioSource.volume = PlayerPrefs.GetFloat("Audio_MusicVolume", 0.5f);
 
         jukeboxWindowOpen = false;
         isPlaying = true;
@@ -238,7 +238,6 @@ public class JukeboxManager : MonoBehaviour
         {
             if (content.GetChild(i).Find("Text").GetComponent<TextMeshProUGUI>().text == name)
             {
-                Debug.Log("Found");
                 HighlightButton(content.GetChild(i).gameObject.GetComponent<Button>());
                 break;
             }

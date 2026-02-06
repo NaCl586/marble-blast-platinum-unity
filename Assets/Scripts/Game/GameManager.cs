@@ -75,6 +75,7 @@ public class GameManager : MonoBehaviour
 
     public void PlayLevelMusic()
     {
+        JukeboxManager.instance.audioSource.volume = PlayerPrefs.GetFloat("Audio_MusicVolume", 0.5f);
         JukeboxManager.instance.PlayMusic(MissionInfo.instance.music);
     }
 
