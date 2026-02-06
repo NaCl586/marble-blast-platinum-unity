@@ -12,6 +12,7 @@ TagManager:
   - Powerup
   - TimeTravel
   - Checkpoint
+  - Jukebox
   layers:
   - Default
   - TransparentFX

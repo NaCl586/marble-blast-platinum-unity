@@ -265,6 +265,8 @@ public class StatisticsManager : MonoBehaviour
                 missionList = MissionInfo.instance.missionsGoldIntermediate;
             if (type == Type.advanced)
                 missionList = MissionInfo.instance.missionsGoldAdvanced;
+            if (type == Type.custom)
+                missionList = MissionInfo.instance.missionsGoldCustom;
         }
 
         return missionList;

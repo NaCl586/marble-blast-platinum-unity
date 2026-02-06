@@ -81,7 +81,7 @@ public class PlayMissionManager : MonoBehaviour
     [Space]
     public bool debug = false;
 
-    int selectedLevelNum;
+    [HideInInspector] public int selectedLevelNum;
     public static Type currentlySelectedType = Type.none;
     public static Game selectedGame = Game.none;
 
@@ -123,6 +123,15 @@ public class PlayMissionManager : MonoBehaviour
                 button.enabled = false;
 
             ToggleAchievementWindow(true);
+        });
+        searchButton.onClick.AddListener(() =>
+        {
+            foreach (var button in FindObjectsOfType<Button>())
+                button.enabled = false;
+
+            ToggleSearchWindow(true);
+            GetComponent<SearchManager>().SelectFirstButton();
+            GetComponent<SearchManager>().scrollRect.verticalNormalizedPosition = 1f;
         });
 
         StartCoroutine(WaitUntilFinishLoading());
@@ -206,6 +215,8 @@ public class PlayMissionManager : MonoBehaviour
             expertButton.SetActive(true);
             customButton.SetActive(false);
         }
+
+        GetComponent<SearchManager>().InitSearchElements();
     }
 
     void SwitchGame()

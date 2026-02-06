@@ -20,6 +20,8 @@ public class SplashScreenManager : MonoBehaviour
 
     public void Start()
     {
+        JukeboxManager.instance.PlayMusic("Pianoforte");
+
         image.sprite = presents;
         image.color = Color.clear;
         image.DOColor(Color.white, 0.5f).OnComplete(() => {

@@ -72,18 +72,10 @@ public class GameManager : MonoBehaviour
     public void PlayMissingGemAudio() => audioSource.PlayOneShot(puMissingGems);
     public void PlayAudioClip(AudioClip _ac) => audioSource.PlayOneShot(_ac);
 
-    [Space]
-    [Header("Level Music")]
-    [SerializeField] AudioSource levelMusic;
 
     public void PlayLevelMusic()
     {
-        if (MenuMusic.instance)
-            Destroy(MenuMusic.instance.gameObject);
-
-        LevelMusic.instance.SetMusic(MissionInfo.instance.music, MissionInfo.instance.level, PlayMissionManager.selectedGame, PlayMissionManager.currentlySelectedType);
-        levelMusic.volume = PlayerPrefs.GetFloat("Audio_MusicVolume", 0.5f);
-        levelMusic.Play();
+        JukeboxManager.instance.PlayMusic(MissionInfo.instance.music);
     }
 
     public void SetSoundVolumes()
@@ -633,6 +625,7 @@ public class GameManager : MonoBehaviour
     #region UI
     public void ReturnToMenu()
     {
+        JukeboxManager.instance.PlayMusic("Pianoforte");
         SceneManager.LoadScene("PlayMission");
     }
 
