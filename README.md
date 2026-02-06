@@ -9,6 +9,12 @@ These features are not yet implemented (and might possibly not implemented later
 <img src="https://i.imgur.com/3HdzfdO.png" width="640">
 
 As the time of me writing this, the game has not been fully tested as I don't have the skill and capability to complete all levels.
+Known issues:
+- Checkpoint respawn orientation when being upside down is wrong (for this reason, Space Station mis file is changed)
+- Some interiors are not parsed correctly into the game (for this reason, Space Station interior is split into two)
+- You can't scroll scrollbars using mouse wheel
+Please report other bugs that you find! Thank you :)
+Also lightning is still not optimized enough, feel free to give feedback too :)
 
 ## Download the Windows build [here](https://github.com/NaCl586/marble-blast-platinum-unity/releases/)
 
