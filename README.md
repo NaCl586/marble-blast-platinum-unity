@@ -12,7 +12,8 @@ As the time of me writing this, the game has not been fully tested as I don't ha
 Known issues:
 - Checkpoint respawn orientation when being upside down is wrong (for this reason, Space Station mis file is changed)
 - Some interiors are not parsed correctly into the game (for this reason, Space Station interior is split into two)
-- You can't scroll scrollbars using mouse wheel
+- You can't scroll scrollbars using mouse wheel 
+- Some Director's Cut levels can cause crash when loading (e.g. Cubed Maze), and some are impossible (e.g. Getting Squeezed, Bent Reality)
 
 Please report other bugs that you find! Thank you
 
