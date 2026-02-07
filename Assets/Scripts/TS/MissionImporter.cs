@@ -63,7 +63,8 @@ namespace TS
         [Space]
         public GameObject teleportPad;
         public GameObject checkpointPrefab;
-        public GameObject colmeshPrefab;
+        [Space]
+        public GameObject[] staticShapes;
 
         [Header("References")]
         public GameObject globalMarble;
@@ -356,6 +357,14 @@ namespace TS
 
                     if (!dif.GenerateMesh(-1))
                         Destroy(gobj.gameObject);
+
+                    //if scale has component with 0 value, remove all colliders
+                    if(scale.x == 0 || scale.y == 0 || scale.z == 0)
+                    {
+                        MeshCollider[] meshColliders = gobj.GetComponentsInChildren<MeshCollider>(true);
+                        foreach (var mc in meshColliders)
+                            Destroy(mc);
+                    }
                 }
 
                 //Shapes
@@ -849,7 +858,7 @@ namespace TS
                     string objectName = obj.GetField("shapeName");
                     objectName = Path.GetFileNameWithoutExtension(objectName);
 
-                    if (objectName.ToLower() == "checkpoint")
+                    if (objectName.ToLower() == "checkpoint" && !string.IsNullOrEmpty(obj.Name))
                     {
                         var cp = Instantiate(checkpointPrefab, transform, false);
                         cp.name = string.IsNullOrEmpty(obj.Name) ? "Checkpoint" : obj.Name;
@@ -918,11 +927,32 @@ namespace TS
                         var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
                         gobj.transform.localPosition = position;
-                        gobj.transform.localRotation = rotation * Quaternion.Euler(90f, 0f, 0f); ;
+                        gobj.transform.localRotation = rotation * Quaternion.Euler(90f, 0f, 0f);
                         gobj.transform.localScale = new Vector3(scale.x * gobj.transform.localScale.x,
                                                                 scale.y * gobj.transform.localScale.y,
                                                                 scale.z * gobj.transform.localScale.z
                                                                 );
+                    }
+
+                    else
+                    {
+                        var shape = staticShapes.FirstOrDefault(go => go != null && go.name.ToLower() == objectName.ToLower());
+                        if(shape != null)
+                        {
+                            var gobj = Instantiate(shape, transform, false);
+                            gobj.name = objectName;
+
+                            var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
+                            var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
+                            var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
+
+                            gobj.transform.localPosition = position;
+                            gobj.transform.localRotation = gobj.transform.localRotation * rotation * Quaternion.Euler(90f, 0f, 0f);
+                            gobj.transform.localScale = new Vector3(scale.x * gobj.transform.localScale.x,
+                                                                    scale.y * gobj.transform.localScale.y,
+                                                                    scale.z * gobj.transform.localScale.z
+                                                                    );
+                        }
                     }
                 }
 
