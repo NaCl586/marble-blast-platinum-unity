@@ -20,6 +20,8 @@ public class Teleport : MonoBehaviour
     // Start is called before the first frame update
     public void InitTeleporter()
     {
+        teleporting = false;
+
         player = Marble.instance.gameObject;
         material = Marble.instance.teleportMesh.GetComponent<MeshRenderer>().sharedMaterial;
         material.color = Color.white;
@@ -107,7 +109,7 @@ public class Teleport : MonoBehaviour
                 originalColor.b,
                 alpha
             );
-
+            Debug.Log(alpha);
             yield return null;
         }
     }

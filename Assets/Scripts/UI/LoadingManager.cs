@@ -77,6 +77,9 @@ public class LoadingManager : MonoBehaviour
         // Stop the coroutine cleanly
         StopAllCoroutines();
 
+		JukeboxManager.instance.PlayMusic("Pianoforte");
+
+
         if(ReplayRecorder.loadReplay)
             SceneManager.LoadScene("ReplayMenu", LoadSceneMode.Single);
         else
