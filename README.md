@@ -1,7 +1,9 @@
 # Marble Blast Platinum Unity Port
 
 The Unity Port of Marble Blast Platinum, based on [Marble Blast Gold Unity remake](https://github.com/NaCl586/marble-blast-gold-unity/) that I did. This remake is based on Marble Blast Platinum 1.14. 
-These features are not yet implemented (and might possibly not implemented later): Replay Center, Leaderboards, and Level Editor (this is not planned, so don't ask for level editor).
+These features are not yet implemented (and might possibly not implemented later): Leaderboards, and Level Editor. Level Editor is not planned, so don't ask. Leaderboards is planned though, but I'm not sure when I'm gonna make it.
+
+<b>As version 1.2, Replay Center and replay recording/loading system has been implemented, check below for more information.</b>
 
 <img src="https://i.imgur.com/j1YrNlX.png" width="640">
 <img src="https://i.imgur.com/yyTlJ6q.png" width="640">
@@ -29,6 +31,20 @@ Special thanks to Vani and RandomityGuy for helping me whenever I have problems 
 
 Press R for quick respawn, works when the game is paused. This button currently is not remappable because I wanted to create the same UI remake without additional things. Also, setting video driver and color mode is just pure cosmetic and does not work.
 
+## NEW! Replay System
+
+Replay system is now here at version 1.2, it works pretty much similar to the original Marble Blast Platinum 1.14. 
+
+To start recording, click on the record button (the bottom-right most button on the level select menu), then you will be asked for a filename. Enter a filename, which must not be the same with any existing replay. When playing, a recording icon will show under the powerup panel (similar within the PlatinumQuest). You can end the recording prematurely or finish the level; either way stops the recording, in which after that you will be asked to fill a short form, containing recording name, recording author, and recording description. Click apply to save the replay or click cancel to discard the replay. If you restart a run then saved a new file, the old one will be overwritten. Also, marble skin used will be saved too.
+
+To load the recording, on the main menu, open replay center, then click the replay you want to play. When playing a replay, it will play until the end, or you can end it prematurely by pressing escape.
+
+Replays are stored in Marble Blast Platinum 1.14_Data\Replays with extension ".urec", short for Unity Port Rec (not using .rec to differentiate between the original vanilla recording format). You can share and exchange .urec files between machines (theoretically). You can see some sample replays I have in the repo.
+
+## Custom Music for Jukebox
+
+You can add custom musics into the jukebox by placing ".ogg" files in Marble Blast Platinum 1.14_Data\CustomMusics. If you have a decent number of files there, it will take a while to load all into the memory. Tested working (in the repo, I put .ogg musics from Marble Blast Future for testing).
+
 ## Save Data
 
 <img src="https://i.imgur.com/u2wAziG.png" width="640">
@@ -37,7 +53,7 @@ Save data uses [PlayerPrefs](https://docs.unity3d.com/6000.0/Documentation/Scrip
 
 ## Custom Level Support
 
-You can add custom levels that are specifically made for Marble Blast Gold and Platinum by placing the mission file in Marble Blast Platinum 1.14_Data\StreamingAssets\marble\data\missions\custom and the interior file in Marble Blast_Data\StreamingAssets\marble\data\interiors (or wherever you put your .dif files when making the level). Adding new folders or custom levels that are not made for Marble Blast Gold do not work. You can technically add more levels to the main game with the same fashion. This feature is theoretically working but still untested.
+You can add custom levels that are specifically made for Marble Blast Gold and Platinum by placing the mission file in Marble Blast Platinum 1.14_Data\StreamingAssets\marble\data\missions\custom and the interior file in Marble Blast_Data\StreamingAssets\marble\data\interiors (or wherever you put your .dif files when making the level). Adding new folders or custom levels that are not made for Marble Blast Gold do not work. You can technically add more levels to the main game with the same way. This feature is theoretically working but still untested.
 
 ## Custom Marble Support
 
