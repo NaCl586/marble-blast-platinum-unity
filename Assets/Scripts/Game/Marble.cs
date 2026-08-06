@@ -54,10 +54,10 @@ public class Marble : MonoBehaviour
 
     private void Update()
     {
-        if (GameUIManager.instance.isInitialized && GameUIManager.instance.oobInsultMenu.activeSelf)
+        if (GameUIManager.instance.isInitialized && (GameUIManager.instance.oobInsultMenu.activeSelf || GameUIManager.instance.saveReplayMenu.activeSelf))
             return;
 
-        if (Input.GetKeyDown(KeyCode.R) && !GameManager.gameFinish)
+        if (Input.GetKeyDown(KeyCode.R) && !GameManager.gameFinish && !ReplayRecorder.loadReplay)
         {
             if (!GameManager.isPaused)
             {
@@ -71,9 +71,25 @@ public class Marble : MonoBehaviour
         }
 
         if (GameManager.isPaused && Input.GetKeyDown(KeyCode.Return))
-            SceneManager.LoadScene("PlayMission");
+        {
+            if (ReplayRecorder.recordReplay)
+            {
+                GameManager.instance.pauseMenu.SetActive(false);
+                GameManager.instance.finishMenu.SetActive(false);
+                GameUIManager.instance.saveReplayMenu.SetActive(true);
+            }
+            else
+            {
+                JukeboxManager.instance.PlayMusic("Pianoforte");
+                SceneManager.LoadScene("PlayMission");
+            }
+        }
 
-        if (Input.GetKeyDown(ControlBinding.instance.usePowerup) && !GameManager.isPaused && !GameManager.gameFinish && Movement.instance.canMove)
+        if (Input.GetKeyDown(ControlBinding.instance.usePowerup) && 
+            !GameManager.isPaused && 
+            !GameManager.gameFinish && 
+            Movement.instance.canMove && 
+            !ReplayRecorder.loadReplay)
             UsePowerup();
     }
 
@@ -82,7 +98,7 @@ public class Marble : MonoBehaviour
         gyrocopterBlades.transform.position = transform.position;
     }
 
-    void UsePowerup()
+    public void UsePowerup()
     {
         PowerupType powerUp = GameManager.instance.ConsumePowerup();
 
@@ -274,6 +290,25 @@ public class Marble : MonoBehaviour
             effect.transform.localScale = Vector3.one;
 
             Destroy(effect.gameObject, effect.GetComponent<ParticleSystem>().main.duration + 1f);
+        }
+    }
+
+    public void BounceEmitter(float speed, Vector3 point, Vector3 normal)
+    {
+        if (GameManager.gameFinish)
+            return;
+
+        if (speed > 3)
+        {
+            var effect = Instantiate(bounceParticle);
+
+            effect.transform.position = point;
+            effect.transform.up = normal.normalized;
+
+            effect.transform.localScale = Vector3.one;
+
+            Destroy(effect.gameObject,
+                effect.GetComponent<ParticleSystem>().main.duration + 1f);
         }
     }
 }

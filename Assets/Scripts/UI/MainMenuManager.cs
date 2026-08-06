@@ -11,6 +11,7 @@ public class MainMenuManager : MonoBehaviour
     public Button optionsButton;
     public Button quitButton;
     public Button websiteButton;
+    public Button replayButton;
     public GameObject quitImage;
 
     bool isQuitting;
@@ -20,6 +21,7 @@ public class MainMenuManager : MonoBehaviour
         playButton.onClick.AddListener(() => SceneManager.LoadScene("PlayMission"));
         helpButton.onClick.AddListener(() => SceneManager.LoadScene("HelpCredits"));
         optionsButton.onClick.AddListener(() => SceneManager.LoadScene("Options"));
+        replayButton.onClick.AddListener(() => SceneManager.LoadScene("ReplayMenu"));
         quitButton.onClick.AddListener(() => {
             quitImage.SetActive(true);
             isQuitting = true;

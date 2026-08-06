@@ -5,12 +5,13 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class JukeboxManager : MonoBehaviour
 {
     public static JukeboxManager instance;
+
     public void Awake()
     {
         if (instance == null)
@@ -25,8 +26,6 @@ public class JukeboxManager : MonoBehaviour
         }
 
         scrollbar.onValueChanged.AddListener(OnScrollbarValueChanged);
-
-        // Initial state
         OnScrollbarValueChanged(scrollbar.value);
 
         scrollUpButton.onClick.AddListener(ScrollUp);
@@ -40,10 +39,12 @@ public class JukeboxManager : MonoBehaviour
 
         jukeboxWindowOpen = false;
         isPlaying = true;
-        InitSong();
+
+        StartCoroutine(LoadSongs());
     }
 
     public List<AudioClip> musics = new List<AudioClip>();
+
     public AudioSource audioSource;
     public GameObject jukeboxWindow;
     public Button prevButton;
@@ -51,14 +52,17 @@ public class JukeboxManager : MonoBehaviour
     public Button playButton;
     public Button stopButton;
     public TextMeshProUGUI musicInfo;
+
     [Space]
     public Transform content;
     public Button buttonInstance;
+
     [SerializeField] private Scrollbar scrollbar;
     public ScrollRect scrollRect;
     [SerializeField] private Button scrollUpButton;
     [SerializeField] private Button scrollDownButton;
     [SerializeField] private float step = 0.1f;
+
     private Button highlightedButton;
     private bool isPlaying;
     private bool jukeboxWindowOpen;
@@ -66,7 +70,7 @@ public class JukeboxManager : MonoBehaviour
     private int selectedIndex;
     private AudioClip selectedAudioClip;
 
-    private void Update()
+    void Update()
     {
         if (Input.GetKeyDown(KeyCode.F5))
         {
@@ -76,11 +80,87 @@ public class JukeboxManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F6))
             PrevSong();
+
         if (Input.GetKeyDown(KeyCode.F7))
             TogglePlayStop();
+
         if (Input.GetKeyDown(KeyCode.F8))
             NextSong();
+    }
 
+    IEnumerator LoadSongs()
+    {
+        foreach (AudioClip clip in musics)
+            InstantiateButton(clip);
+
+        string folder = Path.Combine(
+            Path.GetDirectoryName(Application.dataPath),
+            "CustomMusics");
+
+        if (!Directory.Exists(folder))
+            Directory.CreateDirectory(folder);
+
+        string[] files = Directory.GetFiles(folder, "*.ogg", SearchOption.TopDirectoryOnly);
+
+        System.Array.Sort(files);
+
+        foreach (string file in files)
+        {
+            string url = "file://" + file.Replace("\\", "/");
+
+            using (UnityWebRequest request =
+                UnityWebRequestMultimedia.GetAudioClip(url, AudioType.OGGVORBIS))
+            {
+                yield return request.SendWebRequest();
+
+#if UNITY_2020_1_OR_NEWER
+                if (request.result != UnityWebRequest.Result.Success)
+#else
+            if (request.isHttpError || request.isNetworkError)
+#endif
+                {
+                    Debug.LogError($"Failed to load {file}\n{request.error}");
+                    continue;
+                }
+
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(request);
+                clip.name = Path.GetFileNameWithoutExtension(file);
+
+                // Override official music if it already exists
+                int index = musics.FindIndex(m =>
+                    m != null &&
+                    m.name == clip.name);
+
+                if (index >= 0)
+                {
+                    musics[index] = clip;
+                    Debug.Log($"Replaced official music: {clip.name}");
+                }
+                else
+                {
+                    musics.Add(clip);
+                    Debug.Log($"Added custom music: {clip.name}");
+                }
+
+                InstantiateButton(clip);
+            }
+        }
+
+        var children = content.Cast<Transform>()
+        .OrderBy(t => t.Find("Text").GetComponent<TextMeshProUGUI>().text)
+        .ToList();
+
+        for (int i = 0; i < children.Count; i++)
+        {
+            children[i].SetSiblingIndex(i);
+        }
+
+        musics = musics
+        .Where(m => m != null)
+        .OrderBy(m => m.name)
+        .ToList();
+
+        Debug.Log($"Loaded {musics.Count} songs.");
     }
 
     public void ScrollUp()
@@ -97,7 +177,6 @@ public class JukeboxManager : MonoBehaviour
 
     private void OnScrollbarValueChanged(float value)
     {
-        // Disable when limits reached
         scrollUpButton.interactable = value < 1f;
         scrollDownButton.interactable = value > 0f;
     }
@@ -135,15 +214,18 @@ public class JukeboxManager : MonoBehaviour
 
         highlightedButton = button;
 
-        var colors = button.colors;
+        ColorBlock colors = button.colors;
         button.targetGraphic.color = colors.selectedColor;
 
-        button.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = new Color(0.9804f, 0.7843f, 0.5137f, 1f);
+        button.transform.Find("Text")
+            .GetComponent<TextMeshProUGUI>()
+            .color = new Color(0.9804f, 0.7843f, 0.5137f, 1f);
     }
 
     void ExecuteHighlighted()
     {
-        if (!highlightedButton) return;
+        if (!highlightedButton)
+            return;
 
         highlightedButton.onClick.Invoke();
         HighlightButton(highlightedButton);
@@ -154,19 +236,14 @@ public class JukeboxManager : MonoBehaviour
         if (!highlightedButton)
             return;
 
-        var colors = highlightedButton.colors;
+        ColorBlock colors = highlightedButton.colors;
         highlightedButton.targetGraphic.color = colors.normalColor;
-        highlightedButton.transform.Find("Text").GetComponent<TextMeshProUGUI>().color = Color.black;
+
+        highlightedButton.transform.Find("Text")
+            .GetComponent<TextMeshProUGUI>()
+            .color = Color.black;
 
         highlightedButton = null;
-    }
-
-    public void InitSong()
-    {
-        musics = musics.OrderBy(c => c.name).ToList();
-
-        foreach (AudioClip ac in musics)
-            InstantiateButton(ac);
     }
 
     public void TogglePlayStop()
@@ -188,16 +265,23 @@ public class JukeboxManager : MonoBehaviour
 
     public void Play()
     {
+        if (selectedAudioClip == null)
+            return;
+
         isPlaying = true;
         PlayMusic(selectedAudioClip.name);
 
-        if(musicInfo.text.Contains("Stopped"))
+        if (musicInfo.text.Contains("Stopped"))
             musicInfo.text = musicInfo.text.Replace("Stopped", "Playing");
     }
 
     public void NextSong()
     {
+        if (musics.Count == 0)
+            return;
+
         selectedIndex++;
+
         if (selectedIndex >= musics.Count)
             selectedIndex = 0;
 
@@ -206,7 +290,11 @@ public class JukeboxManager : MonoBehaviour
 
     public void PrevSong()
     {
+        if (musics.Count == 0)
+            return;
+
         selectedIndex--;
+
         if (selectedIndex < 0)
             selectedIndex = musics.Count - 1;
 
@@ -215,39 +303,43 @@ public class JukeboxManager : MonoBehaviour
 
     public void PlayMusic(string name)
     {
-        var selectedMusic = musics.FirstOrDefault(c => c != null && c.name.ToLower() == name.ToLower());
+        AudioClip selectedMusic = musics.FirstOrDefault(c =>
+            c != null &&
+            c.name.Equals(name));
 
-        if (selectedMusic != null)
-        {
-            currentlyPlayingMusic = name.ToLower();
-        }
-        else
-        {
-            PlayMusic(musics[Random.Range(0, musics.Count)].name);
+        if (selectedMusic == null)
             return;
-        }
+
+        currentlyPlayingMusic = selectedMusic.name;
 
         audioSource.Stop();
         audioSource.clip = selectedMusic;
         audioSource.Play();
 
         selectedIndex = GetClipIndexByName(name);
-        selectedAudioClip = musics[selectedIndex];
+        selectedAudioClip = selectedMusic;
 
         for (int i = 0; i < content.childCount; i++)
         {
-            if (content.GetChild(i).Find("Text").GetComponent<TextMeshProUGUI>().text == name)
+            var text = content.GetChild(i)
+                .Find("Text")
+                .GetComponent<TextMeshProUGUI>();
+
+            if (text.text.Equals(name))
             {
-                HighlightButton(content.GetChild(i).gameObject.GetComponent<Button>());
+                HighlightButton(content.GetChild(i).GetComponent<Button>());
                 break;
             }
         }
 
-        musicInfo.text = "Title: " + CapitalizeFirst(name) + "\nPlaying";
+        musicInfo.text = $"Title: {name}\nPlaying";
     }
 
     public void PlayRandomMusic()
     {
+        if (musics.Count == 0)
+            return;
+
         PlayMusic(musics[Random.Range(0, musics.Count)].name);
     }
 
@@ -255,15 +347,6 @@ public class JukeboxManager : MonoBehaviour
     {
         return musics.FindIndex(c =>
             c != null &&
-            string.Equals(c.name, clipName, System.StringComparison.OrdinalIgnoreCase)
-        );
-    }
-
-    public string CapitalizeFirst(string input)
-    {
-        if (string.IsNullOrEmpty(input))
-            return input;
-
-        return char.ToUpper(input[0]) + input.Substring(1);
+            c.name.Equals(clipName));
     }
 }

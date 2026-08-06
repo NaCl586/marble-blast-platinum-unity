@@ -76,6 +76,9 @@ public class Teleport : MonoBehaviour
         Marble.instance.teleportSound.Stop();
         GameManager.instance.PlaySpawnAudio();
 
+        if(!ReplayRecorder.loadReplay)
+            ReplayRecorder.Instance?.RecordTeleportFinished();
+
         teleporting = false;
 
         BoxCollider bc = destination.GetComponent<BoxCollider>();

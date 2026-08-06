@@ -84,6 +84,7 @@ public class SearchManager : MonoBehaviour
             GetComponent<PlayMissionManager>().SetLevelInfo(GetComponent<PlayMissionManager>().selectedLevelNum);
             foreach (var button in FindObjectsOfType<Button>())
                 button.enabled = true;
+            GetComponent<PlayMissionManager>().replayButton.enabled = false;
         });
 
         playButton.onClick.AddListener(() => {

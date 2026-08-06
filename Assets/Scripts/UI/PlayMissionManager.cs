@@ -74,10 +74,12 @@ public class PlayMissionManager : MonoBehaviour
     public GameObject statisticsWindow;
     public GameObject achievementsWindow;
     public GameObject searchWindow;
+    public GameObject replayWindow;
     public Button marbleSelectButton;
     public Button statisticsButton;
     public Button achievementsButton;
     public Button searchButton;
+    public Toggle replayButton;
     [Space]
     public bool debug = false;
 
@@ -85,11 +87,18 @@ public class PlayMissionManager : MonoBehaviour
     public static Type currentlySelectedType = Type.none;
     public static Game selectedGame = Game.none;
 
-    public void FixedUpdate()
+    public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow)) PrevButton();
-        if (Input.GetKeyDown(KeyCode.RightArrow)) NextButton();
-        if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene("MainMenu");
+        if(!marbleSelectWindow.activeSelf &&
+            !statisticsWindow.activeSelf &&
+            !achievementsWindow.activeSelf &&
+            !searchWindow.activeSelf &&
+            !replayWindow.activeSelf)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftArrow)) PrevButton();
+            if (Input.GetKeyDown(KeyCode.RightArrow)) NextButton();
+            if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene("MainMenu");
+        }
     }
 
     public void Start()
@@ -101,11 +110,13 @@ public class PlayMissionManager : MonoBehaviour
         statisticsWindow.SetActive(false);
         achievementsWindow.SetActive(false);
         searchWindow.SetActive(false);
+        replayWindow.SetActive(false);
 
         marbleSelectButton.onClick.AddListener(() => 
         {
             foreach (var button in FindObjectsOfType<Button>())
                 button.enabled = false;
+            replayButton.enabled = false;
 
             ToggleMarbleSelectWindow(true); 
         });
@@ -113,6 +124,7 @@ public class PlayMissionManager : MonoBehaviour
         {
             foreach (var button in FindObjectsOfType<Button>())
                 button.enabled = false;
+            replayButton.enabled = false;
 
             GetComponent<StatisticsManager>().InitStatistics();
             ToggleStatisticsWindow(true);
@@ -121,6 +133,7 @@ public class PlayMissionManager : MonoBehaviour
         {
             foreach (var button in FindObjectsOfType<Button>())
                 button.enabled = false;
+            replayButton.enabled = false;
 
             ToggleAchievementWindow(true);
         });
@@ -128,19 +141,48 @@ public class PlayMissionManager : MonoBehaviour
         {
             foreach (var button in FindObjectsOfType<Button>())
                 button.enabled = false;
+            replayButton.enabled = false;
 
             ToggleSearchWindow(true);
             GetComponent<SearchManager>().SelectFirstButton();
             GetComponent<SearchManager>().scrollRect.verticalNormalizedPosition = 1f;
         });
 
+        replayButton.onValueChanged.AddListener(ToggleReplay);
+        replayButton.SetIsOnWithoutNotify(false);
+
         StartCoroutine(WaitUntilFinishLoading());
     }
+
+    public void ToggleReplay(bool value)
+    {
+        if (value)
+        {
+            foreach (var button in FindObjectsOfType<Button>())
+                button.enabled = false;
+
+            replayButton.enabled = false;
+
+            ToggleReplayWindow(true);
+            GetComponent<NewReplayManager>().Init();
+        }
+        else
+        {
+            foreach (var button in FindObjectsOfType<Button>())
+                button.enabled = true;
+
+            replayButton.enabled = true;
+
+            ToggleReplayWindow(false);
+        }
+    }
+
 
     public void ToggleMarbleSelectWindow(bool _active) => marbleSelectWindow.SetActive(_active);
     public void ToggleStatisticsWindow(bool _active) => statisticsWindow.SetActive(_active);
     public void ToggleAchievementWindow(bool _active) => achievementsWindow.SetActive(_active);
     public void ToggleSearchWindow(bool _active) => searchWindow.SetActive(_active);
+    public void ToggleReplayWindow(bool _active) => replayWindow.SetActive(_active);
 
     IEnumerator WaitUntilFinishLoading()
     {

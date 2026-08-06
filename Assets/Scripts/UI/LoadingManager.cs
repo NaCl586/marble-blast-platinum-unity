@@ -60,8 +60,6 @@ public class LoadingManager : MonoBehaviour
             yield return null;
     }
 
-
-
     bool isCancelling;
 
     private void Update()
@@ -79,7 +77,9 @@ public class LoadingManager : MonoBehaviour
         // Stop the coroutine cleanly
         StopAllCoroutines();
 
-        // Load PlayMission in Single mode
-        SceneManager.LoadScene("PlayMission", LoadSceneMode.Single);
+        if(ReplayRecorder.loadReplay)
+            SceneManager.LoadScene("ReplayMenu", LoadSceneMode.Single);
+        else
+            SceneManager.LoadScene("PlayMission", LoadSceneMode.Single);
     }
 }

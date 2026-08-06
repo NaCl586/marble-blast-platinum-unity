@@ -893,6 +893,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce56ffdd0c4a70549beb1e5e93dfe68d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 0}
   numbers:
   - {fileID: 21300000, guid: e2876df9ec7491c4e9bf9d3592262b0b, type: 3}
   - {fileID: 21300000, guid: e13e6b1cdb8c19447a036236bd638067, type: 3}
@@ -940,6 +941,16 @@ MonoBehaviour:
   oobInsultTitleText: {fileID: 0}
   oobInsultCaptionText: {fileID: 0}
   oobInsultCloseButton: {fileID: 0}
+  saveReplayMenu: {fileID: 0}
+  replayMenuName: {fileID: 0}
+  replayMenuAuthor: {fileID: 0}
+  replayMenuDescription: {fileID: 0}
+  replayMenuApply: {fileID: 0}
+  scrollbar: {fileID: 0}
+  scrollRect: {fileID: 0}
+  scrollUpButton: {fileID: 0}
+  scrollDownButton: {fileID: 0}
+  step: 0.1
   isInitialized: 0
 --- !u!1 &6499325406534328252
 GameObject:
@@ -1421,7 +1432,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Bump Your Head!
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}

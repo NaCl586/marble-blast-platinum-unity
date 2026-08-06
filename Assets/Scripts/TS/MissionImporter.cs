@@ -1278,6 +1278,8 @@ namespace TS
             Invoke(nameof(EnableSounds), 0.1f);
 
             Marble.onRespawn?.Invoke();
+
+            GetComponent<ReplayRecorder>().enabled = true;
         }
 
         void EnableSounds()

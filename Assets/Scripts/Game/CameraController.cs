@@ -108,7 +108,7 @@ public class CameraController : MonoBehaviour
 
     void HandleLook()
     {
-        if (!GameManager.gameFinish && Time.timeScale > 0.01f)
+        if (!GameManager.gameFinish && Time.timeScale > 0.01f && !ReplayRecorder.loadReplay)
         {
             int invert = ControlBinding.instance.invertMouseYAxis ? -1 : 1;
 
@@ -288,5 +288,13 @@ public class CameraController : MonoBehaviour
         return angle;
     }
 
+    public Vector3 GetOffset()
+    {
+        return offset;
+    }
 
+    public void SetOffset(Vector3 newOffset)
+    {
+        offset = newOffset;
+    }
 }

@@ -84,49 +84,106 @@ public class MarbleInfo : MonoBehaviour
     public void ApplyMesh()
     {
         int selectedMarbleIndex = PlayerPrefs.GetInt("SelectedMarbleIndex", 0);
-        MarbleType marbleType = PlayerPrefs.GetInt("DefaultMarbleIsSelected", 0) == 0 ? MarbleType.Default : MarbleType.Custom;
+
+        MarbleType marbleType =
+            PlayerPrefs.GetInt("DefaultMarbleIsSelected", 0) == 0
+            ? MarbleType.Default
+            : MarbleType.Custom;
+
+        ApplyMesh(marbleType, selectedMarbleIndex);
+    }
+
+    public void ApplyMesh(MarbleType marbleType, int selectedMarbleIndex)
+    {
         Transform marble = Marble.instance.transform;
 
         if (marbleType == MarbleType.Default)
         {
-            int length = defaultMarbleMesh[selectedMarbleIndex].GetComponent<MeshRenderer>().sharedMaterials.Length;
+            int length = defaultMarbleMesh[selectedMarbleIndex]
+                .GetComponent<MeshRenderer>()
+                .sharedMaterials.Length;
 
             Material[] mats = new Material[length];
+
             for (int i = 0; i < length; i++)
-                mats[i] = defaultMarbleTeleportMaterial.FirstOrDefault(o => o.name == defaultMarbleMesh[selectedMarbleIndex].GetComponent<MeshRenderer>().sharedMaterial.name);
+            {
+                mats[i] = defaultMarbleTeleportMaterial.FirstOrDefault(
+                    o => o.name ==
+                    defaultMarbleMesh[selectedMarbleIndex]
+                    .GetComponent<MeshRenderer>()
+                    .sharedMaterial.name);
+            }
 
             Marble.instance.teleportMesh.GetComponent<MeshRenderer>().sharedMaterials = mats;
 
-            Marble.instance.teleportMesh.GetComponent<MeshFilter>().sharedMesh = defaultMarbleMesh[selectedMarbleIndex].GetComponent<MeshFilter>().sharedMesh;
+            Marble.instance.teleportMesh.GetComponent<MeshFilter>().sharedMesh =
+                defaultMarbleMesh[selectedMarbleIndex]
+                .GetComponent<MeshFilter>().sharedMesh;
 
-            Marble.instance.normalMesh.GetComponent<MeshRenderer>().sharedMaterials = defaultMarbleMesh[selectedMarbleIndex].GetComponent<MeshRenderer>().sharedMaterials;
-            Marble.instance.normalMesh.GetComponent<MeshFilter>().sharedMesh = defaultMarbleMesh[selectedMarbleIndex].GetComponent<MeshFilter>().sharedMesh;
+            Marble.instance.normalMesh.GetComponent<MeshRenderer>().sharedMaterials =
+                defaultMarbleMesh[selectedMarbleIndex]
+                .GetComponent<MeshRenderer>().sharedMaterials;
 
-            float radius = defaultMarbleRadius[selectedMarbleIndex] * Mathf.Max(
-                marble.lossyScale.x,
-                marble.lossyScale.y,
-                marble.lossyScale.z
-            );
+            Marble.instance.normalMesh.GetComponent<MeshFilter>().sharedMesh =
+                defaultMarbleMesh[selectedMarbleIndex]
+                .GetComponent<MeshFilter>().sharedMesh;
 
-            Marble.instance.GetComponent<SphereCollider>().radius = defaultMarbleRadius[selectedMarbleIndex];
+            float radius =
+                defaultMarbleRadius[selectedMarbleIndex] *
+                Mathf.Max(
+                    marble.lossyScale.x,
+                    marble.lossyScale.y,
+                    marble.lossyScale.z);
+
+            Marble.instance.GetComponent<SphereCollider>().radius =
+                defaultMarbleRadius[selectedMarbleIndex];
+
             Marble.instance.GetComponent<Movement>().marbleRadius = radius;
         }
         else
         {
-            Marble.instance.teleportMesh.GetComponent<MeshRenderer>().sharedMaterial = customMarbleTeleportMaterial.FirstOrDefault(o => o.name == customMarbleMesh[selectedMarbleIndex].GetComponent<MeshRenderer>().sharedMaterial.name);
-            Marble.instance.teleportMesh.GetComponent<MeshFilter>().sharedMesh = customMarbleMesh[selectedMarbleIndex].GetComponent<MeshFilter>().sharedMesh;
+            Marble.instance.teleportMesh.GetComponent<MeshRenderer>().sharedMaterial =
+                customMarbleTeleportMaterial.FirstOrDefault(
+                    o => o.name ==
+                    customMarbleMesh[selectedMarbleIndex]
+                    .GetComponent<MeshRenderer>()
+                    .sharedMaterial.name);
 
-            Marble.instance.normalMesh.GetComponent<MeshRenderer>().sharedMaterials = customMarbleMesh[selectedMarbleIndex].GetComponent<MeshRenderer>().sharedMaterials;
-            Marble.instance.normalMesh.GetComponent<MeshFilter>().sharedMesh = customMarbleMesh[selectedMarbleIndex].GetComponent<MeshFilter>().sharedMesh;
+            Marble.instance.teleportMesh.GetComponent<MeshFilter>().sharedMesh =
+                customMarbleMesh[selectedMarbleIndex]
+                .GetComponent<MeshFilter>().sharedMesh;
 
-            float radius = customMarbleRadius[selectedMarbleIndex] * Mathf.Max(
-                marble.lossyScale.x,
-                marble.lossyScale.y,
-                marble.lossyScale.z
-            );
+            Marble.instance.normalMesh.GetComponent<MeshRenderer>().sharedMaterials =
+                customMarbleMesh[selectedMarbleIndex]
+                .GetComponent<MeshRenderer>().sharedMaterials;
 
-            Marble.instance.GetComponent<SphereCollider>().radius = customMarbleRadius[selectedMarbleIndex];
+            Marble.instance.normalMesh.GetComponent<MeshFilter>().sharedMesh =
+                customMarbleMesh[selectedMarbleIndex]
+                .GetComponent<MeshFilter>().sharedMesh;
+
+            float radius =
+                customMarbleRadius[selectedMarbleIndex] *
+                Mathf.Max(
+                    marble.lossyScale.x,
+                    marble.lossyScale.y,
+                    marble.lossyScale.z);
+
+            Marble.instance.GetComponent<SphereCollider>().radius =
+                customMarbleRadius[selectedMarbleIndex];
+
             Marble.instance.GetComponent<Movement>().marbleRadius = radius;
         }
+    }
+
+    public void ApplyReplayMarble(string marbleID)
+    {
+        MarbleType marbleType =
+            marbleID[0] == 'D'
+            ? MarbleType.Default
+            : MarbleType.Custom;
+
+        int index = int.Parse(marbleID.Substring(1)) - 1;
+
+        ApplyMesh(marbleType, index);
     }
 }

@@ -4,10 +4,10 @@ using UnityEngine.UI;
 [RequireComponent(typeof(AudioSource))]
 public class ButtonSound : MonoBehaviour
 {
-    AudioSource buttonFx;
+    private AudioSource buttonFx;
 
-    Button button;
-    Toggle toggle;
+    private Button button;
+    private Toggle toggle;
 
     public AudioClip hoverFx;
     public AudioClip clickFx;
@@ -17,74 +17,85 @@ public class ButtonSound : MonoBehaviour
 
     void Awake()
     {
+        buttonFx = GetComponent<AudioSource>();
+
         button = GetComponent<Button>();
         toggle = GetComponent<Toggle>();
 
-        if (button)
-        {
+        if (button != null)
             button.onClick.AddListener(PlayClickSound);
-        }
 
-        if (toggle)
-        {
+        if (toggle != null)
             toggle.onValueChanged.AddListener(OnToggleChanged);
-        }
     }
 
     void OnDestroy()
     {
-        if (button)
+        if (button != null)
             button.onClick.RemoveListener(PlayClickSound);
 
-        if (toggle)
+        if (toggle != null)
             toggle.onValueChanged.RemoveListener(OnToggleChanged);
     }
 
-    // --- Hover (called from EventTrigger or IPointerEnter) ---
+    // Called from EventTrigger or IPointerEnter
     public void HoverSound()
     {
-        if (!IsInteractable() || !IsEnabled()) return;
+        if (!IsInteractable() || !IsEnabled())
+            return;
 
-        buttonFx = GetComponent<AudioSource>();
         buttonFx.volume = PlayerPrefs.GetFloat("Audio_SoundVolume", 0.5f);
 
-        if (hoverFx && button.enabled == true) buttonFx.PlayOneShot(hoverFx);
+        if (hoverFx != null)
+            buttonFx.PlayOneShot(hoverFx);
     }
 
-    // --- Button click ---
+    // Button click
     public void PlayClickSound()
     {
-        if (!IsInteractable() || !IsEnabled()) return;
+        if (!IsInteractable() || !IsEnabled())
+            return;
 
-        buttonFx = GetComponent<AudioSource>();
         buttonFx.volume = PlayerPrefs.GetFloat("Audio_SoundVolume", 0.5f);
 
-        if (clickFx) buttonFx.PlayOneShot(clickFx);
+        if (clickFx != null)
+            buttonFx.PlayOneShot(clickFx);
     }
 
-    // --- Toggle click ---
-    void OnToggleChanged(bool isOn)
+    // Toggle changed
+    private void OnToggleChanged(bool isOn)
     {
-        if (!IsInteractable() || !IsEnabled()) return;
+        if (!IsInteractable() || !IsEnabled())
+            return;
 
         if (playToggleOnOnly && !isOn)
             return;
 
-        buttonFx = GetComponent<AudioSource>();
-        if (clickFx) buttonFx.PlayOneShot(clickFx);
+        buttonFx.volume = PlayerPrefs.GetFloat("Audio_SoundVolume", 0.5f);
+
+        if (clickFx != null)
+            buttonFx.PlayOneShot(clickFx);
     }
 
     bool IsInteractable()
     {
-        if (button) return button.interactable;
-        if (toggle) return toggle.interactable;
+        if (button != null)
+            return button.interactable;
+
+        if (toggle != null)
+            return toggle.interactable;
+
         return false;
     }
 
     bool IsEnabled()
     {
-        if (button) return button.enabled;
-        if (toggle) return toggle.enabled;
+        if (button != null)
+            return button.enabled;
+
+        if (toggle != null)
+            return toggle.enabled;
+
         return false;
     }
 }

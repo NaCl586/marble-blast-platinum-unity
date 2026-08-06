@@ -16,6 +16,8 @@ public class StatisticsManager : MonoBehaviour
             GetComponent<PlayMissionManager>().ToggleStatisticsWindow(false);
             foreach (var button in FindObjectsOfType<Button>())
                 button.enabled = true;
+
+            GetComponent<PlayMissionManager>().replayButton.enabled = false;
         });
     }
 

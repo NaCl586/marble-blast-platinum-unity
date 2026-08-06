@@ -87,8 +87,8 @@ public class GameManager : MonoBehaviour
 
     [Space]
     [Header("UI Menu")]
-    [SerializeField] GameObject pauseMenu;
-    [SerializeField] GameObject finishMenu;
+    public GameObject pauseMenu;
+    public GameObject finishMenu;
     [SerializeField] GameObject enterNameMenu;
     [SerializeField] TextMeshProUGUI finalTime;
     [SerializeField] TextMeshProUGUI finishCaption;
@@ -175,10 +175,37 @@ public class GameManager : MonoBehaviour
         pauseMenu.SetActive(false);
 
         okayButton.onClick.AddListener(CloseEnterNameWindow);
-        replayButton.onClick.AddListener(ReplayLevel);
+        replayButton.onClick.AddListener(() => 
+        {
+            if (ReplayRecorder.recordReplay)
+            {
+                pauseMenu.SetActive(false);
+                finishMenu.SetActive(false);
+                GameUIManager.instance.SaveAndRetry();
+                GameUIManager.instance.saveReplayMenu.SetActive(true);
+            }
+            else
+            {
+                ReplayLevel();
+            }
+        });
         continueButton.onClick.AddListener(ReturnToMenu);
         noButton.onClick.AddListener(TogglePause);
-        yesButton.onClick.AddListener(ReturnToMenu);
+        yesButton.onClick.AddListener(() => 
+        {
+            if (ReplayRecorder.recordReplay)
+            {
+                ReplayRecorder.incompleteReplay = true;
+                ReplayRecorder.Instance.StopRecording();
+                GameUIManager.instance.SaveAndReturn();
+                GameUIManager.instance.saveReplayMenu.SetActive(true);
+            }
+            else
+            {
+                JukeboxManager.instance.PlayMusic("Pianoforte");
+                SceneManager.LoadScene("PlayMission");
+            }
+        });
         restartButton.onClick.AddListener(RestartLevel);
 
         nameInputField.onEndEdit.AddListener(UpdateName);
@@ -290,10 +317,18 @@ public class GameManager : MonoBehaviour
         }
 
         //pause
-        if (Input.GetKeyDown(KeyCode.Escape) && !gameFinish)
-            TogglePause();
+        if (ReplayRecorder.loadReplay)
+        {
+            if (Input.GetKeyDown(KeyCode.Escape))
+                ReturnToMenu();
+        }
+        else
+        {
+            if (Input.GetKeyDown(KeyCode.Escape) && !gameFinish)
+                TogglePause();
+        }
 
-        if (gameFinish)
+        if (gameFinish && !ReplayRecorder.loadReplay)
         {
             if (enterNameMenu.activeSelf && Input.GetKeyDown(KeyCode.Return))
                 CloseEnterNameWindow();
@@ -331,7 +366,7 @@ public class GameManager : MonoBehaviour
 
     public void TogglePause()
     {
-        if (GameUIManager.instance.isInitialized && GameUIManager.instance.oobInsultMenu.activeSelf)
+        if (GameUIManager.instance.isInitialized && (GameUIManager.instance.oobInsultMenu.activeSelf || GameUIManager.instance.saveReplayMenu.activeSelf))
             return;
 
         isPaused = !isPaused;
@@ -376,14 +411,17 @@ public class GameManager : MonoBehaviour
 
     void OutOfBounds()
     {
-        IncrementOutOfBoundsCount();
+        if (!ReplayRecorder.loadReplay)
+            IncrementOutOfBoundsCount();
 
         GameUIManager.instance.SetCenterImage(3);
         PlayOutOfBoundsAudio();
         CameraController.instance.LockCamera(false);
 
         CancelInvoke();
-        Invoke(nameof(InvokeRespawn), 2f);
+
+        if(!ReplayRecorder.loadReplay)
+            Invoke(nameof(InvokeRespawn), 2f);
     }
 
     public void IncrementOutOfBoundsCount()
@@ -432,7 +470,9 @@ public class GameManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
+        GameUIManager.instance.saveReplayMenu.SetActive(false);
         finishMenu.SetActive(false);
+
         Marble.onRespawn?.Invoke();
     }
 
@@ -453,7 +493,7 @@ public class GameManager : MonoBehaviour
         recentGems.Clear();
     }
 
-    bool spawnAudioPlayed = false;
+    [HideInInspector] public bool spawnAudioPlayed = false;
     public void Respawn()
     {
         if (!spawnAudioPlayed)
@@ -488,10 +528,27 @@ public class GameManager : MonoBehaviour
 
             Marble.instance.alarmSound.Stop();
 
+            if (ReplayRecorder.loadReplay)
+            {
+                ReplayRecorder.Instance.StartReplay();
+                Debug.Log("Replay Loaded");
+            }
+            else
+            {
+                if (ReplayRecorder.recordReplay)
+                {
+                    ReplayRecorder.Instance.StartRecording();
+                    Debug.Log("Replay Started");
+                }
+            }
+
             GameStateStart();
         }
         else
         {
+            if(!ReplayRecorder.loadReplay)
+                ReplayRecorder.Instance?.RecordRespawn();
+
             Movement.instance.StopAllMovement();
             Movement.instance.StartMoving();
 
@@ -595,27 +652,44 @@ public class GameManager : MonoBehaviour
         //Finish
         else
         {
-            CancelInvoke();
-            PlayFinishAudio();
+            if (!ReplayRecorder.loadReplay)
+            {
+                gameFinish = true;
+                FinishRoutine();
 
-            startTimer = false;
-            GameUIManager.instance.SetBottomText("Congratulations! You've finished!");
+                if(ReplayRecorder.recordReplay)
+                    Invoke(nameof(StopRecording), 0.0625f + Time.fixedDeltaTime);
 
-            finishParticleInstance = Instantiate(finishParticles, finishPad.transform.Find("FinishParticle").position, Quaternion.identity);
-            finishParticleInstance.transform.localScale = Vector3.one * 1.5f;
-            finishParticleInstance.transform.rotation = finishPad.transform.rotation;
-
-            Marble.instance.InactivateTimeTravel();
-
-            gameFinish = true;
-            GameUIManager.instance.SetTimerText(elapsedTime);
-
-            CameraController.onCameraFinish?.Invoke();
-            Invoke(nameof(StopMarbleMovement), 0.0625f);
-            Invoke(nameof(ShowFinishUI), 2f);
+                Invoke(nameof(ShowFinishUI), 2f);
+            }   
         }
-
     }
+
+    public void FinishRoutine()
+    {
+        CancelInvoke();
+        PlayFinishAudio();
+
+        startTimer = false;
+        GameUIManager.instance.SetBottomText("Congratulations! You've finished!");
+
+        finishParticleInstance = Instantiate(finishParticles, finishPad.transform.Find("FinishParticle").position, Quaternion.identity);
+        finishParticleInstance.transform.localScale = Vector3.one * 1.5f;
+        finishParticleInstance.transform.rotation = finishPad.transform.rotation;
+
+        Marble.instance.InactivateTimeTravel();
+        GameUIManager.instance.SetTimerText(elapsedTime);
+
+        CameraController.onCameraFinish?.Invoke();
+        Invoke(nameof(StopMarbleMovement), 0.0625f);
+    }
+
+    void StopRecording()
+    {
+        ReplayRecorder.incompleteReplay = false;
+        ReplayRecorder.Instance.StopRecording();
+    }
+
     void StopMarbleMovement()
     {
         Movement.instance.freezeMovement = true;
@@ -626,8 +700,23 @@ public class GameManager : MonoBehaviour
     #region UI
     public void ReturnToMenu()
     {
-        JukeboxManager.instance.PlayMusic("Pianoforte");
-        SceneManager.LoadScene("PlayMission");
+        if (ReplayRecorder.recordReplay)
+        {
+            pauseMenu.SetActive(false);
+            finishMenu.SetActive(false);
+            GameUIManager.instance.SaveAndReturn();
+            GameUIManager.instance.saveReplayMenu.SetActive(true);
+        }
+        else if (ReplayRecorder.loadReplay)
+        {
+            JukeboxManager.instance.PlayMusic("Pianoforte");
+            SceneManager.LoadScene("ReplayMenu");
+        }
+        else
+        {
+            JukeboxManager.instance.PlayMusic("Pianoforte");
+            SceneManager.LoadScene("PlayMission");
+        }
     }
 
     public void ShowFinishUI()

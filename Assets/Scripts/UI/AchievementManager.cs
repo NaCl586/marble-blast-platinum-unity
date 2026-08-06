@@ -15,6 +15,7 @@ public class AchievementManager : MonoBehaviour
             GetComponent<PlayMissionManager>().ToggleAchievementWindow(false);
             foreach (var button in FindObjectsOfType<Button>())
                 button.enabled = true;
+            GetComponent<PlayMissionManager>().replayButton.enabled = false;
         });
         InitAchiev();
     }

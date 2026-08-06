@@ -61,7 +61,7 @@ public class Movement : MonoBehaviour
 	private Vector2 inputMovement()
 	{
 		Vector2 movement = fakeInput;
-		if (canSpin)
+		if (canSpin && !ReplayRecorder.loadReplay)
         {
 			if (Input.GetKey(ControlBinding.instance.moveForward)) movement.y = 1f;
 			if (Input.GetKey(ControlBinding.instance.moveBackward)) movement.y = -1f;
@@ -73,7 +73,13 @@ public class Movement : MonoBehaviour
 
 	private Vector2 fakeInput = Vector2.zero;
 
-	private bool Jump => Input.GetKey(ControlBinding.instance.jump);
+	private bool Jump()
+	{
+		if (!ReplayRecorder.loadReplay)
+			return Input.GetKey(ControlBinding.instance.jump);
+		else
+			return false;
+	}
 
 	private Vector3 forwards = Vector3.forward;
 
@@ -81,9 +87,10 @@ public class Movement : MonoBehaviour
 	private float bounceSpeed;
 	private Vector3 bouncePos;
 	private Vector3 bounceNormal;
-	private float slipAmount;
+	[HideInInspector] public float slipAmount;
 	private float contactTime;
 	private float rollVolume;
+	[HideInInspector] public float contactPct;
 
 	private Vector3 surfaceVelocity;
 
@@ -124,6 +131,8 @@ public class Movement : MonoBehaviour
 	private CollisionInfo bestContact;
 
 	private bool hasPosition = false;
+
+	public int justJumped = 0;
 
 	public void SetPosition(Vector3 newPos)
 	{
@@ -219,6 +228,8 @@ public class Movement : MonoBehaviour
 
 	void FixedUpdate()
 	{
+		justJumped = 0;
+
 		if (!hasPosition)
 			return;
 
@@ -505,7 +516,9 @@ public class Movement : MonoBehaviour
 
 		position = newPos;
 
-		float contactPct = contacts.Count > 0 ? 1f : 0f;
+		if(!ReplayRecorder.loadReplay)
+			contactPct = contacts.Count > 0 ? 1f : 0f;
+
 		UpdateRollSound(contactPct, slipAmount);
 	}
 
@@ -703,6 +716,14 @@ public class Movement : MonoBehaviour
 
 							Marble.instance.BounceEmitter(sVel.magnitude * restitution, contacts[i]);
 
+							if (ReplayRecorder.Instance != null && ReplayRecorder.Instance.isRecording)
+							{
+								ReplayRecorder.Instance.RecordBounce(
+									sVel.magnitude * restitution,
+									contacts[i].point,
+									contacts[i].normal);
+							}
+
 							vAtC -= contacts[i].normal * Vector3.Dot(contacts[i].normal, sVel);
 
 							var vAtCMag = vAtC.magnitude;
@@ -724,7 +745,8 @@ public class Movement : MonoBehaviour
 							}
 							marbleVelocity += velocityAdd;
 
-							slipAmount = Mathf.Clamp(vAtCMag / maxRollVelocity, 0f, 1.5f);
+							if(!ReplayRecorder.loadReplay)
+								slipAmount = Mathf.Clamp(vAtCMag / maxRollVelocity, 0f, 1.5f);
 						}
 					}
 
@@ -809,7 +831,8 @@ public class Movement : MonoBehaviour
 
 		if (bestSurface == -1)
 		{
-			slipAmount = 0f;
+			if (!ReplayRecorder.loadReplay)
+				slipAmount = 0f;
 		}
 
 		//bouncy floor
@@ -827,7 +850,7 @@ public class Movement : MonoBehaviour
         }
 
 		bool _canJump = bestSurface != -1;
-		if (_canJump && Jump && canJump)
+		if (_canJump && Jump() && canJump)
 		{
 			float upDot = Vector3.Dot(bestContact.normal.normalized, -GravitySystem.GravityDir.normalized);
 
@@ -843,6 +866,9 @@ public class Movement : MonoBehaviour
 				if (sv < jumpImpulse)
 				{
 					marbleVelocity += bestContact.normal * (jumpImpulse - sv);
+
+					justJumped = 1;
+
 					GameManager.instance.PlayJumpAudio();
 				}
 			}
@@ -861,7 +887,8 @@ public class Movement : MonoBehaviour
 
 			float rawSlip = vAtC.magnitude / maxRollVelocity;
 			// Accumulate peak slip (important!)
-			slipAmount = Mathf.Max(slipAmount, rawSlip);
+			if (!ReplayRecorder.loadReplay)
+				slipAmount = Mathf.Max(slipAmount, rawSlip);
 
 			float vAtCMag = vAtC.magnitude;
 			bool slipping = false;
@@ -923,7 +950,8 @@ public class Movement : MonoBehaviour
 		}
 		a += _aControl;
 
-		slipAmount = Mathf.MoveTowards(slipAmount, 0f, _dt * 2.5f);
+		if (!ReplayRecorder.loadReplay)
+			slipAmount = Mathf.MoveTowards(slipAmount, 0f, _dt * 2.5f);
 	}
 
 	public void ApplySurfaceBoost(float strength = 24.7f)
@@ -951,7 +979,7 @@ public class Movement : MonoBehaviour
 		marbleVelocity += movementVector * strength;
 	}
 
-	void UpdateRollSound(float contactPct, float _slipAmount) 
+	void UpdateRollSound(float _contactPct, float _slipAmount) 
 	{
 		Vector3 pos = transform.position;
 
@@ -977,7 +1005,7 @@ public class Movement : MonoBehaviour
 		if (rollVolume > 1f)
 			rollVolume = 1f;
 
-		if (contactPct < 0.05f && rollSound != null)
+		if (_contactPct < 0.05f && rollSound != null)
 			rollVolume = rollSound.volume / 5f;
 
 		// Slip volume

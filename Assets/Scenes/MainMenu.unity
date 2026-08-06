@@ -911,6 +911,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce56ffdd0c4a70549beb1e5e93dfe68d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvas: {fileID: 0}
   numbers:
   - {fileID: 21300000, guid: e2876df9ec7491c4e9bf9d3592262b0b, type: 3}
   - {fileID: 21300000, guid: e13e6b1cdb8c19447a036236bd638067, type: 3}
@@ -950,6 +951,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   gemCountUI: {fileID: 0}
+  recordingIcon: {fileID: 0}
   readyImage: {fileID: 0}
   setImage: {fileID: 0}
   goImage: {fileID: 0}
@@ -958,6 +960,17 @@ MonoBehaviour:
   oobInsultTitleText: {fileID: 0}
   oobInsultCaptionText: {fileID: 0}
   oobInsultCloseButton: {fileID: 0}
+  saveReplayMenu: {fileID: 0}
+  replayMenuName: {fileID: 0}
+  replayMenuAuthor: {fileID: 0}
+  replayMenuDescription: {fileID: 0}
+  replayMenuApply: {fileID: 0}
+  replayMenuCancel: {fileID: 0}
+  scrollbar: {fileID: 0}
+  scrollRect: {fileID: 0}
+  scrollUpButton: {fileID: 0}
+  scrollDownButton: {fileID: 0}
+  step: 0.1
   isInitialized: 0
 --- !u!114 &873342550
 MonoBehaviour:
@@ -1521,6 +1534,18 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 1450358741}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1450358746 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 726010180165256345, guid: 7e97ac5490aa5d54884df4f56d4bf0b4,
+    type: 3}
+  m_PrefabInstance: {fileID: 1450358741}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1511790368
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1886,6 +1911,7 @@ MonoBehaviour:
   optionsButton: {fileID: 1511790370}
   quitButton: {fileID: 858802311}
   websiteButton: {fileID: 1770198199}
+  replayButton: {fileID: 1450358746}
   quitImage: {fileID: 855046523}
 --- !u!1 &1642933468
 GameObject:

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 920183629696906097}
   - component: {fileID: 8159213354703822167}
+  - component: {fileID: 720414727811194006}
   m_Layer: 0
   m_Name: Level
   m_TagString: Untagged
@@ -236,3 +237,17 @@ MonoBehaviour:
   startPad: {fileID: 0}
   finishPad: {fileID: 0}
   directionalLight: {fileID: 0}
+--- !u!114 &720414727811194006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4886211401690479370}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f9df9d2eba6a2b04bb65fcfc7276f6c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isRecording: 0
+  isPlayingReplay: 0

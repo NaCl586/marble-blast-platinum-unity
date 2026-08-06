@@ -156,6 +156,8 @@ public class MarbleSelectManager : MonoBehaviour
         foreach (var button in FindObjectsOfType<Button>())
                 button.enabled = true;
 
+        GetComponent<PlayMissionManager>().replayButton.enabled = false;
+
         GetComponent<PlayMissionManager>().ToggleMarbleSelectWindow(false);
     }
 

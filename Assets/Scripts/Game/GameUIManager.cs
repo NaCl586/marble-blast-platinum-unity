@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameUIManager : MonoBehaviour
 {
@@ -12,7 +13,8 @@ public class GameUIManager : MonoBehaviour
         instance = this;
         UpdateHUDMaterial();
     }
-
+    [SerializeField] Canvas canvas;
+    [Space]
     [SerializeField] Sprite[] numbers;
     [SerializeField] Sprite[] numbersGreen;
     [SerializeField] Sprite[] numbersRed;
@@ -25,6 +27,7 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] Image[] targetGem;
     [SerializeField] Image[] currentGem;
     [SerializeField] GameObject gemCountUI;
+    [SerializeField] GameObject recordingIcon;
     [Space]
     [SerializeField] GameObject readyImage;
     [SerializeField] GameObject setImage;
@@ -35,6 +38,18 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] TextMeshProUGUI oobInsultTitleText;
     [SerializeField] TextMeshProUGUI oobInsultCaptionText;
     [SerializeField] Button oobInsultCloseButton;
+    [Space]
+    public GameObject saveReplayMenu;
+    [SerializeField] TMP_InputField replayMenuName;
+    [SerializeField] TMP_InputField replayMenuAuthor;
+    [SerializeField] TMP_InputField replayMenuDescription;
+    [SerializeField] Button replayMenuApply;
+    [SerializeField] Button replayMenuCancel;
+    [SerializeField] private Scrollbar scrollbar;
+    public ScrollRect scrollRect;
+    [SerializeField] private Button scrollUpButton;
+    [SerializeField] private Button scrollDownButton;
+    [SerializeField] private float step = 0.1f;
 
     Tween centerTextFade;
     Tween bottomTextFade;
@@ -55,6 +70,80 @@ public class GameUIManager : MonoBehaviour
             oobInsultMenu.SetActive(false);
         });
         isInitialized = true;
+
+        // Listen to text changes
+        ReplayRecorder.actualReplayName = string.Empty;
+        ReplayRecorder.replayAuthor = string.Empty;
+        ReplayRecorder.replayDesc = string.Empty;
+        replayMenuName.text = ReplayRecorder.actualReplayName;
+        replayMenuAuthor.text = ReplayRecorder.replayAuthor;
+        replayMenuDescription.text = ReplayRecorder.replayDesc;
+        replayMenuName.onValueChanged.AddListener(SetName);
+        replayMenuAuthor.onValueChanged.AddListener(SetAuthor);
+        replayMenuDescription.onValueChanged.AddListener(SetDesc);
+
+        // Listen for scrollbar movement (drag, mouse wheel, buttons)
+        scrollbar.onValueChanged.AddListener(OnScrollbarValueChanged);
+
+        // Initial state
+        OnScrollbarValueChanged(scrollbar.value);
+
+        scrollUpButton.onClick.AddListener(ScrollUp);
+        scrollDownButton.onClick.AddListener(ScrollDown);
+
+        recordingIcon.SetActive(ReplayRecorder.recordReplay);
+    }
+
+    public void SaveAndReturn()
+    {
+        replayMenuApply.onClick.RemoveAllListeners();
+        replayMenuApply.onClick.AddListener(() => {
+            ReplayRecorder.Instance.SaveReplay();
+            Debug.Log("Replay Saved");
+
+            JukeboxManager.instance.PlayMusic("Pianoforte");
+            SceneManager.LoadScene("PlayMission");
+        });
+
+        replayMenuCancel.onClick.RemoveAllListeners();
+        replayMenuCancel.onClick.AddListener(() => {
+            Debug.Log("Replay Not Saved");
+
+            JukeboxManager.instance.PlayMusic("Pianoforte");
+            SceneManager.LoadScene("PlayMission");
+        });
+    }
+
+    public void SaveAndRetry()
+    {
+        replayMenuApply.onClick.RemoveAllListeners();
+        replayMenuApply.onClick.AddListener(() => {
+            ReplayRecorder.Instance.SaveReplay();
+            Debug.Log("Replay Saved");
+
+            GameManager.instance?.ReplayLevel();
+        });
+
+        replayMenuCancel.onClick.RemoveAllListeners();
+        replayMenuCancel.onClick.AddListener(() => {
+            Debug.Log("Replay Not Saved");
+
+            GameManager.instance?.ReplayLevel();
+        });
+    }
+
+    public void SetName(string s)
+    {
+        ReplayRecorder.actualReplayName = s;
+    }
+    public void SetAuthor(string s)
+    {
+        ReplayRecorder.replayAuthor = s;
+    }
+    public void SetDesc(string s)
+    {
+        Canvas.ForceUpdateCanvases();
+        ReplayRecorder.replayDesc = s;
     }
 
     private void Update()
@@ -261,5 +350,25 @@ public class GameUIManager : MonoBehaviour
             case 2: goImage.SetActive(true); break;
             case 3: outOfBoundsImage.SetActive(true); break;
         }
+    }
+
+    //Replay
+    public void ScrollUp()
+    {
+        scrollRect.verticalNormalizedPosition =
+            Mathf.Clamp01(scrollRect.verticalNormalizedPosition + step);
+    }
+
+    public void ScrollDown()
+    {
+        scrollRect.verticalNormalizedPosition =
+            Mathf.Clamp01(scrollRect.verticalNormalizedPosition - step);
+    }
+
+    private void OnScrollbarValueChanged(float value)
+    {
+        // Disable when limits reached
+        scrollUpButton.interactable = value < 1f;
+        scrollDownButton.interactable = value > 0f;
     }
 }
