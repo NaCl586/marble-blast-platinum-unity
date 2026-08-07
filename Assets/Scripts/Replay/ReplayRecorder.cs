@@ -16,6 +16,9 @@ public class ReplayRecorder : MonoBehaviour
 
     private void OnDestroy()
     {
+        returnToMenuTween?.Kill();
+        returnToMenuTween = null;
+
         recordingBytes?.Clear();
         playbackBytes = null;
 
@@ -60,6 +63,8 @@ public class ReplayRecorder : MonoBehaviour
     public static string replayAuthor = string.Empty;
     public static string replayDesc = string.Empty;
     public static bool incompleteReplay = false;
+
+    private Tween returnToMenuTween;
 
     public bool HasReplay => currentFrame != null;
 
@@ -241,9 +246,14 @@ public class ReplayRecorder : MonoBehaviour
             }
             else
             {
-                DOVirtual.DelayedCall(5, () => {
+                returnToMenuTween?.Kill(); // Prevent multiple timers
+
+                returnToMenuTween = DOVirtual.DelayedCall(5f, () =>
+                {
                     gm.ReturnToMenu();
-                }).SetUpdate(true);
+                })
+                .SetUpdate(true)
+                .SetLink(gameObject);
             }
         }
     }

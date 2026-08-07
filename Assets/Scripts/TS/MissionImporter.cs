@@ -80,7 +80,9 @@ namespace TS
 
         void Start()
         {
-            MarbleInfo.instance.ApplyMesh();
+            if(!ReplayRecorder.loadReplay)
+                MarbleInfo.instance.ApplyMesh();
+
             ImportMission();
         }
 

@@ -305,10 +305,17 @@ public class JukeboxManager : MonoBehaviour
     {
         AudioClip selectedMusic = musics.FirstOrDefault(c =>
             c != null &&
-            c.name.Equals(name));
+            c.name.Equals(name, System.StringComparison.Ordinal));
 
         if (selectedMusic == null)
-            return;
+        {
+            selectedMusic = musics.FirstOrDefault(c =>
+                c != null &&
+                c.name.Equals(name, System.StringComparison.OrdinalIgnoreCase));
+
+            if (selectedMusic == null)
+                return;
+        }
 
         currentlyPlayingMusic = selectedMusic.name;
 
