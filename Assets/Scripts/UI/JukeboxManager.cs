@@ -119,7 +119,7 @@ public class JukeboxManager : MonoBehaviour
             if (request.isHttpError || request.isNetworkError)
 #endif
                 {
-                    Debug.LogError($"Failed to load {file}\n{request.error}");
+                    //Debug.LogError($"Failed to load {file}\n{request.error}");
                     continue;
                 }
 
@@ -134,12 +134,12 @@ public class JukeboxManager : MonoBehaviour
                 if (index >= 0)
                 {
                     musics[index] = clip;
-                    Debug.Log($"Replaced official music: {clip.name}");
+                    //Debug.Log($"Replaced official music: {clip.name}");
                 }
                 else
                 {
                     musics.Add(clip);
-                    Debug.Log($"Added custom music: {clip.name}");
+                    //Debug.Log($"Added custom music: {clip.name}");
                 }
 
                 InstantiateButton(clip);
@@ -160,7 +160,7 @@ public class JukeboxManager : MonoBehaviour
         .OrderBy(m => m.name)
         .ToList();
 
-        Debug.Log($"Loaded {musics.Count} songs.");
+        //Debug.Log($"Loaded {musics.Count} songs.");
     }
 
     public void ScrollUp()

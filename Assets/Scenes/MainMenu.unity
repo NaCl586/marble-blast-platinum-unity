@@ -416,6 +416,74 @@ RectTransform:
     type: 3}
   m_PrefabInstance: {fileID: 364853203}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &406833862
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 406833865}
+  - component: {fileID: 406833864}
+  - component: {fileID: 406833866}
+  m_Layer: 0
+  m_Name: ServerTest
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &406833864
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 406833862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a00049790dc283f4180a0d251720f90d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serverConfig: {fileID: 11400000, guid: b6168af57cabe954cbe9369a8d0e0c07, type: 2}
+--- !u!4 &406833865
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 406833862}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1096.3607, y: 423.54144, z: 0.02702919}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &406833866
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 406833862}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4737c9447c74a44f961341c22bb9efe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  username: Gerson
+  password: 123456
+  invalidPassword: 123456789
+  invalidUsername: UnknownUser
+  level: missions_mbp/beginner/Let'sRoll!
+  page: 1
+  pageSize: 10
+  runOnStart: 1
+  stopOnFailure: 0
+  testId: 102
 --- !u!1001 &544966757
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2738,3 +2806,4 @@ SceneRoots:
   - {fileID: 717479619}
   - {fileID: 1794301722}
   - {fileID: 1661751138323779441}
+  - {fileID: 406833865}
