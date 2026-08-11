@@ -12,7 +12,6 @@ public class Teleport : MonoBehaviour
     private float teleportTime;
 
     [HideInInspector] public static bool teleporting;
-    private Material material;
     private Color originalColor;
 
     private float initTime;
@@ -23,8 +22,6 @@ public class Teleport : MonoBehaviour
         teleporting = false;
 
         player = Marble.instance.gameObject;
-        material = Marble.instance.teleportMesh.GetComponent<MeshRenderer>().sharedMaterial;
-        material.color = Color.white;
         originalColor = Color.white;
     }
 
@@ -93,7 +90,7 @@ public class Teleport : MonoBehaviour
         Camera.main.GetComponent<CameraController>().SetCameraPosition(cameraPos.transform.GetChild(0).position, cameraPos.transform.GetChild(1).position);
         
         SetOpaque();
-        material.color = originalColor;
+        Marble.instance.teleportMesh.GetComponent<MeshRenderer>().material.color = originalColor;
     }
 
     IEnumerator TeleportFade()
@@ -103,13 +100,13 @@ public class Teleport : MonoBehaviour
             teleportTime -= Time.deltaTime;
             float alpha = Mathf.Clamp01(teleportTime / time);
 
-            material.color = new Color(
+            Marble.instance.teleportMesh.GetComponent<MeshRenderer>().material.color = new Color(
                 originalColor.r,
                 originalColor.g,
                 originalColor.b,
                 alpha
             );
-            Debug.Log(alpha);
+
             yield return null;
         }
     }

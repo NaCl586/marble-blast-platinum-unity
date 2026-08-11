@@ -31,10 +31,7 @@ public class NewReplayManager : MonoBehaviour
             cancelButton.GetComponent<ButtonSound>().PlayClickSound();
             Cancel();
             GetComponent<PlayMissionManager>().ToggleReplayWindow(false);
-            foreach (var button in FindObjectsOfType<Button>())
-                button.enabled = true;
-
-            GetComponent<PlayMissionManager>().replayButton.enabled = true;
+            GetComponent<PlayMissionManager>().raycastBlocker.SetActive(false);
         });
 
         applyButton.onClick.AddListener(() => {
@@ -98,17 +95,16 @@ public class NewReplayManager : MonoBehaviour
         }
 
         GetComponent<PlayMissionManager>().ToggleReplayWindow(false);
-        foreach (var button in FindObjectsOfType<Button>())
-            button.enabled = true;
-
-        GetComponent<PlayMissionManager>().replayButton.enabled = true;
 
         ReplayRecorder.recordReplay = true;
+        GetComponent<PlayMissionManager>().raycastBlocker.SetActive(false);
         GetComponent<PlayMissionManager>().replayButton.SetIsOnWithoutNotify(true);
     }
 
     public void ShowError(string title, string desc)
     {
+        GetComponent<PlayMissionManager>().raycastBlocker2.SetActive(true);
+
         applyButton.enabled = true;
         cancelButton.enabled = true;
 
@@ -120,6 +116,7 @@ public class NewReplayManager : MonoBehaviour
     public void CloseError()
     {
         errorWindow.SetActive(false);
+        GetComponent<PlayMissionManager>().raycastBlocker2.SetActive(false);
     }
 
     public bool ReplayFileExists(string fileName)

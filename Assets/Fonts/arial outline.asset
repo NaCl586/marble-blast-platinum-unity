@@ -7919,7 +7919,7 @@ MonoBehaviour:
   boldStyle: 0.75
   boldSpacing: 7
   italicStyle: 35
-  tabSize: 10
+  tabSize: 2
 --- !u!28 &2489036789372368517
 Texture2D:
   m_ObjectHideFlags: 0

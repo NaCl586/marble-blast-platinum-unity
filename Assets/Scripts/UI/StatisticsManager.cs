@@ -13,11 +13,8 @@ public class StatisticsManager : MonoBehaviour
     private void Start()
     {
         returnButton.onClick.AddListener(() => { 
-            GetComponent<PlayMissionManager>().ToggleStatisticsWindow(false);
-            foreach (var button in FindObjectsOfType<Button>())
-                button.enabled = true;
-
-            GetComponent<PlayMissionManager>().replayButton.enabled = false;
+            GetComponent<OfflinePlayMission>()?.ToggleStatisticsWindow(false);
+            GetComponent<PlayMissionManager>().raycastBlocker.SetActive(false);
         });
     }
 

@@ -82,9 +82,7 @@ public class SearchManager : MonoBehaviour
         cancelButton.onClick.AddListener(() => {
             GetComponent<PlayMissionManager>().ToggleSearchWindow(false);
             GetComponent<PlayMissionManager>().SetLevelInfo(GetComponent<PlayMissionManager>().selectedLevelNum);
-            foreach (var button in FindObjectsOfType<Button>())
-                button.enabled = true;
-            GetComponent<PlayMissionManager>().replayButton.enabled = false;
+            GetComponent<PlayMissionManager>().raycastBlocker.SetActive(false);
         });
 
         playButton.onClick.AddListener(() => {
@@ -145,46 +143,74 @@ public class SearchManager : MonoBehaviour
         playButton.interactable = found;
     }
 
+    public List<Mission> GetMissionList(Game game, Type type)
+    {
+        List<Mission> missionList = new List<Mission>();
+        if (game == Game.platinum)
+        {
+            if (type == Type.beginner)
+                missionList = MissionInfo.instance.missionsPlatinumBeginner;
+            if (type == Type.intermediate)
+                missionList = MissionInfo.instance.missionsPlatinumIntermediate;
+            if (type == Type.advanced)
+                missionList = MissionInfo.instance.missionsPlatinumAdvanced;
+            if (type == Type.expert)
+                missionList = MissionInfo.instance.missionsPlatinumExpert;
+        }
+        else if (game == Game.gold)
+        {
+            if (type == Type.beginner)
+                missionList = MissionInfo.instance.missionsGoldBeginner;
+            if (type == Type.intermediate)
+                missionList = MissionInfo.instance.missionsGoldIntermediate;
+            if (type == Type.advanced)
+                missionList = MissionInfo.instance.missionsGoldAdvanced;
+            if (type == Type.custom)
+                missionList = MissionInfo.instance.missionsGoldCustom;
+        }
+
+        return missionList;
+    }
+
     public void InitSearchElements()
     {
-        var sm = GetComponent<StatisticsManager>();
         List<Mission> missionList = new List<Mission>();
 
-        missionList = sm.GetMissionList(Game.gold, Type.beginner);
+        missionList = GetMissionList(Game.gold, Type.beginner);
         foreach (Mission m in missionList)
             if(m.levelNumber <= PlayerPrefs.GetInt("QualifiedLevelBeginnerGold", 0) + 1)
                 InstantiateButton(m, Color.black);
 
-        missionList = sm.GetMissionList(Game.gold, Type.intermediate);
+        missionList = GetMissionList(Game.gold, Type.intermediate);
         foreach (Mission m in missionList)
             if (m.levelNumber <= PlayerPrefs.GetInt("QualifiedLevelIntermediateGold", 0) + 1)
                 InstantiateButton(m, Color.black);
 
-        missionList = sm.GetMissionList(Game.gold, Type.advanced);
+        missionList = GetMissionList(Game.gold, Type.advanced);
         foreach (Mission m in missionList)
             if (m.levelNumber <= PlayerPrefs.GetInt("QualifiedLevelAdvancedGold", 0) + 1)
                 InstantiateButton(m, Color.black);
 
-        missionList = sm.GetMissionList(Game.gold, Type.custom);
+        missionList = GetMissionList(Game.gold, Type.custom);
         foreach (Mission m in missionList)
             InstantiateButton(m, Color.green);
 
-        missionList = sm.GetMissionList(Game.platinum, Type.beginner);
+        missionList = GetMissionList(Game.platinum, Type.beginner);
         foreach (Mission m in missionList)
             if (m.levelNumber <= PlayerPrefs.GetInt("QualifiedLevelBeginnerPlatinum", 0) + 1)
                 InstantiateButton(m, Color.black);
 
-        missionList = sm.GetMissionList(Game.platinum, Type.intermediate);
+        missionList = GetMissionList(Game.platinum, Type.intermediate);
         foreach (Mission m in missionList)
             if (m.levelNumber <= PlayerPrefs.GetInt("QualifiedLevelIntermediatePlatinum", 0) + 1)
                 InstantiateButton(m, Color.black);
 
-        missionList = sm.GetMissionList(Game.platinum, Type.advanced);
+        missionList = GetMissionList(Game.platinum, Type.advanced);
         foreach (Mission m in missionList)
             if (m.levelNumber <= PlayerPrefs.GetInt("QualifiedLevelAdvancedPlatinum", 0) + 1)
                 InstantiateButton(m, Color.black);
 
-        missionList = sm.GetMissionList(Game.platinum, Type.expert);
+        missionList = GetMissionList(Game.platinum, Type.expert);
         foreach (Mission m in missionList)
             if (m.levelNumber <= PlayerPrefs.GetInt("QualifiedLevelExpertPlatinum", 0) + 1)
                 InstantiateButton(m, Color.black);

@@ -17,6 +17,7 @@ public class ReplayMenuManager : MonoBehaviour
         public Mission mission;
 
         public string fileName;
+        public string filePath;
         public string replayName;
         public string author;
         public string description;
@@ -125,6 +126,7 @@ public class ReplayMenuManager : MonoBehaviour
         if (currentReplay == null || currentReplay.mission == null)
             return;
 
+        ReplayRecorder.loadedReplayPath = currentReplay.filePath;
         ReplayRecorder.replayName = currentReplay.fileName;
         ReplayRecorder.loadReplay = true;
         ReplayRecorder.incompleteReplay = currentReplay.completed == "Incomplete";
@@ -175,26 +177,92 @@ public class ReplayMenuManager : MonoBehaviour
     {
         replays.Clear();
 
-        string replayFolder = Path.Combine(
-            Path.GetDirectoryName(Application.dataPath),
-            "Replay");
+        string replayFolder =
+            Path.Combine(
+                Path.GetDirectoryName(Application.dataPath),
+                "Replay");
 
         if (!Directory.Exists(replayFolder))
             return;
 
-        string[] files = Directory.GetFiles(replayFolder, "*.urec");
+        // --------------------------------------------------
+        // Main Replay folder
+        // --------------------------------------------------
+
+        string[] files =
+            Directory.GetFiles(
+                replayFolder,
+                "*.urec");
 
         foreach (string file in files)
         {
-            Replay replay = ReadReplayMetadata(file);
+            Replay replay =
+                ReadReplayMetadata(file);
 
             if (replay != null)
                 replays.Add(replay);
         }
 
-        replays = replays
-            .OrderBy(r => r.replayName)
-            .ToList();
+        // --------------------------------------------------
+        // Leaderboard replays
+        // --------------------------------------------------
+
+        string leaderboardFolder =
+            Path.Combine(
+                replayFolder,
+                "Leaderboard");
+
+        if (Directory.Exists(leaderboardFolder))
+        {
+            files =
+                Directory.GetFiles(
+                    leaderboardFolder,
+                    "*.urec");
+
+            foreach (string file in files)
+            {
+                Replay replay =
+                    ReadReplayMetadata(file);
+
+                if (replay != null)
+                    replays.Add(replay);
+            }
+        }
+
+        // --------------------------------------------------
+        // Pending replays
+        // --------------------------------------------------
+
+        string pendingFolder =
+            Path.Combine(
+                replayFolder,
+                "Pending");
+
+        if (Directory.Exists(pendingFolder))
+        {
+            files =
+                Directory.GetFiles(
+                    pendingFolder,
+                    "*.urec");
+
+            foreach (string file in files)
+            {
+                Replay replay =
+                    ReadReplayMetadata(file);
+
+                if (replay != null)
+                    replays.Add(replay);
+            }
+        }
+
+        // --------------------------------------------------
+        // Sort
+        // --------------------------------------------------
+
+        replays =
+            replays
+                .OrderBy(r => r.replayName)
+                .ToList();
 
         PopulateReplayButtons();
     }
@@ -287,23 +355,37 @@ public class ReplayMenuManager : MonoBehaviour
                 int metadataSize = reader.ReadInt32();
 
                 // Jump directly to metadata
-                stream.Position = stream.Length - 4 - metadataSize;
+                stream.Position =
+                    stream.Length - 4 - metadataSize;
 
                 Replay replay = new Replay();
 
-                replay.fileName = Path.GetFileNameWithoutExtension(path);
+                replay.fileName =
+                    Path.GetFileNameWithoutExtension(path);
 
-                string missionPath = reader.ReadString();
+                replay.filePath =
+                    path;
+
+                string missionPath =
+                    reader.ReadString();
+
                 reader.ReadString(); // Stored level name (unused)
                 reader.ReadString(); // Marble ID (unused)
 
-                replay.replayName = reader.ReadString();
-                replay.author = reader.ReadString();
-                replay.description = reader.ReadString();
+                replay.replayName =
+                    reader.ReadString();
 
-                replay.completed = reader.ReadString();
+                replay.author =
+                    reader.ReadString();
 
-                replay.mission = FindMission(missionPath);
+                replay.description =
+                    reader.ReadString();
+
+                replay.completed =
+                    reader.ReadString();
+
+                replay.mission =
+                    FindMission(missionPath);
 
                 return replay;
             }

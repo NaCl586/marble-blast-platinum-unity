@@ -1,5 +1,12 @@
+﻿using Cysharp.Threading.Tasks;
+using Server;
+using Server.DTOs.Requests;
+using Server.DTOs.Responses;
+using Server.Replay;
+using Server.Score;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -123,6 +130,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public float elapsedTime;
     float bonusTime;
     string bestTimeName = string.Empty;
+    int pendingNamePosition = -1;
 
     int totalGems;
     [HideInInspector] public int currentGems;
@@ -203,7 +211,11 @@ public class GameManager : MonoBehaviour
             else
             {
                 JukeboxManager.instance.PlayMusic("Pianoforte");
-                SceneManager.LoadScene("PlayMission");
+
+                if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
+                    SceneManager.LoadScene("PLayMission");
+                else 
+                    SceneManager.LoadScene("LBPlayMission");
             }
         });
         restartButton.onClick.AddListener(RestartLevel);
@@ -530,12 +542,12 @@ public class GameManager : MonoBehaviour
 
             if (ReplayRecorder.loadReplay)
             {
-                ReplayRecorder.Instance.StartReplay();
+                ReplayRecorder.Instance.StartReplay(ReplayRecorder.loadedReplayPath);
                 Debug.Log("Replay Loaded");
             }
             else
             {
-                if (ReplayRecorder.recordReplay)
+                if (ReplayRecorder.recordReplay || ReplayRecorder.leaderboardRecording)
                 {
                     ReplayRecorder.Instance.StartRecording();
                     Debug.Log("Replay Started");
@@ -657,8 +669,10 @@ public class GameManager : MonoBehaviour
                 gameFinish = true;
                 FinishRoutine();
 
-                if(ReplayRecorder.recordReplay)
-                    Invoke(nameof(StopRecording), 0.0625f + Time.fixedDeltaTime);
+                if (ReplayRecorder.recordReplay || ReplayRecorder.leaderboardRecording)
+                    Invoke(
+                        nameof(StopRecordingAfterFinish),
+                        0.0625f + Time.fixedDeltaTime);
 
                 Invoke(nameof(ShowFinishUI), 2f);
             }   
@@ -684,10 +698,28 @@ public class GameManager : MonoBehaviour
         Invoke(nameof(StopMarbleMovement), 0.0625f);
     }
 
-    void StopRecording()
+    async void StopRecordingAfterFinish()
     {
         ReplayRecorder.incompleteReplay = false;
         ReplayRecorder.Instance.StopRecording();
+
+        await SubmitOnlineScore();
+    }
+
+    private async UniTask SubmitOnlineScore()
+    {
+        string level =
+            Path.ChangeExtension(
+                MissionInfo.instance.MissionPath,
+                null);
+
+        int timeMs =
+            Mathf.RoundToInt(elapsedTime);
+
+        await OnlineManager.Instance.OnlineScore
+            .SubmitScoreAsync(
+                level,
+                timeMs);
     }
 
     void StopMarbleMovement()
@@ -709,13 +741,29 @@ public class GameManager : MonoBehaviour
         }
         else if (ReplayRecorder.loadReplay)
         {
-            JukeboxManager.instance.PlayMusic("Pianoforte");
-            SceneManager.LoadScene("ReplayMenu");
+            if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
+            {
+                JukeboxManager.instance.PlayMusic("Pianoforte");
+                SceneManager.LoadScene("ReplayMenu");
+            }
+            else
+            {
+                JukeboxManager.instance.PlayMusic("Flanked");
+                SceneManager.LoadScene("LBPlayMission");
+            }
         }
         else
         {
-            JukeboxManager.instance.PlayMusic("Pianoforte");
-            SceneManager.LoadScene("PlayMission");
+            if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
+            {
+                JukeboxManager.instance.PlayMusic("Pianoforte");
+                SceneManager.LoadScene("PLayMission");
+            }
+            else
+            {
+                JukeboxManager.instance.PlayMusic("Flanked");
+                SceneManager.LoadScene("LBPlayMission");
+            }
         }
     }
 
@@ -738,10 +786,24 @@ public class GameManager : MonoBehaviour
     public void CloseEnterNameWindow()
     {
         enterNameMenu.SetActive(false);
+
         replayButton.interactable = true;
         continueButton.interactable = true;
 
-        InsertBestTime(bestTimeName, elapsedTime);
+        if (pendingNamePosition >= 0 && pendingNamePosition < 3)
+        {
+            string levelName = MissionInfo.instance.levelName;
+
+            PlayerPrefs.SetString(
+                levelName + "_Name_" + pendingNamePosition,
+                bestTimeName
+            );
+
+            PlayerPrefs.Save();
+
+            pendingNamePosition = -1;
+        }
+
         UpdateBestTimes();
     }
 
@@ -752,24 +814,44 @@ public class GameManager : MonoBehaviour
 
         bool gold = elapsedTime < MissionInfo.instance.goldTime;
         bool ultimate = elapsedTime < MissionInfo.instance.ultimateTime;
-        bool qualify = !(MissionInfo.instance.time != -1 && elapsedTime >= MissionInfo.instance.time);
+        bool qualify = !(MissionInfo.instance.time != -1 &&
+                         elapsedTime >= MissionInfo.instance.time);
+
         finalTime.text = Utils.FormatTime(elapsedTime);
 
+        // Determine where this time would be placed in the TOP 10.
         int pos = DeterminePosition(elapsedTime);
+
+        pendingNamePosition = -1;
+
         if (pos != -1 && qualify)
         {
-            replayButton.interactable = false;
-            continueButton.interactable = false;
-            enterNameMenu.SetActive(true);
-            if (pos == 0)
-                enterNameCaption.text = "You got the top time!";
-            else if (pos == 1)
-                enterNameCaption.text = "You got the second top time!";
-            else if (pos == 2)
-                enterNameCaption.text = "You got the third top time!";
+            // Always save a top-10 time immediately.
+            SaveTimeToTop10(elapsedTime, pos);
 
-            nameInputField.SetTextWithoutNotify(MissionInfo.instance.highScoreName);
-            UpdateName(MissionInfo.instance.highScoreName);
+            // Only top 3 require a name.
+            if (pos < 3)
+            {
+                pendingNamePosition = pos;
+
+                replayButton.interactable = false;
+                continueButton.interactable = false;
+
+                enterNameMenu.SetActive(true);
+
+                if (pos == 0)
+                    enterNameCaption.text = "You got the top time!";
+                else if (pos == 1)
+                    enterNameCaption.text = "You got the second top time!";
+                else if (pos == 2)
+                    enterNameCaption.text = "You got the third top time!";
+
+                nameInputField.SetTextWithoutNotify(
+                    MissionInfo.instance.highScoreName
+                );
+
+                UpdateName(MissionInfo.instance.highScoreName);
+            }
         }
 
         string _qualifyTime, _goldTime, _platinumTime, _ultimateTime;
@@ -840,11 +922,65 @@ public class GameManager : MonoBehaviour
 
         UpdateBestTimes();
 
-        int qualifiedLevel = PlayerPrefs.GetInt("QualifiedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + PlayMissionManager.CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), 0);
+        int qualifiedLevel = PlayerPrefs.GetInt("QualifiedLevel" + CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), 0);
         if (qualify && qualifiedLevel + 1 == MissionInfo.instance.level)
-            PlayerPrefs.SetInt("QualifiedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + PlayMissionManager.CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), (qualifiedLevel + 1));
+            PlayerPrefs.SetInt("QualifiedLevel" + CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), (qualifiedLevel + 1));
 
-        PlayerPrefs.SetInt("SelectedLevel" + PlayMissionManager.CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + PlayMissionManager.CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), (MissionInfo.instance.level));
+        PlayerPrefs.SetInt("SelectedLevel" + CapitalizeFirst(PlayMissionManager.currentlySelectedType.ToString()) + CapitalizeFirst(PlayMissionManager.selectedGame.ToString()), (MissionInfo.instance.level));
+    }
+
+    private void SaveTimeToTop10(float newTime, int position)
+    {
+        string levelName = MissionInfo.instance.levelName;
+
+        // Shift records down.
+        for (int i = 9; i > position; i--)
+        {
+            float previousTime = PlayerPrefs.GetFloat(
+                levelName + "_Time_" + (i - 1),
+                -1
+            );
+
+            PlayerPrefs.SetFloat(
+                levelName + "_Time_" + i,
+                previousTime
+            );
+
+            // Only preserve names that remain in the top 3.
+            if (i < 3)
+            {
+                string previousName = PlayerPrefs.GetString(
+                    levelName + "_Name_" + (i - 1),
+                    ""
+                );
+
+                PlayerPrefs.SetString(
+                    levelName + "_Name_" + i,
+                    previousName
+                );
+            }
+            else
+            {
+                PlayerPrefs.SetString(
+                    levelName + "_Name_" + i,
+                    ""
+                );
+            }
+        }
+
+        // Insert the new time.
+        PlayerPrefs.SetFloat(
+            levelName + "_Time_" + position,
+            newTime
+        );
+
+        // Name will be filled in later if this is a top-3 record.
+        PlayerPrefs.SetString(
+            levelName + "_Name_" + position,
+            ""
+        );
+
+        PlayerPrefs.Save();
     }
 
     void UpdateBestTimes()
@@ -897,32 +1033,34 @@ public class GameManager : MonoBehaviour
 
     int DeterminePosition(float time)
     {
-        float[] times = new float[3];
-        for (int i = 0; i < 3; i++)
-            times[i] = PlayerPrefs.GetFloat(MissionInfo.instance.levelName + "_Time_" + i, -1);
-
-        if (times[0] == -1 || time < times[0]) return 0;
-        else if (times[1] == -1 || (time < times[1] && time >= times[0])) return 1;
-        else if (times[2] == -1 || (time < times[2] && time >= times[1])) return 2;
-        else return -1;
-    }
-
-    void InsertBestTime(string _name, float _time)
-    {
-        int pos = DeterminePosition(_time);
-        if (pos == -1) return;
-
-        for (int i = 1; i >= pos; i--)
+        for (int i = 0; i < 10; i++)
         {
-            string playerName = PlayerPrefs.GetString(MissionInfo.instance.levelName + "_Name_" + i, "Matan W.");
-            float playerTime = PlayerPrefs.GetFloat(MissionInfo.instance.levelName + "_Time_" + i, -1);
-            PlayerPrefs.SetString(MissionInfo.instance.levelName + "_Name_" + (i + 1), playerName);
-            PlayerPrefs.SetFloat(MissionInfo.instance.levelName + "_Time_" + (i + 1), playerTime);
+            float existingTime = PlayerPrefs.GetFloat(
+                MissionInfo.instance.levelName + "_Time_" + i,
+                -1
+            );
+
+            // Empty slot = new record goes here.
+            if (existingTime == -1)
+                return i;
+
+            // Faster than this record = insert here.
+            if (time < existingTime)
+                return i;
         }
 
-        PlayerPrefs.SetString(MissionInfo.instance.levelName + "_Name_" + pos, _name);
-        PlayerPrefs.SetFloat(MissionInfo.instance.levelName + "_Time_" + pos, _time);
+        // Slower than all top 10 records.
+        return -1;
     }
+
+    public string CapitalizeFirst(string input)
+    {
+        if (string.IsNullOrEmpty(input))
+            return input;
+
+        return char.ToUpper(input[0]) + input.Substring(1);
+    }
+
     #endregion
 
     string[] oobRandom;
