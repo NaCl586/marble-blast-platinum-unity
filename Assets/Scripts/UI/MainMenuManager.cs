@@ -12,16 +12,23 @@ public class MainMenuManager : MonoBehaviour
     public Button quitButton;
     public Button websiteButton;
     public Button replayButton;
+    public Button leaderboardButton;
     public GameObject quitImage;
 
     bool isQuitting;
 
     public void Start()
     {
+        JukeboxManager.instance.PlayMusic("Pianoforte");
+
         playButton.onClick.AddListener(() => SceneManager.LoadScene("PlayMission"));
         helpButton.onClick.AddListener(() => SceneManager.LoadScene("HelpCredits"));
         optionsButton.onClick.AddListener(() => SceneManager.LoadScene("Options"));
         replayButton.onClick.AddListener(() => SceneManager.LoadScene("ReplayMenu"));
+        leaderboardButton.onClick.AddListener(() => {
+            JukeboxManager.instance.Stop();
+            SceneManager.LoadScene("LBAuth");
+        });
         quitButton.onClick.AddListener(() => {
             quitImage.SetActive(true);
             isQuitting = true;

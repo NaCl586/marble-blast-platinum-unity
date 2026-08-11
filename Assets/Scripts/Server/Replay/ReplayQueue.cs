@@ -14,23 +14,15 @@ namespace Server.Replay
 
         public ReplayQueue()
         {
-            _path = Path.Combine(
-                Application.persistentDataPath,
-                "ReplayQueue.json");
+            ReplayPaths.EnsureDirectories();
+
+            _path = ReplayPaths.QueueFile;
 
             Load();
         }
 
         public bool HasPendingReplay =>
             _items.Count > 0;
-
-        public PendingReplay? Peek()
-        {
-            if (_items.Count == 0)
-                return null;
-
-            return _items[0];
-        }
 
         public void Enqueue(
             PendingReplay replay)
@@ -62,23 +54,6 @@ namespace Server.Replay
                 return;
 
             _items[index] = replay;
-
-            Save();
-        }
-
-        public void Dequeue()
-        {
-            if (_items.Count == 0)
-                return;
-
-            _items.RemoveAt(0);
-
-            Save();
-        }
-
-        public void Clear()
-        {
-            _items.Clear();
 
             Save();
         }
@@ -119,6 +94,67 @@ namespace Server.Replay
             {
                 _items.AddRange(
                     data.Items);
+            }
+        }
+
+        public void RemovePendingReplayForUserAndLevel(
+    int userId,
+    string level)
+        {
+            for (int i = _items.Count - 1; i >= 0; i--)
+            {
+                PendingReplay replay =
+                    _items[i];
+
+                if (replay.UserId != userId)
+                    continue;
+
+                if (!string.Equals(
+                        replay.Level,
+                        level,
+                        System.StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                string filePath =
+                    ReplayPaths.GetAbsolutePath(
+                        replay.FileName);
+
+                if (File.Exists(filePath))
+                {
+                    File.Delete(filePath);
+
+                    Debug.Log(
+                        $"Deleted obsolete pending replay: " +
+                        $"UserId={userId}, File={filePath}");
+                }
+
+                _items.RemoveAt(i);
+            }
+
+            Save();
+        }
+
+        public PendingReplay? PeekForUser(int userId)
+        {
+            for (int i = 0; i < _items.Count; i++)
+            {
+                if (_items[i].UserId == userId)
+                    return _items[i];
+            }
+
+            return null;
+        }
+
+        public void Remove(PendingReplay replay)
+        {
+            if (replay == null)
+                return;
+
+            if (_items.Remove(replay))
+            {
+                Save();
             }
         }
     }

@@ -303,6 +303,10 @@ public class JukeboxManager : MonoBehaviour
 
     public void PlayMusic(string name)
     {
+        // Already playing this song, do nothing
+        if (currentlyPlayingMusic == name)
+            return;
+
         AudioClip selectedMusic = musics.FirstOrDefault(c =>
             c != null &&
             c.name.Equals(name, System.StringComparison.Ordinal));

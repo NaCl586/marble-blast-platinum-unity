@@ -1,18 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class RegisterRequest : MonoBehaviour
+namespace Server.DTOs.Requests
 {
-    // Start is called before the first frame update
-    void Start()
+    public class RegisterRequest
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 }
+

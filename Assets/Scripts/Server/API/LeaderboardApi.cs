@@ -1,6 +1,6 @@
 using Cysharp.Threading.Tasks;
-using UnityEngine.Networking;
 using Server.DTOs.Responses;
+using UnityEngine.Networking;
 
 namespace Server.API
 {
@@ -8,21 +8,40 @@ namespace Server.API
     {
         private readonly ApiClient _client;
 
-        public LeaderboardApi(ApiClient client)
+        public LeaderboardApi(
+            ApiClient client)
         {
             _client = client;
         }
 
         public UniTask<LeaderboardResponse> GetLeaderboardAsync(
             string level,
-            int page = 1,
-            int pageSize = 10)
+            int page,
+            int pageSize)
         {
-            string encodedLevel =
-                UnityWebRequest.EscapeURL(level);
+            string route =
+                "/api/leaderboard" +
+                "?level=" +
+                UnityWebRequest.EscapeURL(level) +
+                "&page=" +
+                page +
+                "&pageSize=" +
+                pageSize;
 
             return _client.GetAsync<LeaderboardResponse>(
-                $"/api/leaderboard?level={encodedLevel}&page={page}&pageSize={pageSize}");
+                route);
+        }
+
+        public UniTask<MyRankResponse> GetMyRankAsync(
+            string level)
+        {
+            string route =
+                "/api/leaderboard/my-rank" +
+                "?level=" +
+                UnityWebRequest.EscapeURL(level);
+
+            return _client.GetAsync<MyRankResponse>(
+                route);
         }
     }
 }

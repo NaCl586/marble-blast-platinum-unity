@@ -77,12 +77,18 @@ public class LoadingManager : MonoBehaviour
         // Stop the coroutine cleanly
         StopAllCoroutines();
 
-		JukeboxManager.instance.PlayMusic("Pianoforte");
-
-
-        if(ReplayRecorder.loadReplay)
-            SceneManager.LoadScene("ReplayMenu", LoadSceneMode.Single);
+        if (PlayMissionManager.LevelLoadedFromLeaderboards)
+        {
+            SceneManager.LoadScene("LBPlayMission", LoadSceneMode.Single);
+        }
         else
-            SceneManager.LoadScene("PlayMission", LoadSceneMode.Single);
+        {
+            JukeboxManager.instance.PlayMusic("Pianoforte");
+
+            if (ReplayRecorder.loadReplay)
+                SceneManager.LoadScene("ReplayMenu", LoadSceneMode.Single);
+            else
+                SceneManager.LoadScene("PlayMission", LoadSceneMode.Single);
+        }
     }
 }

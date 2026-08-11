@@ -153,11 +153,7 @@ public class MarbleSelectManager : MonoBehaviour
         PlayerPrefs.SetInt("DefaultMarbleIsSelected", (marbleType == MarbleType.Default) ? 0 : 1);
         PlayerPrefs.SetInt("SelectedMarbleIndex", (marbleType == MarbleType.Default) ? selectedIndexDefault : selectedIndexCustom);
 
-        foreach (var button in FindObjectsOfType<Button>())
-                button.enabled = true;
-
-        GetComponent<PlayMissionManager>().replayButton.enabled = false;
-
+        GetComponent<PlayMissionManager>().raycastBlocker.SetActive(false);
         GetComponent<PlayMissionManager>().ToggleMarbleSelectWindow(false);
     }
 

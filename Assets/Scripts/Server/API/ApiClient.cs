@@ -1,5 +1,7 @@
 using System.IO;
 using System.Text;
+using System.Net;
+using System.Net.Http.Headers;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
@@ -7,6 +9,7 @@ using UnityEngine.Networking;
 using Server.Config;
 using Server.DTOs.Responses;
 using Server.Exceptions;
+using System;
 
 namespace Server.API
 {
@@ -49,6 +52,9 @@ namespace Server.API
         {
             request.timeout = _config.Timeout;
 
+            Debug.Log(
+                $"Authenticated: {HasToken}");
+
             if (!string.IsNullOrWhiteSpace(Token))
             {
                 request.SetRequestHeader(
@@ -57,15 +63,13 @@ namespace Server.API
             }
         }
 
-        private async UniTask SendAsync(UnityWebRequest request)
+        private async UniTask SendAsync(
+    UnityWebRequest request)
         {
             ApplyHeaders(request);
 
-            if (_config.LogRequests)
-            {
-                Debug.Log(
-                    $"--> {request.method} {request.url}");
-            }
+            Debug.Log(
+                $"--> {request.method} {request.url}");
 
             try
             {
@@ -73,45 +77,30 @@ namespace Server.API
             }
             catch (UnityWebRequestException)
             {
-                // UniTask melempar exception untuk HTTP error.
-                // Abaikan dulu supaya kita bisa memetakan sendiri.
+                // UniTask throws for HTTP errors.
+                // Handle the actual HTTP status ourselves below.
             }
 
-            if (_config.LogRequests)
+            if (request.result ==
+                UnityWebRequest.Result.Success)
             {
                 Debug.Log(
-                    $"<-- {(int)request.responseCode}");
+                    $"<-- {(int)request.responseCode} " +
+                    $"{request.method} success");
 
-                if (request.downloadHandler != null)
-                {
-                    Debug.Log(request.downloadHandler.text);
-                }
+                return;
             }
 
-            switch (request.responseCode)
+            Debug.LogError(
+                $"<-- {(int)request.responseCode} {request.error}");
+
+            if (request.responseCode != 0)
             {
-                case 200:
-                case 201:
-                case 204:
-                    return;
-
-                case 400:
-                case 401:
-                case 403:
-                case 404:
-                case 409:
-                    ThrowHttpException(request);
-                    return;
-
-                case 0:
-                    throw new NetworkException(
-                        request.error ?? "Network error.");
-
-                default:
-                    throw new ApiException(
-                        (int)request.responseCode,
-                        ExtractErrorMessage(request));
+                ThrowHttpException(request);
             }
+
+            throw new NetworkException(
+                request.error);
         }
 
         private TResponse ReadResponse<TResponse>(
@@ -191,19 +180,107 @@ namespace Server.API
                 request.downloadHandler);
         }
 
-        public async UniTask DownloadFileAsync(
+        public async UniTask<string> DownloadFileAsync(
             string route,
-            string savePath)
+            string downloadDirectory)
         {
-            using UnityWebRequest request =
+            Directory.CreateDirectory(
+                downloadDirectory);
+
+            using var request =
                 UnityWebRequest.Get(
                     BuildUrl(route));
 
-            request.downloadHandler =
-                new DownloadHandlerFile(
-                    savePath);
+            string tempPath =
+                Path.Combine(
+                    downloadDirectory,
+                    Guid.NewGuid().ToString() + ".tmp");
 
-            await SendAsync(request);
+            request.downloadHandler =
+                new DownloadHandlerFile(tempPath);
+
+            try
+            {
+                await SendAsync(request);
+
+                string fileName =
+                    GetFileNameFromContentDisposition(
+                        request);
+
+                if (string.IsNullOrWhiteSpace(fileName))
+                {
+                    throw new ApiException(
+                        500,
+                        "Server did not provide a replay filename.");
+                }
+
+                string finalPath =
+                    Path.Combine(
+                        downloadDirectory,
+                        fileName);
+
+                if (File.Exists(finalPath))
+                {
+                    File.Delete(finalPath);
+                }
+
+                File.Move(
+                    tempPath,
+                    finalPath);
+
+                return finalPath;
+            }
+            catch
+            {
+                if (File.Exists(tempPath))
+                    File.Delete(tempPath);
+
+                throw;
+            }
+        }
+
+        private string GetFileNameFromContentDisposition(
+    UnityWebRequest request)
+        {
+            string header =
+                request.GetResponseHeader(
+                    "Content-Disposition");
+
+            if (string.IsNullOrWhiteSpace(header))
+            {
+                return null;
+            }
+
+            try
+            {
+                System.Net.Http.Headers.ContentDispositionHeaderValue disposition =
+                    System.Net.Http.Headers.ContentDispositionHeaderValue.Parse(
+                        header);
+
+                // Prefer filename*
+                if (!string.IsNullOrWhiteSpace(
+                        disposition.FileNameStar))
+                {
+                    return Uri.UnescapeDataString(
+                        disposition.FileNameStar.Trim('"'));
+                }
+
+                // Fallback to filename
+                if (!string.IsNullOrWhiteSpace(
+                        disposition.FileName))
+                {
+                    return disposition.FileName.Trim('"');
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning(
+                    $"Failed to parse Content-Disposition: {header}");
+
+                Debug.LogException(ex);
+            }
+
+            return null;
         }
 
         private async UniTask<TResponse> SendJsonAsync<TRequest, TResponse>(
@@ -265,6 +342,12 @@ namespace Server.API
         private static string ExtractErrorMessage(
             UnityWebRequest request)
         {
+            if (request.downloadHandler is DownloadHandlerFile)
+            {
+                return request.error
+                       ?? "Unknown server error.";
+            }
+
             return request.downloadHandler?.text
                    ?? request.error
                    ?? "Unknown server error.";
@@ -306,6 +389,78 @@ namespace Server.API
             {
                 return !string.IsNullOrWhiteSpace(Token);
             }
+        }
+
+        public async UniTask<TResponse> UploadFileAsync<TResponse>(
+            string route,
+            string formFieldName,
+            string filePath,
+            string additionalFieldName,
+            string additionalFieldValue)
+        {
+            byte[] bytes =
+                File.ReadAllBytes(filePath);
+
+            WWWForm form =
+                new WWWForm();
+
+            form.AddBinaryData(
+                formFieldName,
+                bytes,
+                Path.GetFileName(filePath));
+
+            form.AddField(
+                additionalFieldName,
+                additionalFieldValue);
+
+            using UnityWebRequest request =
+                UnityWebRequest.Post(
+                    BuildUrl(route),
+                    form);
+
+            await SendAsync(request);
+
+            return ReadResponse<TResponse>(
+                request.downloadHandler);
+        }
+
+        public async UniTask<ApiResponse<TResponse>> PostJsonResponseAsync<TRequest, TResponse>(
+            string route,
+            TRequest body)
+        {
+            string json =
+                JsonConvert.SerializeObject(body);
+
+            using UnityWebRequest request =
+                new UnityWebRequest(
+                    BuildUrl(route),
+                    UnityWebRequest.kHttpVerbPOST);
+
+            request.uploadHandler =
+                new UploadHandlerRaw(
+                    Encoding.UTF8.GetBytes(json));
+
+            request.downloadHandler =
+                new DownloadHandlerBuffer();
+
+            request.SetRequestHeader(
+                "Content-Type",
+                "application/json");
+
+            await SendAsync(request);
+
+            ApiResponse<TResponse>? response =
+                JsonConvert.DeserializeObject<ApiResponse<TResponse>>(
+                    request.downloadHandler.text);
+
+            if (response == null)
+            {
+                throw new ApiException(
+                    500,
+                    "Failed to deserialize server response.");
+            }
+
+            return response;
         }
     }
 }

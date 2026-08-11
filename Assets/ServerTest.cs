@@ -1,4 +1,6 @@
 using System;
+using System.IO;
+using Server.Replay;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Cysharp.Threading.Tasks;
@@ -26,6 +28,14 @@ public class ServerTest : MonoBehaviour
 
     [SerializeField]
     private string invalidUsername = "UnknownUser";
+
+    [Header("Replay Test")]
+
+    [SerializeField]
+    private string replayTestFileName = "ServerTest.urec";
+
+    [SerializeField]
+    private string replayDownloadFileName = "ServerTest_Downloaded.urec";
 
     [Header("Level")]
 
@@ -161,13 +171,55 @@ public class ServerTest : MonoBehaviour
             301,
             "Replay Download",
             TestReplayDownload));
+
+        _tests.Add(new TestCase(
+            302,
+            "Replay Upload - Not Found",
+            TestReplayUploadNotFound));
+
+        _tests.Add(new TestCase(
+            303,
+            "Replay Download - Not Found",
+            TestReplayDownloadNotFound));
+
+        _tests.Add(new TestCase(
+            304,
+            "Replay Upload - Unauthorized",
+            TestReplayUploadUnauthorized));
+
+        _tests.Add(new TestCase(
+            305,
+            "Replay Download - Unauthorized",
+            TestReplayDownloadUnauthorized));
+
+        _tests.Add(new TestCase(
+            306,
+            "World Record",
+            TestWorldRecord));
+
+        _tests.Add(new TestCase(
+            307,
+            "World Record Replaced",
+            TestWorldRecordReplaced));
+
+        _tests.Add(new TestCase(
+            308,
+            "Stale World Record Replay",
+            TestStaleWorldRecordReplay));
     }
 
     private async UniTask Login()
     {
+        await Login(username, password);
+    }
+
+    private async UniTask Login(
+        string testUsername,
+        string testPassword)
+    {
         await OnlineManager.Instance.Auth.LoginAsync(
-            username,
-            password,
+            testUsername,
+            testPassword,
             false);
     }
 
@@ -207,22 +259,6 @@ public class ServerTest : MonoBehaviour
         AssertTrue(
             response.TimeMs > 0,
             "Invalid score.");
-    }
-
-    private UniTask TestReplayUpload()
-    {
-        Debug.Log(
-            "Replay upload not implemented.");
-
-        return UniTask.CompletedTask;
-    }
-
-    private UniTask TestReplayDownload()
-    {
-        Debug.Log(
-            "Replay download not implemented.");
-
-        return UniTask.CompletedTask;
     }
 
     protected async UniTask AssertThrows<T>(
@@ -400,6 +436,16 @@ public class ServerTest : MonoBehaviour
     {
         await Login();
 
+        await OnlineManager.Instance.Auth.LoginAsync(
+             username,
+             password,
+             false);
+
+        ReplayRecorder.leaderboardRecording = true;
+
+        await OnlineManager.Instance.ReplayUpload
+            .UploadPendingReplayAsync();
+
         AssertTrue(
             OnlineManager.Instance.Auth.IsLoggedIn,
             "User should be logged in.");
@@ -527,5 +573,473 @@ public class ServerTest : MonoBehaviour
             Debug.Log(
                 $"{score.Rank}. {score.PlayerName} ({score.TimeMs})");
         }
+    }
+
+    private string GetReplayTestDirectory()
+    {
+        string directory = Path.Combine(
+            ReplayPaths.ReplayDirectory,
+            "ServerTest");
+
+        Directory.CreateDirectory(directory);
+
+        return directory;
+    }
+
+    private string GetReplayTestFilePath()
+    {
+        return Path.Combine(
+            GetReplayTestDirectory(),
+            replayTestFileName);
+    }
+
+    private string GetReplayDownloadPath()
+    {
+        return Path.Combine(
+            GetReplayTestDirectory(),
+            replayDownloadFileName);
+    }
+
+    private async UniTask TestReplayUpload()
+    {
+        await Login();
+
+        SubmitScoreResponse score =
+            await CreateReplayTestScore();
+
+        int scoreId = score.ScoreId;
+
+        string replayPath =
+            GetReplayTestFile();
+
+        UploadReplayResponse response =
+            await OnlineManager.Instance
+                .Replay
+                .UploadReplayAsync(
+                    scoreId,
+                    score.TimeMs,
+                    replayPath);
+
+        AssertNotNull(
+            response,
+            "Upload response is null.");
+
+        AssertTrue(
+            response.ReplayId > 0,
+            "Invalid ReplayId.");
+
+        Debug.Log(
+            $"Replay uploaded successfully. " +
+            $"ScoreId={scoreId}, " +
+            $"ReplayId={response.ReplayId}");
+    }
+
+    private int _replayTestScoreId;
+
+    private async UniTask TestReplayDownload()
+    {
+        await Login();
+
+        SubmitScoreResponse score =
+            await CreateReplayTestScore();
+
+        int scoreId = score.ScoreId;
+
+        string replayPath =
+            GetReplayTestFile();
+
+        await OnlineManager.Instance
+            .Replay
+            .UploadReplayAsync(
+                scoreId,
+                10000,
+                replayPath);
+
+        ReplayPaths.EnsureDirectories();
+
+        var scoreTime = 10000;
+
+        string fileName =
+            $"{GetLevelFileName(level)}_" +
+            $"{scoreTime}_" +
+            $"{username}.urec";
+
+        string savePath =
+            Path.Combine(
+                ReplayPaths.LeaderboardDirectory,
+                fileName);
+
+        if (File.Exists(savePath))
+            File.Delete(savePath);
+
+        await OnlineManager.Instance
+            .Replay
+            .DownloadReplayAsync(
+                scoreId,
+                savePath);
+
+        AssertTrue(
+            File.Exists(savePath),
+            "Leaderboard replay was not downloaded.");
+
+        FileInfo file =
+            new FileInfo(savePath);
+
+        AssertTrue(
+            file.Length > 0,
+            "Downloaded replay is empty.");
+
+        Debug.Log(
+            $"Leaderboard replay downloaded: {savePath}");
+
+        Debug.Log(
+            $"Size: {file.Length} bytes");
+    }
+
+    private string GetReplayTestFile()
+    {
+        string replayDirectory =
+            Path.Combine(
+                Directory.GetParent(
+                    Application.dataPath).FullName,
+                "Replay");
+
+        string path =
+            Path.Combine(
+                replayDirectory,
+                replayTestFileName);
+
+        if (!File.Exists(path))
+        {
+            throw new Exception(
+                $"Replay test file not found: {path}");
+        }
+
+        return path;
+    }
+
+    private async UniTask<SubmitScoreResponse> CreateReplayTestScore()
+    {
+        SubmitScoreResponse response =
+            await Submit(10000);
+
+        AssertNotNull(
+            response,
+            "Score response is null.");
+
+        AssertTrue(
+            response.ScoreId > 0,
+            "Invalid ScoreId.");
+
+        return response;
+    }
+
+    private string GetLevelFileName(string level)
+    {
+        string fileName =
+            Path.GetFileName(level);
+
+        return fileName;
+    }
+
+    private async UniTask TestReplayUploadNotFound()
+    {
+        await Login();
+
+        string replayPath =
+            GetReplayTestFile();
+
+        await AssertThrows<NotFoundException>(
+            () =>
+                OnlineManager.Instance
+                    .Replay
+                    .UploadReplayAsync(
+                        999999,
+                        10000,
+                        replayPath));
+    }
+
+    private async UniTask TestReplayDownloadNotFound()
+    {
+        await Login();
+
+        int nonExistentScoreId = 999999999;
+
+        string savePath =
+            Path.Combine(
+                ReplayPaths.LeaderboardDirectory,
+                "ShouldNotExist.urec");
+
+        if (File.Exists(savePath))
+            File.Delete(savePath);
+
+        await AssertThrows<NotFoundException>(
+            () =>
+                OnlineManager.Instance
+                    .Replay
+                    .DownloadReplayAsync(
+                        nonExistentScoreId,
+                        savePath));
+
+        AssertFalse(
+            File.Exists(savePath),
+            "Replay file should not exist.");
+    }
+
+    private async UniTask TestReplayUploadUnauthorized()
+    {
+        await Login();
+
+        SubmitScoreResponse score =
+            await CreateReplayTestScore();
+
+        string replayPath =
+            GetReplayTestFile();
+
+        OnlineManager.Instance.Auth.Logout();
+
+        await AssertThrows<UnauthorizedException>(
+            () =>
+                OnlineManager.Instance
+                    .Replay
+                    .UploadReplayAsync(
+                        score.ScoreId,
+                        score.TimeMs,
+                        replayPath));
+    }
+
+    private async UniTask TestReplayDownloadUnauthorized()
+    {
+        await Login();
+
+        SubmitScoreResponse score =
+            await CreateReplayTestScore();
+
+        string replayPath =
+            GetReplayTestFile();
+
+        // Give the score a replay first.
+        await OnlineManager.Instance
+            .Replay
+            .UploadReplayAsync(
+                score.ScoreId,
+                score.TimeMs,
+                replayPath);
+
+        string savePath =
+            Path.Combine(
+                ReplayPaths.LeaderboardDirectory,
+                "UnauthorizedTest.urec");
+
+        if (File.Exists(savePath))
+            File.Delete(savePath);
+
+        OnlineManager.Instance.Auth.Logout();
+
+        await AssertThrows<UnauthorizedException>(
+            () =>
+                OnlineManager.Instance
+                    .Replay
+                    .DownloadReplayAsync(
+                        score.ScoreId,
+                        savePath));
+
+        AssertFalse(
+            File.Exists(savePath),
+            "Unauthorized download should not create a replay file.");
+    }
+
+    private async UniTask TestWorldRecord()
+    {
+        await Login();
+
+        SubmitScoreResponse first =
+            await Submit(10000);
+
+        Debug.Log(
+            $"First: PB={first.IsNewPersonalBest}, " +
+            $"WR={first.IsWorldRecord}, " +
+            $"Time={first.TimeMs}");
+
+        AssertTrue(
+            first.IsNewPersonalBest,
+            "First score should be a PB.");
+
+        AssertTrue(
+            first.IsWorldRecord,
+            "First score should be the World Record.");
+
+        SubmitScoreResponse second =
+            await Submit(12000);
+
+        Debug.Log(
+            $"Second: PB={second.IsNewPersonalBest}, " +
+            $"WR={second.IsWorldRecord}, " +
+            $"Time={second.TimeMs}");
+
+        AssertFalse(
+            second.IsNewPersonalBest,
+            "Worse score should not be a PB.");
+
+        AssertFalse(
+            second.IsWorldRecord,
+            "Worse score should not be the World Record.");
+    }
+
+    private async UniTask TestWorldRecordReplaced()
+    {
+        // Player A
+        await Login();
+
+        SubmitScoreResponse first =
+            await Submit(10000);
+
+        Debug.Log(
+            $"Player A: PB={first.IsNewPersonalBest}, " +
+            $"WR={first.IsWorldRecord}, " +
+            $"Time={first.TimeMs}");
+
+        AssertTrue(
+            first.IsNewPersonalBest,
+            "Player A should have a new PB.");
+
+        AssertTrue(
+            first.IsWorldRecord,
+            "Player A should initially be the World Record.");
+
+        // Player B
+        await Login(
+            "NaCl586",
+            "1234");
+
+        SubmitScoreResponse second =
+            await Submit(9000);
+
+        Debug.Log(
+            $"Player B: PB={second.IsNewPersonalBest}, " +
+            $"WR={second.IsWorldRecord}, " +
+            $"Time={second.TimeMs}");
+
+        AssertTrue(
+            second.IsNewPersonalBest,
+            "Player B should have a new PB.");
+
+        AssertTrue(
+            second.IsWorldRecord,
+            "Player B should become the new World Record.");
+
+        AssertTrue(
+            second.TimeMs < first.TimeMs,
+            "Player B should have a better time.");
+    }
+
+    private async UniTask TestStaleWorldRecordReplay()
+    {
+        // =========================
+        // Player A gets World Record
+        // =========================
+
+        await Login();
+
+        SubmitScoreResponse playerA =
+            await Submit(10000);
+
+        AssertTrue(
+            playerA.IsNewPersonalBest,
+            "Player A should have a new PB.");
+
+        AssertTrue(
+            playerA.IsWorldRecord,
+            "Player A should initially be the World Record.");
+
+        // =========================
+        // Create fake pending replay
+        // =========================
+
+        string replayPath =
+            Path.Combine(
+                ReplayPaths.PendingDirectory,
+                "StaleWRTest.urec");
+
+        if (File.Exists(replayPath))
+            File.Delete(replayPath);
+
+        Directory.CreateDirectory(
+            ReplayPaths.PendingDirectory);
+
+        File.WriteAllText(
+            replayPath,
+            "Fake replay data");
+
+        PendingReplay pendingReplay =
+            new PendingReplay
+            {
+                ScoreId = playerA.ScoreId,
+                TimeMs = playerA.TimeMs,
+                FileName = replayPath,
+                RetryCount = 0
+            };
+
+        // =========================
+        // Player B gets new WR
+        // =========================
+
+        await Login(
+            "NaCl586",
+            "1234");
+
+        SubmitScoreResponse playerB =
+            await Submit(9000);
+
+        AssertTrue(
+            playerB.IsNewPersonalBest,
+            "Player B should have a new PB.");
+
+        AssertTrue(
+            playerB.IsWorldRecord,
+            "Player B should become the new World Record.");
+
+        // =========================
+        // Put old replay into queue
+        // =========================
+
+        ReplayQueue queue =
+            new ReplayQueue();
+
+        queue.Enqueue(pendingReplay);
+
+        ReplayUploadManager manager =
+            new ReplayUploadManager(
+                OnlineManager.Instance.Replay,
+                queue);
+
+        // =========================
+        // Player A must be logged in
+        // =========================
+
+        await Login();
+
+        // =========================
+        // Upload pending replay
+        // =========================
+
+        await manager.UploadPendingReplayAsync();
+
+        // =========================
+        // Replay should be removed
+        // =========================
+
+        AssertFalse(
+            queue.HasPendingReplay,
+            "Stale replay should be removed from queue.");
+
+        AssertTrue(
+            File.Exists(replayPath),
+            "This test should not delete the local replay file yet.");
+
+        File.Delete(replayPath);
+
+        Debug.Log(
+            "Stale World Record replay test passed.");
     }
 }

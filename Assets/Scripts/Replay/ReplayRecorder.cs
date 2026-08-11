@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
+using Server.Replay;
 
 public class ReplayRecorder : MonoBehaviour
 {
@@ -63,6 +64,8 @@ public class ReplayRecorder : MonoBehaviour
     public static string replayAuthor = string.Empty;
     public static string replayDesc = string.Empty;
     public static bool incompleteReplay = false;
+    public static string loadedReplayPath = string.Empty;
+    public static bool leaderboardRecording = false;
 
     private Tween returnToMenuTween;
 
@@ -93,7 +96,7 @@ public class ReplayRecorder : MonoBehaviour
         mi = MissionInfo.instance;
         skin = MarbleInfo.instance;
 
-        if(recordReplay)
+        if(recordReplay || leaderboardRecording)
             incompleteReplay = false;
     }
 
@@ -169,11 +172,68 @@ public class ReplayRecorder : MonoBehaviour
 
         teleportFinished = 0;
     }
+    
+    public string GetReplayPath()
+    {
+        ReplayPaths.EnsureDirectories();
 
-    public void SaveReplay()
+        return Path.Combine(
+            ReplayPaths.ReplayDirectory,
+            GetReplayFileName());
+    }
+
+    private string GetReplayFileName()
+    {
+        return $"{replayName}.urec";
+    }
+
+    private string GetPendingReplayFileName(
+        int timeMs,
+        string playerName)
+    {
+        string levelName = MissionInfo.instance.levelName;
+
+        return $"{levelName}_{timeMs}_{playerName}.urec";
+    }
+
+    private string GetPendingReplayPath(
+        int timeMs,
+        string playerName)
+    {
+        ReplayPaths.EnsureDirectories();
+
+        return Path.Combine(
+            ReplayPaths.PendingDirectory,
+            GetPendingReplayFileName(
+                timeMs,
+                playerName));
+    }
+
+    public string SavePendingReplay(
+        int timeMs,
+        string playerName)
+    {
+        string path =
+            GetPendingReplayPath(
+                timeMs,
+                playerName);
+
+        WriteReplayFile(path);
+
+        return path;
+    }
+
+    public string SaveReplay()
     {
         string path = GetReplayPath();
 
+        WriteReplayFile(path);
+
+        return path;
+    }
+
+    private void WriteReplayFile(string path)
+    {
         using (Stream stream = File.Open(path, FileMode.Create))
         using (BinaryWriter writer = new BinaryWriter(stream))
         {
@@ -190,10 +250,9 @@ public class ReplayRecorder : MonoBehaviour
             // Replay frames
             writer.Write(recordingBytes.ToArray());
 
-            // Remember where metadata begins
+            // Metadata
             long metadataStart = stream.Position;
 
-            // Metadata
             writer.Write(mi.MissionPath);
             writer.Write(mi.levelName);
             writer.Write(GetCurrentMarbleID());
@@ -201,19 +260,22 @@ public class ReplayRecorder : MonoBehaviour
             writer.Write(replayAuthor);
             writer.Write(replayDesc);
 
-            if (incompleteReplay)
-                writer.Write("Incomplete");
-            else
-                writer.Write("Complete");
+            writer.Write(
+                incompleteReplay
+                    ? "Incomplete"
+                    : "Complete");
 
-            // Metadata size (last 4 bytes of file)
-            int metadataSize = (int)(stream.Position - metadataStart);
+            // Metadata size
+            int metadataSize =
+                (int)(stream.Position - metadataStart);
+
             writer.Write(metadataSize);
         }
     }
-    public void StartReplay()
+
+    public void StartReplay(string path)
     {
-        if (LoadReplay())
+        if (LoadReplay(path))
         {
             isPlayingReplay = true;
             gameFinished = false;
@@ -258,13 +320,13 @@ public class ReplayRecorder : MonoBehaviour
         }
     }
 
-    public bool LoadReplay()
+    public bool LoadReplay(string path)
     {
-        string path = GetReplayPath();
-
         if (!File.Exists(path))
         {
-            Debug.LogWarning("Replay file not found.");
+            Debug.LogWarning(
+                $"Replay file not found: {path}");
+
             return false;
         }
 
@@ -349,20 +411,6 @@ public class ReplayRecorder : MonoBehaviour
             PlayerPrefs.GetInt("DefaultMarbleIsSelected", 0) == 1;
 
         return (isCustom ? "C" : "D") + (index + 1).ToString("00");
-    }
-
-    string GetReplayPath()
-    {
-        string replayFolder = Path.Combine(
-            Path.GetDirectoryName(Application.dataPath),
-            "Replay");
-
-        Directory.CreateDirectory(replayFolder);
-
-        string levelName = MissionInfo.instance.levelName;
-        if (replayName != string.Empty) levelName = replayName;
-
-        return Path.Combine(replayFolder, levelName + ".urec");
     }
 
     void ApplyFrame(ReplayFrame frame)

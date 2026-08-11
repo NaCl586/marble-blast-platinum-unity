@@ -34,9 +34,7 @@ namespace Server.API
         public async UniTask RegisterAsync(
             RegisterRequest request)
         {
-            await _client.PostJsonAsync<
-                RegisterRequest,
-                EmptyResponse>(
+            await _client.PostJsonResponseAsync<RegisterRequest, object>(
                 "/api/players/register",
                 request);
         }

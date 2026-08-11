@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using Server.API;
 using Server.DTOs.Requests;
+using Server.DTOs.Responses;
 
 namespace Server.Authentication
 {
@@ -8,6 +9,10 @@ namespace Server.Authentication
     {
         private readonly AuthApi _authApi;
         private readonly CredentialStorage _credentialStorage;
+
+        public string? Username { get; private set; }
+
+        public int? UserId { get; private set; }
 
         public bool IsLoggedIn =>
             _authApi.IsLoggedIn;
@@ -20,17 +25,38 @@ namespace Server.Authentication
             _credentialStorage = credentialStorage;
         }
 
+        public async UniTask RegisterAsync(
+            string username,
+            string password)
+        {
+            await _authApi.RegisterAsync(
+                new RegisterRequest
+                {
+                    Username = username,
+                    Password = password
+                });
+        }
+
         public async UniTask LoginAsync(
             string username,
             string password,
             bool rememberMe)
         {
-            await _authApi.LoginAsync(
-                new LoginRequest
-                {
-                    Username = username,
-                    Password = password
-                });
+            LoginResponse response =
+                await _authApi.LoginAsync(
+                    new LoginRequest
+                    {
+                        Username = username,
+                        Password = password
+                    });
+
+            Username = username;
+
+            UserId =
+                JwtHelper.GetUserId(response.Token);
+
+            UnityEngine.Debug.Log(
+                $"Logged in: Username={Username}, UserId={UserId}");
 
             if (rememberMe)
             {
@@ -55,6 +81,9 @@ namespace Server.Authentication
         public void Logout()
         {
             _authApi.Logout();
+
+            Username = null;
+            UserId = null;
         }
 
         public void ClearRememberedCredential()

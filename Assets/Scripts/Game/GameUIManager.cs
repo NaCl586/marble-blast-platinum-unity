@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Server;
 
 public class GameUIManager : MonoBehaviour
 {
@@ -101,16 +102,32 @@ public class GameUIManager : MonoBehaviour
             ReplayRecorder.Instance.SaveReplay();
             Debug.Log("Replay Saved");
 
-            JukeboxManager.instance.PlayMusic("Pianoforte");
-            SceneManager.LoadScene("PlayMission");
+            if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
+            {
+                JukeboxManager.instance.PlayMusic("Pianoforte");
+                SceneManager.LoadScene("PlayMission");
+            }
+            else
+            {
+                JukeboxManager.instance.PlayMusic("Flanked");
+                SceneManager.LoadScene("LBPlayMission");
+            }
         });
 
         replayMenuCancel.onClick.RemoveAllListeners();
         replayMenuCancel.onClick.AddListener(() => {
             Debug.Log("Replay Not Saved");
 
-            JukeboxManager.instance.PlayMusic("Pianoforte");
-            SceneManager.LoadScene("PlayMission");
+            if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
+            {
+                JukeboxManager.instance.PlayMusic("Pianoforte");
+                SceneManager.LoadScene("PlayMission");
+            }
+            else
+            {
+                JukeboxManager.instance.PlayMusic("Flanked");
+                SceneManager.LoadScene("LBPlayMission");
+            }
         });
     }
 

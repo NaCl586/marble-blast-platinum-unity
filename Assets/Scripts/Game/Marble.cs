@@ -85,7 +85,7 @@ public class Marble : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(ControlBinding.instance.usePowerup) && 
+        if (Input.GetKey(ControlBinding.instance.usePowerup) && 
             !GameManager.isPaused && 
             !GameManager.gameFinish && 
             Movement.instance.canMove && 
