@@ -64,6 +64,9 @@ public class LeaderboardsAuth : MonoBehaviour
 
     private void Start()
     {
+        JukeboxManager.instance.PlayMusic("Quiet Lab");
+        JukeboxManager.instance.Stop();
+
         SetupButtons();
         InitializeUI();
         LoadRememberedCredentials();
@@ -170,11 +173,7 @@ public class LeaderboardsAuth : MonoBehaviour
             isProcessing = false;
 
             ReplayRecorder.leaderboardRecording = true;
-            SceneManager.LoadScene("LBPlayMission");
 
-            isProcessing = false;
-
-            ReplayRecorder.leaderboardRecording = true;
             SceneManager.LoadScene("LBPlayMission");
         }
         catch (Exception ex)
@@ -403,7 +402,7 @@ public class LeaderboardsAuth : MonoBehaviour
         if (OnlineManager.Instance != null)
             OnlineManager.Instance.Shutdown();
 
-        JukeboxManager.instance.PlayMusic("Pianoforte");
+        JukeboxManager.instance.Play();
         SceneManager.LoadScene("MainMenu");
     }
 

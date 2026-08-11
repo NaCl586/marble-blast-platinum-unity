@@ -35,6 +35,8 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] GameObject goImage;
     [SerializeField] GameObject outOfBoundsImage;
     [Space]
+    [SerializeField] TextMeshProUGUI lbStatusText;
+    [Space]
     public GameObject oobInsultMenu;
     [SerializeField] TextMeshProUGUI oobInsultTitleText;
     [SerializeField] TextMeshProUGUI oobInsultCaptionText;
@@ -93,6 +95,12 @@ public class GameUIManager : MonoBehaviour
         scrollDownButton.onClick.AddListener(ScrollDown);
 
         recordingIcon.SetActive(ReplayRecorder.recordReplay);
+    }
+
+    public void SetLBStatus(string text)
+    {
+        Debug.Log(text);
+        lbStatusText.text = text;
     }
 
     public void SaveAndReturn()

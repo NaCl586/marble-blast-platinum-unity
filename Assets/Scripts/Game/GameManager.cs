@@ -708,6 +708,15 @@ public class GameManager : MonoBehaviour
 
     private async UniTask SubmitOnlineScore()
     {
+        if (OnlineManager.Instance == null ||
+            !OnlineManager.Instance.Auth.IsLoggedIn)
+        {
+            GameUIManager.instance.SetLBStatus("");
+            return;
+        }
+
+        GameUIManager.instance.SetLBStatus("Submitting your score to Leaderboards...");
+
         string level =
             Path.ChangeExtension(
                 MissionInfo.instance.MissionPath,
@@ -716,10 +725,19 @@ public class GameManager : MonoBehaviour
         int timeMs =
             Mathf.RoundToInt(elapsedTime);
 
-        await OnlineManager.Instance.OnlineScore
-            .SubmitScoreAsync(
-                level,
-                timeMs);
+        try
+        {
+            await OnlineManager.Instance.OnlineScore
+                .SubmitScoreAsync(
+                    level,
+                    timeMs);
+
+            GameUIManager.instance.SetLBStatus("Information sent successfully.");
+        }
+        catch
+        {
+            GameUIManager.instance.SetLBStatus("There was an error submitting the information.");
+        }
     }
 
     void StopMarbleMovement()

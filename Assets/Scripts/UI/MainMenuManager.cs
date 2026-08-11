@@ -26,7 +26,6 @@ public class MainMenuManager : MonoBehaviour
         optionsButton.onClick.AddListener(() => SceneManager.LoadScene("Options"));
         replayButton.onClick.AddListener(() => SceneManager.LoadScene("ReplayMenu"));
         leaderboardButton.onClick.AddListener(() => {
-            JukeboxManager.instance.Stop();
             SceneManager.LoadScene("LBAuth");
         });
         quitButton.onClick.AddListener(() => {
