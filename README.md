@@ -3,7 +3,7 @@
 The Unity Port of Marble Blast Platinum, based on [Marble Blast Gold Unity remake](https://github.com/NaCl586/marble-blast-gold-unity/) that I did. This remake is based on Marble Blast Platinum 1.14. 
 These features are not yet implemented (and might possibly not implemented later): Leaderboards, and Level Editor. Level Editor is not planned, so don't ask. Leaderboards is planned though, but I'm not sure when I'm gonna make it.
 
-<b>As version 1.2, Replay Center and replay recording/loading system has been implemented, check below for more information.</b>
+<b>As version 1.3, Leaderboards has been implemented, check below for more information.</b>
 
 <img src="https://i.imgur.com/j1YrNlX.png" width="640">
 <img src="https://i.imgur.com/yyTlJ6q.png" width="640">
@@ -31,7 +31,15 @@ Special thanks to Vani and RandomityGuy for helping me whenever I have problems 
 
 Press R for quick respawn, works when the game is paused. This button currently is not remappable because I wanted to create the same UI remake without additional things. Also, setting video driver and color mode is just pure cosmetic and does not work.
 
-## NEW! Replay System
+## Leaderboard System
+
+Leaderboard is now here at version 1.3, it works similar to the original Marble Blast Platinum 1.14, but without chat, account, and rating features
+
+The leaderboard system allows players to compete for the fastest times across different levels. After finishing a level, your time can be submitted to the leaderboard, where it will be ranked alongside other players' times. You can view the global records for each level, as well as your own personal best, making it easy to see how well you rank and keep track of your improvements.
+
+Leaderboard records can also include a replay of the run. If a replay is available, you can watch the run directly from the leaderboard to see how another player achieved their time. This makes the leaderboard more than just a list of records, allowing players to compare their runs, learn from faster players, and compete for better times.
+
+## Replay System
 
 Replay system is now here at version 1.2, it works pretty much similar to the original Marble Blast Platinum 1.14. 
 
