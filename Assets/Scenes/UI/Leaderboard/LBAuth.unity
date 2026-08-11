@@ -8236,7 +8236,7 @@ PrefabInstance:
     - target: {fileID: 1334885751087432294, guid: b1305ce5f9cfd87448369baf2b697517,
         type: 3}
       propertyPath: m_Name
-      value: ServerTest
+      value: OnlineManager
       objectReference: {fileID: 0}
     - target: {fileID: 4037051956358936318, guid: b1305ce5f9cfd87448369baf2b697517,
         type: 3}

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b42dae06be89b3478a5e232bf1977c6, type: 3}
   m_Name: ServerConfig
   m_EditorClassIdentifier: 
-  BaseUrl: https://localhost:7104
+  BaseUrl: https://api.edureinvented-fun.my.id
   Timeout: 30
   LogRequests: 1

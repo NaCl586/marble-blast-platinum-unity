@@ -10,9 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4037051956358936318}
   - component: {fileID: 6271990353894892106}
-  - component: {fileID: 2158237216997681686}
   m_Layer: 0
-  m_Name: ServerTest
+  m_Name: OnlineManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -46,27 +45,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   serverConfig: {fileID: 11400000, guid: b6168af57cabe954cbe9369a8d0e0c07, type: 2}
---- !u!114 &2158237216997681686
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1334885751087432294}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a4737c9447c74a44f961341c22bb9efe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  username: Gerson
-  password: 123456
-  invalidPassword: 123456789
-  invalidUsername: UnknownUser
-  replayTestFileName: ServerTest.urec
-  replayDownloadFileName: ServerTest_Downloaded.urec
-  level: missions_mbp/beginner/Let'sRoll!
-  page: 1
-  pageSize: 10
-  runOnStart: 1
-  stopOnFailure: 0
-  testId: 0
