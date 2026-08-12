@@ -210,12 +210,16 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                JukeboxManager.instance.PlayMusic("Pianoforte");
-
                 if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
+                {
+                    JukeboxManager.instance.PlayMusic("Pianoforte");
                     SceneManager.LoadScene("PLayMission");
-                else 
+                }
+                else
+                {
+                    JukeboxManager.instance.PlayMusic("Flanked");
                     SceneManager.LoadScene("LBPlayMission");
+                }
             }
         });
         restartButton.onClick.AddListener(RestartLevel);

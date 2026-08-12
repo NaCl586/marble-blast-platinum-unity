@@ -47,7 +47,8 @@ namespace Server.Authentication
                     new LoginRequest
                     {
                         Username = username,
-                        Password = password
+                        Password = password,
+                        GameVersion = UnityEngine.Application.version
                     });
 
             Username = username;

@@ -1156,6 +1156,9 @@ namespace TS
                                 TriggerGoToTarget tgtt = tgttObj.GetComponent<TriggerGoToTarget>();
                                 tgtt.movingPlatform = movingPlatform;
                                 tgtt.targetTime = (float)int.Parse(trigger.GetField("targetTime")) / 1000;
+
+                                if (!string.IsNullOrEmpty(trigger.GetField("instantReturn")))
+                                    tgtt.instantReturn = int.Parse(trigger.GetField("instantReturn")) == 1;
                             }
                         }
                     }

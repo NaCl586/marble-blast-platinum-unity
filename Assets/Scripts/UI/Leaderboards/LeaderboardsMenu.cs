@@ -39,6 +39,7 @@ public class LeaderboardsMenu : MonoBehaviour
     public TextMeshProUGUI loadingMessage;
 
     private bool isProcessing;
+    private bool returnToLBPlayMission;
 
     private void Awake()
     {
@@ -182,22 +183,51 @@ public class LeaderboardsMenu : MonoBehaviour
     // ERROR
     // --------------------------------------------------
 
-    private void ShowError(
+    public void ShowError(
         string title,
-        string message)
+        string message,
+        bool returnToLBPlayMission = false)
     {
         errorSound.PlayErrorSound();
 
         errorTitle.text = title;
         errorMessage.text = message;
 
+        this.returnToLBPlayMission = returnToLBPlayMission;
+
         errorMenu.SetActive(true);
 
         loadingMenu.SetActive(false);
     }
 
-    private void OnCloseErrorClicked()
+    void OnCloseErrorClicked()
     {
+        StartCoroutine(OnCloseErrorClickedRoutine());
+    }
+
+    private IEnumerator OnCloseErrorClickedRoutine()
+    {
+        if (returnToLBPlayMission)
+        {
+            errorMenu.SetActive(false);
+            loadingMenu.SetActive(false);
+
+            blackout.SetActive(true);
+
+            yield return new WaitForSeconds(blackoutDuration);
+
+            blackout.SetActive(false);
+
+            playMissionWindow.SetActive(true);
+            raycastBlocker.SetActive(true);
+
+            returnToLBPlayMission = false;
+
+            JukeboxManager.instance.PlayMusic("Flanked");
+
+            yield break;
+        }
+
         StartCoroutine(ReturnToMainMenu());
     }
 

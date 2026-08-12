@@ -2538,6 +2538,7 @@ new SimGroup(MissionGroup) {
          dataBlock = "TriggerGotoTarget";
          polyhedron = "-2.0000000 2.0000000 -0.2500000 4.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.5000000 0.0000000 -4.0000000 0.0000000";
             targetTime = "0";
+			instantReturn = "1";
       };
       new Trigger(MustChange) {
          position = "3 7.875 116.25";
@@ -2546,6 +2547,7 @@ new SimGroup(MissionGroup) {
          dataBlock = "TriggerGotoTarget";
          polyhedron = "-1.0000000 1.8750000 -0.2500000 2.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.5000000 0.0000000 -3.7500000 0.0000000";
             targetTime = "0";
+			instantReturn = "1";
       };
       new Trigger(MustChange) {
          position = "3 14.125 116.25";
@@ -2554,6 +2556,7 @@ new SimGroup(MissionGroup) {
          dataBlock = "TriggerGotoTarget";
          polyhedron = "-1.0000000 1.8750000 -0.2500000 2.0000000 0.0000000 0.0000000 0.0000000 0.0000000 0.5000000 0.0000000 -3.7500000 0.0000000";
             targetTime = "0";
+			instantReturn = "1";
       };
       new PathedInterior(MustChange) {
          position = "0 0 0";

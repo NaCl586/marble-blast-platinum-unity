@@ -69,6 +69,12 @@ namespace Server
             private set;
         }
 
+        public IntegrityApi Integrity
+        {
+            get;
+            private set;
+        }
+
         private ApiClient _apiClient;
 
         private void Awake()
@@ -151,6 +157,9 @@ namespace Server
             ReplayDownload =
                new ReplayDownloadManager(
                    Replay);
+
+            Integrity =
+                new IntegrityApi(_apiClient);
         }
 
         public async UniTask ProcessPendingOnlineDataAsync()

@@ -327,7 +327,7 @@ new SimGroup(MissionGroup) {
       rotate = "1";
    };
    new Trigger(Ifyouarereadingthisthenyouarereallyweird) {
-      position = "38.6579 78.4463 219.279";
+      position = "8.5 62.2 219.279";
       rotation = "0 0 1 45";
       scale = "50 50 85";
       dataBlock = "InBoundsTrigger";

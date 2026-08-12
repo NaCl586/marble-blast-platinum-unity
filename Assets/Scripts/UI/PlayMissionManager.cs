@@ -1,4 +1,8 @@
+using Cysharp.Threading.Tasks;
 using Server;
+using Server.DTOs.Requests;
+using Server.DTOs.Responses;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -193,20 +197,97 @@ public abstract class PlayMissionManager : MonoBehaviour
         {
             LeaderboardsMenu lm = GetComponent<LeaderboardsMenu>();
             LevelLoadedFromLeaderboards = true;
-            StartCoroutine(CheckMission(lm));
+            CheckMission(lm).Forget();
         }
     }
 
-    IEnumerator CheckMission(LeaderboardsMenu lm)
+    async UniTask CheckMission(LeaderboardsMenu lm)
     {
         JukeboxManager.instance.ForceStop();
 
         lm.blackout.SetActive(true);
         lm.ShowLoading("Checking Mission Consistency...");
 
-        yield return new WaitForSecondsRealtime(1f);
+        await UniTask.Delay(
+            TimeSpan.FromSeconds(1));
 
-        SceneManager.LoadScene("Loading");
+        string missionPath =
+            MissionInfo.instance.MissionPath;
+
+        try
+        {
+            List<string> files =
+                DataIntegrityManager.GetMissionIntegrityFiles(
+                    missionPath
+                );
+
+            if (files.Count == 0)
+            {
+                throw new Exception(
+                    "Could not read the mission integrity data."
+                );
+            }
+
+            IntegrityResponse response =
+                await OnlineManager.Instance
+                    .Integrity
+                    .CheckAsync(
+                        new IntegrityRequest
+                        {
+                            GameVersion =
+                                Application.version,
+
+                            Files = files
+                        }
+                    );
+
+            List<string> invalidFiles =
+                DataIntegrityManager.VerifyAgainstServer(
+                    response
+                );
+
+            if (invalidFiles.Count > 0)
+            {
+                string modifiedFiles =
+                    string.Join(
+                        "\n",
+                        invalidFiles
+                    );
+
+                lm.ShowError(
+                    "Invalid game data",
+                    "It seems that internal game data was modified in some way. " +
+                    "If either you modified any files, or it was done by any virus, " +
+                    "please ask the forums for the original data or reinstall MBP.\n\n" +
+                    "Modified file(s):\n" +
+                    modifiedFiles,
+                    true
+                );
+
+                Debug.LogError(
+                    $"[Integrity] Mission consistency check failed!\n" +
+                    $"Mission: {missionPath}\n" +
+                    $"Invalid file(s):\n{modifiedFiles}"
+                );
+
+                return;
+            }
+
+            SceneManager.LoadScene("Loading");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                $"[Integrity] Integrity check failed:\n{ex}"
+            );
+
+            lm.ShowError(
+                "Integrity check failed",
+                "The game could not verify the mission data with the server.\n\n" +
+                "Please make sure you are connected to the internet and try again.",
+                true
+            );
+        }
     }
 
     protected virtual void OnSearchButtonClicked()
