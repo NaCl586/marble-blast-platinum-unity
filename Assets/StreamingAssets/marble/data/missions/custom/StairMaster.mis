@@ -96,7 +96,7 @@ new SimGroup(MissionGroup) {
       position = "57.7567 0.868603 495.511";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/Stairmaster.dif";
+      interiorFile = "~/data/interiors_mbp/Stairmaster.dif";
       showTerrainInside = "0";
    };
    new Item() {

@@ -70,7 +70,7 @@ new SimGroup(MissionGroup) {
       position = "27.0611 35.7716 271.189";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/dualperspectivesMBP.dif";
+      interiorFile = "~/data/interiors_mbp/dualperspectivesMBP.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -327,7 +327,7 @@ new SimGroup(MissionGroup) {
       rotate = "1";
    };
    new Trigger(Ifyouarereadingthisthenyouarereallyweird) {
-      position = "8.5 62.2 219.279";
+      position = "38.6579 78.4463 219.279";
       rotation = "0 0 1 45";
       scale = "50 50 85";
       dataBlock = "InBoundsTrigger";

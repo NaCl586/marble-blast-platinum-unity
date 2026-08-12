@@ -74,238 +74,238 @@ new SimGroup(MissionGroup) {
       position = "-8.48761 71.1971 501.355";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-0.623753 18.8543 499.262";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_grass_100x100.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_grass_100x100.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "7.49547 71.1984 501.218";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall2.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall2.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-24.3341 71.1983 501.355";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-40.1666 71.2144 501.355";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "55.1308 71.183 501.351";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "23.4518 71.2003 501.351";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "39.2843 71.1842 501.351";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-37.108 -29.7868 483.215";
       rotation = "0 0 1 90";
       scale = "4 4 4";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_pyramid1.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_pyramid1.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "1.91784 3.0036 499.355";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_2road.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_2road.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "1.91681 26.9989 499.355";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_1road.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_1road.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "4.92819 4.38702 532.309";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall5.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall5.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "54.9517 55.12 501.223";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "54.9485 39.1345 501.223";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "54.949 23.142 501.243";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "54.9338 7.13822 501.24";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "54.9336 -8.86144 501.143";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "54.9189 -40.8577 501.16";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "54.9341 -24.8539 501.163";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-56.3377 55.1443 501.179";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-56.3558 -8.83716 501.099";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-56.3553 -24.8296 501.119";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-56.3705 -40.8334 501.116";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-56.3556 7.1625 501.196";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-56.3404 23.1663 501.199";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-56.3409 39.1588 501.179";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-8.34334 -40.7605 501.355";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "39.2862 -40.78 501.289";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "23.4398 -40.7788 501.289";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "7.60725 -40.7627 501.289";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-40.1787 -40.7647 501.293";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-24.3322 -40.7659 501.293";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "55.277 -40.7785 501.155";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "71.2676 -40.7737 501.264";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall7.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall7.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -321,35 +321,35 @@ new SimGroup(MissionGroup) {
       position = "1.46583 105.303 499.255";
       rotation = "-1 0 0 30";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_chevron_neutral2.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_chevron_neutral2.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "18.625 398.215 499.23";
       rotation = "-1 0 0 70";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/water_20x20.dif";
+      interiorFile = "~/data/interiors_mbp/water_20x20.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-27.4021 389.771 499.191";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_TTMR4.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_TTMR4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-21.3991 397.764 499.191";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_3road.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_3road.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-23.2131 380.651 502.116";
       rotation = "1 0 0 30";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_chevron_neutral3.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_chevron_neutral3.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -374,35 +374,35 @@ new SimGroup(MissionGroup) {
       position = "32.5909 389.769 499.191";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_TTMR4.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_TTMR4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "92.5862 389.764 499.191";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_TTMR4.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_TTMR4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "152.579 389.762 498.947";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_TTMR4.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_TTMR4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "326.585 398.208 499.233";
       rotation = "-1 0 0 70";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/water_20x20.dif";
+      interiorFile = "~/data/interiors_mbp/water_20x20.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "272.551 389.762 499.194";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_TTMR4.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_TTMR4.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -427,28 +427,28 @@ new SimGroup(MissionGroup) {
       position = "330.747 380.644 502.119";
       rotation = "1 0 0 30";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_chevron_neutral3.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_chevron_neutral3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "332.561 397.757 499.194";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_3road.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_3road.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "212.558 389.764 499.194";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_TTMR4.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_TTMR4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "340.973 18.9955 499.144";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_grass_100x100.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_grass_100x100.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -464,238 +464,238 @@ new SimGroup(MissionGroup) {
       position = "343.062 105.444 499.137";
       rotation = "-1 0 0 30";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_chevron_neutral2.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_chevron_neutral2.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "412.864 -40.6325 501.146";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall7.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall7.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.873 -40.6373 501.037";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "333.253 -40.6192 501.237";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "317.264 -40.6247 501.175";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "301.418 -40.6235 501.175";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "349.204 -40.6214 501.171";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "365.036 -40.6376 501.171";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "380.883 -40.6388 501.171";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "285.259 55.2855 501.061";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "285.256 39.3001 501.061";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "285.256 23.3075 501.081";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "285.241 7.30374 501.078";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "285.226 -40.6922 500.998";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "285.241 -24.6883 501.001";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "285.241 -8.69602 500.981";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.53 -8.72031 501.025";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.53 -24.7127 501.045";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.515 -40.7165 501.042";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.53 7.27945 501.122";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.545 23.2832 501.125";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.545 39.2757 501.105";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.548 55.2613 501.105";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "346.525 4.52823 532.19";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall5.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall5.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "343.513 27.1402 499.237";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_1road.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_1road.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "343.514 3.1448 499.237";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_2road.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_2road.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "304.489 -29.6456 483.097";
       rotation = "0 0 1 90";
       scale = "4 4 4";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_pyramid1.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_pyramid1.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "396.727 71.3242 501.233";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "380.881 71.3255 501.233";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "365.048 71.3416 501.233";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "301.43 71.3556 501.237";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "317.262 71.3395 501.237";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "333.109 71.3383 501.237";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall4.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "349.092 71.3396 501.1";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/CastleWall2.dif";
+      interiorFile = "~/data/interiors_mbp/CastleWall2.dif";
       showTerrainInside = "0";
    };
    new Item() {

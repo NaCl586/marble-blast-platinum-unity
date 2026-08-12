@@ -173,14 +173,14 @@ new SimGroup(MissionGroup) {
       position = "-3.73523 -18.6109 15.3463";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/TrampolineBox.dif";
+      interiorFile = "~/data/interiors_mbp/TrampolineBox.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-3.73523 -18.6109 15.6113";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/TrampolineBox2.dif";
+      interiorFile = "~/data/interiors_mbp/TrampolineBox2.dif";
       showTerrainInside = "0";
    };
 };

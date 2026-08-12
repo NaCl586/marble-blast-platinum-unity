@@ -80,7 +80,7 @@ new SimGroup(MissionGroup) {
       position = "-6.77172 -10.8471 -0.585252";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/Half_pipe_dive.dif";
+      interiorFile = "~/data/interiors_mbp/Half_pipe_dive.dif";
       showTerrainInside = "0";
    };
    new ScriptObject() {

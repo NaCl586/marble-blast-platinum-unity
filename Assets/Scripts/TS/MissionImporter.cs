@@ -975,7 +975,7 @@ namespace TS
                         var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
                         ibtObj.transform.localPosition = position;
-                        ibtObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                        ibtObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
                         ibtObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
                     }
 
@@ -991,7 +991,7 @@ namespace TS
                         var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
                         oobtObj.transform.localPosition = position;
-                        oobtObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                        oobtObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
                         oobtObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
                     }
 
@@ -1009,7 +1009,7 @@ namespace TS
                         var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
                         htObj.transform.localPosition = position;
-                        htObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                        htObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
                         htObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
                     }
 
@@ -1029,8 +1029,8 @@ namespace TS
 
                         var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
-                        telObj.transform.localPosition = position;
-                        telObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                        telObj.transform.localPosition = position;  
+                        telObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
 
                         var cameraPos = telObj.transform.Find("CameraPos");
                         cameraPos.transform.parent = null;
@@ -1054,7 +1054,7 @@ namespace TS
                         var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
                         destObj.transform.localPosition = position;
-                        destObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                        destObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
 
                         var cameraPos = destObj.transform.Find("CameraPos");
                         cameraPos.transform.parent = null;
@@ -1150,7 +1150,7 @@ namespace TS
                                 var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(trigger.GetField("polyhedron")));
 
                                 tgttObj.transform.localPosition = position;
-                                tgttObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+                                tgttObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
                                 tgttObj.transform.localScale = Vector3.Scale(scale, polyhedronScale);
 
                                 TriggerGoToTarget tgtt = tgttObj.GetComponent<TriggerGoToTarget>();
@@ -1236,7 +1236,7 @@ namespace TS
                             var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
                             cpTrigger.transform.position = position;
-                            cpTrigger.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+                            cpTrigger.transform.rotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
                             cpTrigger.transform.localScale = Vector3.Scale(scale, polyhedronScale);
 
                             cpTrigger.GetComponent<BoxCollider>().enabled = true;

@@ -58,7 +58,7 @@ new SimGroup(MissionGroup) {
       position = "-8.9117 -56.0852 0";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/Pool.dif";
+      interiorFile = "~/data/interiors_mbp/Pool.dif";
       showTerrainInside = "0";
    };
    new StaticShape(StartPoint) {
@@ -89,7 +89,7 @@ new SimGroup(MissionGroup) {
       position = "-39.7326 -17.9092 0.45";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      shapeName = "~/data/lbinteriors_mbp/teleportpad.dts";
+      shapeName = "~/data/interiors_mbp/teleportpad.dts";
    };
    new Item() {
       position = "-10.7807 -21.3395 22.0928";
@@ -115,7 +115,7 @@ new SimGroup(MissionGroup) {
       position = "21.8643 -18.0384 38.2";
       rotation = "0 0 -1 90";
       scale = "1 1 0.62";
-      shapeName = "~/data/lbinteriors_mbp/teleportpad.dts";
+      shapeName = "~/data/interiors_mbp/teleportpad.dts";
    };
    new Item() {
       position = "-3.10169 -12.37 22.0928";
@@ -131,7 +131,7 @@ new SimGroup(MissionGroup) {
       position = "-13.6014 -35.3506 20.8984";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/warm1_1x1.dif";
+      interiorFile = "~/data/interiors_mbp/warm1_1x1.dif";
       showTerrainInside = "0";
    };
    new StaticShape() {
@@ -168,7 +168,7 @@ new SimGroup(MissionGroup) {
       position = "-13.6085 -31.4875 20.8984";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/warm1_1x1.dif";
+      interiorFile = "~/data/interiors_mbp/warm1_1x1.dif";
       showTerrainInside = "0";
    };
    new Item() {

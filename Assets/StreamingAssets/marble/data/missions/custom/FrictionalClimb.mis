@@ -75,7 +75,7 @@ new SimGroup(MissionGroup) {
       position = "28.2743 -10.4804 114.015";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/FrictionalClimb.dif";
+      interiorFile = "~/data/interiors_mbp/FrictionalClimb.dif";
       showTerrainInside = "0";
    };
    new Item() {

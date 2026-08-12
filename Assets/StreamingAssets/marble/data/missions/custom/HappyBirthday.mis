@@ -79,35 +79,35 @@ new SimGroup(MissionGroup) {
       position = "-4.8773 2.07056 0";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/BDCake1.dif";
+      interiorFile = "~/data/interiors_mbp/BDCake1.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-3.3198 0.408073 2.4";
       rotation = "1 0 0 0";
       scale = "0.9 0.9 0.9";
-      interiorFile = "~/data/lbinteriors_mbp/BDCake2.dif";
+      interiorFile = "~/data/interiors_mbp/BDCake2.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-4.81518 2.02487 0.2";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/BDCake3.dif";
+      interiorFile = "~/data/interiors_mbp/BDCake3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-4.19265 2.1817 0";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/BDCake4.dif";
+      interiorFile = "~/data/interiors_mbp/BDCake4.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "-3.75164 1.71542 0";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/BDCake5.dif";
+      interiorFile = "~/data/interiors_mbp/BDCake5.dif";
       showTerrainInside = "0";
    };
    new ParticleEmitterNode() {

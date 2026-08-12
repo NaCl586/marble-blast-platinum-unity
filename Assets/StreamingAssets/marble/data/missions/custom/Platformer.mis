@@ -172,7 +172,7 @@ new SimGroup(MissionGroup) {
       position = "2.41279 -1.90741 496.716";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/Platformer.dif";
+      interiorFile = "~/data/interiors_mbp/Platformer.dif";
       showTerrainInside = "0";
    };
    new AudioProfile(MusicProfile) {

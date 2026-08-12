@@ -73,7 +73,7 @@ new SimGroup(MissionGroup) {
       position = "7.81372 -2.33205 499.11";
       rotation = "0 0 1 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/LearningTheBasics.dif";
+      interiorFile = "~/data/interiors_mbp/LearningTheBasics.dif";
       showTerrainInside = "0";
    };
    new Item() {

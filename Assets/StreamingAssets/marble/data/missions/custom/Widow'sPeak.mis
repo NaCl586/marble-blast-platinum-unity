@@ -2,20 +2,20 @@
 new SimGroup(MissionGroup) {
 
    new ScriptObject(MissionInfo) {
-         type = "LBCustom";
-         desc = "Pass the hazards ahead!";
-         level = "27";
-         name = "Widow's Peak";
-         startHelpText = "Don\'t fall off and keep on rollin\'!";
          artist = "Jase / Rep. by Phil";
-         music = "Endurance.ogg";
-         goldTime = "16000";
-         UltimateTime = "12000";
          PlatinumBonus = "2800";
-         UltimateBonus = "5300";
-         Standardiser = "28000";
          BaseScore = "80000";
+         desc = "Pass the hazards ahead!";
+         name = "Widow\'s Peak";
+         startHelpText = "Don\'t fall off and keep on rollin\'!";
+         Standardiser = "28000";
+         goldTime = "16000";
+         level = "77";
+         music = "Endurance.ogg";
+         UltimateTime = "12000";
+         UltimateBonus = "5300";
          BaseMultiplier = "3";
+         type = "Custom";
    };
    new MissionArea(MissionArea) {
       area = "-360 -648 720 1296";
@@ -57,19 +57,19 @@ new SimGroup(MissionGroup) {
    };
    new StaticShape() {
       position = "41.7999 -65.9214 12.95";
-      rotation = "0 0 1 180.527";
+      rotation = "0 0 1 180";
       scale = "1 1 1";
       dataBlock = "SignFinish";
    };
    new StaticShape(EndPoint) {
       position = "42.2999 -65.926 6.63672";
-      rotation = "0 0 1 0.527859";
+      rotation = "0 0 1 180";
       scale = "1 1 1";
       dataBlock = "EndPad";
    };
    new StaticShape(StartPoint) {
       position = "-8 -15.2 -1.8";
-      rotation = "0 0 1 0.0395647";
+      rotation = "1 0 0 0";
       scale = "1 1 1";
       dataBlock = "StartPad";
    };
@@ -77,13 +77,20 @@ new SimGroup(MissionGroup) {
       position = "-4.97933 -17.3548 -2.29316";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/WidowsPeak.dif";
+      interiorFile = "~/data/interiors_mbp/WidowsPeak.dif";
       showTerrainInside = "0";
    };
    new AudioProfile(MusicProfile) {
-      fileName = "~/data/sound/Metropolis.ogg";
+      fileName = "~/data/sound/Pianoforte.ogg";
       description = "AudioMusic";
       preload = "0";
+   };
+   new Trigger(stayhere) {
+      position = "-18.4096 1.48329 -2.89669";
+      rotation = "1 0 0 0";
+      scale = "70 75 30";
+      dataBlock = "InBoundsTrigger";
+      polyhedron = "0.0000000 0.0000000 0.0000000 1.0000000 0.0000000 0.0000000 0.0000000 -1.0000000 0.0000000 0.0000000 0.0000000 1.0000000";
    };
 };
 //--- OBJECT WRITE END ---

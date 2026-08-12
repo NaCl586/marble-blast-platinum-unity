@@ -74,7 +74,7 @@ new SimGroup(MissionGroup) {
       position = "9.63131 -7.81271 -54.9864";
       rotation = "1 0 0 0";
       scale = "1.5 1.5 170";
-      interiorFile = "~/data/lbinteriors_mbp/green_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/green_3x3.dif";
       showTerrainInside = "0";
    };
    new StaticShape(StartPoint) {
@@ -87,14 +87,14 @@ new SimGroup(MissionGroup) {
       position = "6.22548 -6.02739 -61.0209";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/green_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/green_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "6.20292 -0.127932 -60.3";
       rotation = "1 0 0 20";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/green_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/green_3x3.dif";
       showTerrainInside = "0";
    };
    new StaticShape(EndPoint) {

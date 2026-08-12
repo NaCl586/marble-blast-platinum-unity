@@ -191,7 +191,7 @@ new SimGroup(MissionGroup) {
       position = "18.9304 -60.56 143.461";
       rotation = "1 0 0 0";
       scale = "1.3 1.3 1.3";
-      interiorFile = "~/data/lbinteriors_mbp/mbp_rock.dif";
+      interiorFile = "~/data/interiors_mbp/mbp_rock.dif";
       showTerrainInside = "0";
    };
    new StaticShape(EndPoint) {
@@ -1012,7 +1012,7 @@ new SimGroup(MissionGroup) {
       position = "-7.59816 -75.6881 102.7";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/DiamondTravel.dif";
+      interiorFile = "~/data/interiors_mbp/DiamondTravel.dif";
       showTerrainInside = "0";
    };
    new Trigger(Bounds) {

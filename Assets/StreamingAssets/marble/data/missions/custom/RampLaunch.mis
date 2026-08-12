@@ -59,7 +59,7 @@ new SimGroup(MissionGroup) {
       position = "2.14652 -5.19442 29.5523";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/grid_neutral1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/grid_neutral1_3x3.dif";
       showTerrainInside = "0";
    };
    new StaticShape(StartPoint) {
@@ -72,77 +72,77 @@ new SimGroup(MissionGroup) {
       position = "2.14518 0.805685 29.5523";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/grid_neutral1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/grid_neutral1_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15065 6.8021 29.5523";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/grid_neutral1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/grid_neutral1_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15012 12.8466 29.5592";
       rotation = "-1 0 0 9.99997";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14912 18.8285 30.6219";
       rotation = "-1 0 0 20";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15087 24.463 32.6685";
       rotation = "-1 0 0 30";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15227 29.6969 35.6943";
       rotation = "-1 0 0 40";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.1546 34.3197 39.5825";
       rotation = "-1 0 0 50";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.1522 38.2174 44.2391";
       rotation = "-1 0 0 60";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15089 41.225 49.4568";
       rotation = "-1 0 0 70";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15065 43.2981 55.1725";
       rotation = "-1 0 0 80";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14967 44.3472 61.1533";
       rotation = "-1 0 0 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -176,7 +176,7 @@ new SimGroup(MissionGroup) {
       position = "2.14435 55.0486 144.695";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/pink_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/pink_3x3.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -210,84 +210,84 @@ new SimGroup(MissionGroup) {
       position = "2.14888 104.591 176.296";
       rotation = "-1 0 0 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14986 103.542 170.315";
       rotation = "-1 0 0 80";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.1501 101.469 164.6";
       rotation = "-1 0 0 70";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15141 98.4615 159.382";
       rotation = "-1 0 0 60";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15381 94.5638 154.725";
       rotation = "-1 0 0 50";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15148 89.941 150.837";
       rotation = "-1 0 0 40";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.15008 84.7072 147.811";
       rotation = "-1 0 0 30";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14833 79.0726 145.765";
       rotation = "-1 0 0 20";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14933 73.0908 144.702";
       rotation = "-1 0 0 9.99997";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14986 67.0463 144.695";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/grid_neutral1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/grid_neutral1_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14439 61.0498 144.695";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/grid_neutral1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/grid_neutral1_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14306 49.0489 144.695";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/pink_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/pink_3x3.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -321,7 +321,7 @@ new SimGroup(MissionGroup) {
       position = "2.14055 195.227 613.606";
       rotation = "-1 0 0 90";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -382,98 +382,98 @@ new SimGroup(MissionGroup) {
       position = "2.13473 139.685 582.005";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/pink_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/pink_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.13602 145.684 582.005";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/pink_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/pink_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.13606 151.686 582.005";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/grid_neutral1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/grid_neutral1_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14153 157.682 582.005";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/grid_neutral1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/grid_neutral1_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.141 163.727 582.012";
       rotation = "-1 0 0 9.99997";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14 169.708 583.075";
       rotation = "-1 0 0 20";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14175 175.343 585.121";
       rotation = "-1 0 0 30";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14315 180.577 588.147";
       rotation = "-1 0 0 40";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14548 185.2 592.035";
       rotation = "-1 0 0 50";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14308 189.097 596.692";
       rotation = "-1 0 0 60";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14177 192.105 601.91";
       rotation = "-1 0 0 70";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.14153 194.178 607.625";
       rotation = "-1 0 0 80";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.13502 133.688 582.005";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/warm1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/warm1_3x3.dif";
       showTerrainInside = "0";
    };
    new InteriorInstance() {
       position = "2.1298 127.688 582.005";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/warm1_3x3.dif";
+      interiorFile = "~/data/interiors_mbp/warm1_3x3.dif";
       showTerrainInside = "0";
    };
    new Item() {
@@ -507,7 +507,7 @@ new SimGroup(MissionGroup) {
       position = "3.09317 145.528 1678.35";
       rotation = "1 0 0 0";
       scale = "1 1 1";
-      interiorFile = "~/data/lbinteriors_mbp/yellow2_15x15.dif";
+      interiorFile = "~/data/interiors_mbp/yellow2_15x15.dif";
       showTerrainInside = "0";
    };
    new StaticShape(EndPoint) {

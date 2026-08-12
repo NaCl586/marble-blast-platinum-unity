@@ -171,7 +171,7 @@ public class LeaderboardsAuth : MonoBehaviour
             HideLoading();
 
             isProcessing = false;
-
+            PlayMissionManager.LevelLoadedFromLeaderboards = false;
             ReplayRecorder.leaderboardRecording = true;
 
             SceneManager.LoadScene("LBPlayMission");

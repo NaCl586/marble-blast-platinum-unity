@@ -79,7 +79,7 @@ new SimGroup(MissionGroup) {
       position = "0.130441 -0.138468 11.7";
       rotation = "1 0 0 0";
       scale = "1.1 1.1 0.9";
-      interiorFile = "~/data/lbinteriors_mbp/GravityShaker.dif";
+      interiorFile = "~/data/interiors_mbp/GravityShaker.dif";
       showTerrainInside = "0";
    };
    new StaticShape() {
