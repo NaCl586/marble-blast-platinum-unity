@@ -199,7 +199,7 @@ public abstract class PlayMissionManager : MonoBehaviour
 
     IEnumerator CheckMission(LeaderboardsMenu lm)
     {
-        JukeboxManager.instance.Stop();
+        JukeboxManager.instance.ForceStop();
 
         lm.blackout.SetActive(true);
         lm.ShowLoading("Checking Mission Consistency...");

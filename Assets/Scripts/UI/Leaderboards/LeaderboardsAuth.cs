@@ -65,7 +65,7 @@ public class LeaderboardsAuth : MonoBehaviour
     private void Start()
     {
         JukeboxManager.instance.PlayMusic("Quiet Lab");
-        JukeboxManager.instance.Stop();
+        JukeboxManager.instance.ForceStop();
 
         SetupButtons();
         InitializeUI();

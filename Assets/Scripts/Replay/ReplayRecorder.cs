@@ -210,9 +210,11 @@ public class ReplayRecorder : MonoBehaviour
     }
 
     public string SavePendingReplay(
-        int timeMs,
-        string playerName)
+    string playerName,
+    out int timeMs)
     {
+        timeMs = GetFinalReplayTimeMs();
+
         string path =
             GetPendingReplayPath(
                 timeMs,
@@ -221,6 +223,107 @@ public class ReplayRecorder : MonoBehaviour
         WriteReplayFile(path);
 
         return path;
+    }
+
+    public int GetFinalReplayTimeMs()
+    {
+        if (recordingBytes == null ||
+            recordingBytes.Count == 0)
+        {
+            throw new System.InvalidOperationException(
+                "Cannot get final replay time: no replay frames recorded.");
+        }
+
+        byte[] bytes = recordingBytes.ToArray();
+
+        ReplayFrame frame = new ReplayFrame();
+
+        int nextOffset = 0;
+
+        while (nextOffset < bytes.Length)
+        {
+            ReplayFrame nextFrame =
+                new ReplayFrame();
+
+            nextOffset =
+                nextFrame.GetFromByteArray(
+                    bytes,
+                    nextOffset);
+
+            frame = nextFrame;
+        }
+
+        return Mathf.RoundToInt(
+            frame.time);
+    }
+
+    public static int GetReplayFileTimeMs(string path)
+    {
+        if (!File.Exists(path))
+        {
+            throw new FileNotFoundException(
+                "Replay file not found.",
+                path);
+        }
+
+        using (FileStream stream =
+            File.OpenRead(path))
+        using (BinaryReader reader =
+            new BinaryReader(stream))
+        {
+            // Skip UREC header.
+            if (reader.ReadByte() != 'U' ||
+                reader.ReadByte() != 'R' ||
+                reader.ReadByte() != 'E' ||
+                reader.ReadByte() != 'C')
+            {
+                throw new InvalidDataException(
+                    "Invalid replay header.");
+            }
+
+            reader.ReadByte(); // Replay version
+
+            // Metadata size is the final 4 bytes.
+            stream.Seek(-4, SeekOrigin.End);
+
+            int metadataSize =
+                reader.ReadInt32();
+
+            long metadataStart =
+                stream.Length -
+                4 -
+                metadataSize;
+
+            int replaySize =
+                (int)(metadataStart - 5);
+
+            stream.Position = 5;
+
+            byte[] replayBytes =
+                reader.ReadBytes(replaySize);
+
+            if (replayBytes.Length == 0)
+            {
+                throw new InvalidDataException(
+                    "Replay contains no frames.");
+            }
+
+            ReplayFrame frame =
+                new ReplayFrame();
+
+            int playhead = 0;
+
+            while (playhead < replayBytes.Length)
+            {
+                playhead =
+                    frame.GetFromByteArray(
+                        replayBytes,
+                        playhead);
+            }
+
+            return Mathf.RoundToInt(
+                frame.time);
+        }
     }
 
     public string SaveReplay()

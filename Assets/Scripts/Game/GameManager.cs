@@ -722,15 +722,11 @@ public class GameManager : MonoBehaviour
                 MissionInfo.instance.MissionPath,
                 null);
 
-        int timeMs =
-            Mathf.RoundToInt(elapsedTime);
-
         try
         {
             await OnlineManager.Instance.OnlineScore
                 .SubmitScoreAsync(
-                    level,
-                    timeMs);
+                    level);
 
             GameUIManager.instance.SetLBStatus("Information sent successfully.");
         }
@@ -969,7 +965,7 @@ public class GameManager : MonoBehaviour
             {
                 string previousName = PlayerPrefs.GetString(
                     levelName + "_Name_" + (i - 1),
-                    ""
+                    "Matan W."
                 );
 
                 PlayerPrefs.SetString(
@@ -1008,8 +1004,19 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < 3; i++)
         {
-            string _name = PlayerPrefs.GetString(MissionInfo.instance.levelName + "_Name_" + i, "Matan W.");
-            float _time = PlayerPrefs.GetFloat(MissionInfo.instance.levelName + "_Time_" + i, -1);
+            string _name = PlayerPrefs.GetString(
+                MissionInfo.instance.levelName + "_Name_" + i,
+                ""
+            );
+
+            if (string.IsNullOrWhiteSpace(_name))
+                _name = "Matan W.";
+
+            float _time = PlayerPrefs.GetFloat(
+                MissionInfo.instance.levelName + "_Time_" + i,
+                -1
+            );
+
             namesCaption.text += _name + "\n";
 
             bool ultimate = _time < MissionInfo.instance.ultimateTime;

@@ -975,7 +975,6 @@ public class ServerTest : MonoBehaviour
             new PendingReplay
             {
                 ScoreId = playerA.ScoreId,
-                TimeMs = playerA.TimeMs,
                 FileName = replayPath,
                 RetryCount = 0
             };

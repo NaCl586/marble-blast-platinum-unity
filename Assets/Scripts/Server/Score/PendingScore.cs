@@ -7,7 +7,6 @@ namespace Server.Score
     {
         public int UserId;
         public string Level = "";
-        public int TimeMs;
         public string ReplayFileName = "";
         public int RetryCount;
     }

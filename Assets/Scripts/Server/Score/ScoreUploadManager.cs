@@ -46,102 +46,189 @@ namespace Server.Score
             if (!userId.HasValue)
             {
                 Debug.LogWarning(
-                    "Cannot process pending scores: UserId unavailable.");
+                    "Cannot process pending scores: " +
+                    "UserId unavailable.");
 
                 return;
             }
 
-            while (true)
+            try
             {
-                PendingScore score =
-                    _scoreQueue.PeekForUser(userId.Value);
-
-                if (score == null)
-                    break;
-
-                try
+                while (true)
                 {
+                    PendingScore score =
+                        _scoreQueue.PeekForUser(userId.Value);
+
+                    if (score == null)
+                        break;
+
+                    string filePath =
+                        ReplayPaths.GetPendingReplayPath(
+                            score.ReplayFileName);
+
+                    if (!File.Exists(filePath))
+                    {
+                        Debug.LogError(
+                            $"Pending replay file not found: " +
+                            $"{filePath}");
+
+                        _scoreQueue.Remove(score);
+                        continue;
+                    }
+
+                    int replayTimeMs =
+                        ReplayRecorder.GetReplayFileTimeMs(
+                            filePath);
+
                     Debug.Log(
                         $"Submitting pending score: " +
                         $"UserId={score.UserId}, " +
                         $"Level={score.Level}, " +
-                        $"TimeMs={score.TimeMs}");
+                        $"TimeMs={replayTimeMs}");
 
                     SubmitScoreResponse response =
                         await _scoreApi.SubmitScoreAsync(
                             new SubmitScoreRequest
                             {
                                 Level = score.Level,
-                                TimeMs = score.TimeMs
+                                TimeMs = replayTimeMs
                             });
 
                     Debug.Log(
                         $"Pending score submitted. " +
                         $"ScoreId={response.ScoreId}, " +
                         $"PB={response.IsNewPersonalBest}, " +
-                        $"WR={response.IsWorldRecord}");
+                        $"ServerWR={response.IsWorldRecord}");
 
-                    // Remove THIS specific score.
-                    _scoreQueue.Remove(score);
+                    bool isCurrentWorldRecord =
+                        await IsCurrentWorldRecordAsync(
+                            score.Level,
+                            response.ScoreId);
 
-                    if (response.IsWorldRecord)
+                    Debug.Log(
+                        $"Pending score WR check: " +
+                        $"ScoreId={response.ScoreId}, " +
+                        $"CurrentWR={isCurrentWorldRecord}");
+
+                    if (isCurrentWorldRecord)
                     {
-                        await HandleWorldRecord(
+                        HandleWorldRecord(
                             score,
                             response);
                     }
-                    else
-                    {
-                        DeletePendingReplay(score);
-                    }
+
+                    _scoreQueue.Remove(score);
                 }
-                catch (Exception ex)
+
+                // ========================================
+                // ALL SCORES HAVE BEEN PROCESSED.
+                // NOW UPLOAD EVERYTHING IN replay_queue.json.
+                // ========================================
+
+                bool allReplayUploadsSuccessful =
+                    await _replayUpload.UploadPendingReplayAsync();
+
+                // ========================================
+                // ONLY EMPTY THE FOLDER IF:
+                //
+                // 1. Every replay upload succeeded
+                // 2. replay_queue.json is completely empty
+                // ========================================
+
+                if (allReplayUploadsSuccessful &&
+                    _replayUpload.PendingReplayCount == 0)
                 {
-                    score.RetryCount++;
-
-                    _scoreQueue.Update(score);
-
-                    Debug.LogError(
-                        $"Pending score submission failed. " +
-                        $"UserId={score.UserId}, " +
-                        $"Level={score.Level}, " +
-                        $"RetryCount={score.RetryCount}");
-
-                    Debug.LogException(ex);
-
-                    // Keep this score in the queue.
-                    throw;
+                    ClearPendingReplayFolder();
                 }
+                else
+                {
+                    Debug.LogWarning(
+                        "Not all pending replays were successfully " +
+                        "uploaded. Pending replay folder will NOT " +
+                        "be cleared.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError(
+                    "Failed to process pending scores or replays. " +
+                    "Pending replay folder will NOT be cleared.");
+
+                Debug.LogException(ex);
+
+                throw;
             }
         }
 
-        private async UniTask HandleWorldRecord(
+        private async UniTask<bool> IsCurrentWorldRecordAsync(
+            string level,
+            int scoreId)
+        {
+            if (OnlineManager.Instance == null ||
+                OnlineManager.Instance.Leaderboard == null)
+            {
+                throw new InvalidOperationException(
+                    "Leaderboard API is unavailable.");
+            }
+
+            LeaderboardResponse response =
+                await OnlineManager.Instance.Leaderboard
+                    .GetLeaderboardAsync(
+                        level,
+                        1,
+                        10);
+
+            if (response == null ||
+                response.Scores == null)
+            {
+                throw new InvalidOperationException(
+                    "Leaderboard response is empty.");
+            }
+
+            foreach (ScoreResponse leaderboardScore
+                in response.Scores)
+            {
+                if (leaderboardScore == null)
+                    continue;
+
+                if (leaderboardScore.Rank == 1)
+                {
+                    Debug.Log(
+                        $"Current #1 score: " +
+                        $"ScoreId={leaderboardScore.ScoreId}, " +
+                        $"Player={leaderboardScore.PlayerName}, " +
+                        $"TimeMs={leaderboardScore.TimeMs}");
+
+                    return leaderboardScore.ScoreId == scoreId;
+                }
+            }
+
+            return false;
+        }
+
+        private void HandleWorldRecord(
             PendingScore score,
             SubmitScoreResponse response)
         {
             if (string.IsNullOrWhiteSpace(
                     score.ReplayFileName))
             {
-                Debug.LogError(
+                throw new InvalidOperationException(
                     $"Pending score became a World Record, " +
                     $"but no replay file exists. " +
                     $"Level={score.Level}, " +
                     $"ScoreId={response.ScoreId}");
-
-                return;
             }
 
             string filePath =
-                ReplayPaths.GetAbsolutePath(
+                ReplayPaths.GetPendingReplayPath(
                     score.ReplayFileName);
 
             if (!File.Exists(filePath))
             {
-                Debug.LogError(
-                    $"Pending WR replay file not found: " +
-                    $"{filePath}");
-
-                return;
+                throw new FileNotFoundException(
+                    "Pending WR replay file not found.",
+                    filePath);
             }
 
             PendingReplay pendingReplay =
@@ -150,44 +237,62 @@ namespace Server.Score
                     UserId = score.UserId,
                     ScoreId = response.ScoreId,
                     Level = score.Level,
-                    TimeMs = response.TimeMs,
                     FileName = score.ReplayFileName,
                     RetryCount = 0
                 };
 
             Debug.Log(
                 $"Pending score became a World Record. " +
-                $"Creating pending replay. " +
+                $"Adding replay to replay queue. " +
                 $"ScoreId={response.ScoreId}");
 
             _replayUpload.QueueReplay(
                 pendingReplay);
-
-            await _replayUpload
-                .UploadPendingReplayAsync();
         }
 
-        private void DeletePendingReplay(
-            PendingScore score)
+        private void ClearPendingReplayFolder()
         {
-            if (string.IsNullOrWhiteSpace(
-                    score.ReplayFileName))
+            string folderPath =
+                ReplayPaths.PendingDirectory;
+
+            if (!Directory.Exists(folderPath))
             {
+                Debug.Log(
+                    "Pending replay folder does not exist. " +
+                    "Nothing to clear.");
+
                 return;
             }
 
-            string filePath =
-                ReplayPaths.GetAbsolutePath(
-                    score.ReplayFileName);
+            string[] files =
+                Directory.GetFiles(folderPath);
 
-            if (!File.Exists(filePath))
-                return;
+            int deletedCount = 0;
 
-            File.Delete(filePath);
+            foreach (string filePath in files)
+            {
+                try
+                {
+                    File.Delete(filePath);
+                    deletedCount++;
+
+                    Debug.Log(
+                        $"Deleted processed pending replay: " +
+                        $"{filePath}");
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError(
+                        $"Failed to delete pending replay: " +
+                        $"{filePath}");
+
+                    Debug.LogException(ex);
+                }
+            }
 
             Debug.Log(
-                $"Deleted replay for non-WR pending score: " +
-                $"{filePath}");
+                $"Pending replay folder cleanup complete. " +
+                $"Deleted={deletedCount}");
         }
     }
 }

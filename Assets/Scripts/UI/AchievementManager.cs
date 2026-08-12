@@ -232,25 +232,11 @@ public class AchievementManager : MonoBehaviour
             if (data == null)
                 continue;
 
-            Debug.Log(
-                $"Achievement #26 checking: " +
-                $"Level='{pair.Key}', " +
-                $"Rank={data.Rank}, " +
-                $"TimeMs={data.TimeMs}");
-
             if (data.Rank == 1)
             {
-                Debug.Log(
-                    $"ACHIEVEMENT #26 UNLOCKED: " +
-                    $"First place on '{pair.Key}'");
-
                 return true;
             }
         }
-
-        Debug.Log(
-            "Achievement #26 NOT unlocked: " +
-            "No Rank=1 entry found.");
 
         return false;
     }
@@ -261,18 +247,12 @@ public class AchievementManager : MonoBehaviour
 
         if (OnlineManager.Instance == null)
         {
-            Debug.LogWarning(
-                "AchievementManager: OnlineManager not found.");
-
             return;
         }
 
         if (OnlineManager.Instance.Auth == null ||
             !OnlineManager.Instance.Auth.IsLoggedIn)
         {
-            Debug.LogWarning(
-                "AchievementManager: User is not logged in.");
-
             return;
         }
 
@@ -379,7 +359,6 @@ public class AchievementManager : MonoBehaviour
                 return mission;
         }
 
-        Debug.LogWarning($"AchievementManager: Could not find mission '{levelName}'.");
         return null;
     }
 

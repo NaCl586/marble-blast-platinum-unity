@@ -8,7 +8,7 @@ namespace Server.API
     public class ReplayApi
     {
         private readonly ApiClient _client;
-        public static bool simulateUploadFailure;
+        public static bool simulateUploadFailure = false;
 
         public ReplayApi(ApiClient client)
         {

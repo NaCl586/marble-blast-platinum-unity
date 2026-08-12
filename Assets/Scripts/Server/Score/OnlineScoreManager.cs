@@ -27,8 +27,7 @@ namespace Server.Score
         }
 
         public async UniTask SubmitScoreAsync(
-            string level,
-            int timeMs)
+            string level)
         {
             if (OnlineManager.Instance == null ||
                 !OnlineManager.Instance.Auth.IsLoggedIn)
@@ -64,20 +63,23 @@ namespace Server.Score
                 return;
             }
 
-            // Save the replay BEFORE submitting the score.
-            string pendingPath =
+            // Get the actual time from the replay.
+            int replayTimeMs;
+
+            string replayPath =
                 ReplayRecorder.Instance.SavePendingReplay(
-                    timeMs,
-                    username);
+                    username,
+                    out replayTimeMs);
 
             string replayFileName =
                 Path.GetRelativePath(
-                    ReplayPaths.ReplayDirectory,
-                    pendingPath);
+                    ReplayPaths.PendingDirectory,
+                    replayPath);
 
             Debug.Log(
                 $"Replay saved before score submission: " +
-                $"{replayFileName}");
+                $"{replayFileName}, " +
+                $"FinalTimeMs={replayTimeMs}");
 
             try
             {
@@ -85,14 +87,14 @@ namespace Server.Score
                     $"Submitting score: " +
                     $"UserId={userId.Value}, " +
                     $"Level={level}, " +
-                    $"TimeMs={timeMs}");
+                    $"TimeMs={replayTimeMs}");
 
                 SubmitScoreResponse response =
                     await _scoreApi.SubmitScoreAsync(
                         new SubmitScoreRequest
                         {
                             Level = level,
-                            TimeMs = timeMs
+                            TimeMs = replayTimeMs
                         });
 
                 Debug.Log(
@@ -112,8 +114,6 @@ namespace Server.Score
                 }
                 else
                 {
-                    // Score succeeded but was not a WR.
-                    // Replay is no longer needed.
                     DeleteReplay(replayFileName);
                 }
             }
@@ -124,20 +124,18 @@ namespace Server.Score
                     $"Creating pending score. " +
                     $"UserId={userId.Value}, " +
                     $"Level={level}, " +
-                    $"TimeMs={timeMs}");
+                    $"TimeMs={replayTimeMs}");
 
                 PendingScore pendingScore =
                     new PendingScore
                     {
                         UserId = userId.Value,
                         Level = level,
-                        TimeMs = timeMs,
                         ReplayFileName = replayFileName,
                         RetryCount = 0
                     };
 
-                _scoreUpload.QueueScore(
-                    pendingScore);
+                _scoreUpload.QueueScore(pendingScore);
 
                 Debug.Log(
                     $"Pending score queued. " +
@@ -188,7 +186,6 @@ namespace Server.Score
                     UserId = userId,
                     ScoreId = response.ScoreId,
                     Level = level,
-                    TimeMs = response.TimeMs,
                     FileName = replayFileName,
                     RetryCount = 0
                 };

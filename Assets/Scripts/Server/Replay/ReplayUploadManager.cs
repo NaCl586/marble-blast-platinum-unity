@@ -30,7 +30,7 @@ namespace Server.Replay
             _replayQueue.Enqueue(replay);
         }
 
-        public async UniTask UploadPendingReplayAsync()
+        public async UniTask<bool> UploadPendingReplayAsync()
         {
             int? userId =
                 OnlineManager.Instance.Auth.UserId;
@@ -41,8 +41,10 @@ namespace Server.Replay
                     "Cannot upload pending replays: " +
                     "UserId unavailable.");
 
-                return;
+                return false;
             }
+
+            bool allUploadsSuccessful = true;
 
             while (true)
             {
@@ -53,7 +55,7 @@ namespace Server.Replay
                     break;
 
                 string filePath =
-                    ReplayPaths.GetAbsolutePath(
+                    ReplayPaths.GetPendingReplayPath(
                         replay.FileName);
 
                 if (!File.Exists(filePath))
@@ -65,9 +67,7 @@ namespace Server.Replay
 
                     _replayQueue.Update(replay);
 
-                    throw new FileNotFoundException(
-                        "Replay file not found.",
-                        filePath);
+                    return false;
                 }
 
                 try
@@ -76,20 +76,25 @@ namespace Server.Replay
                         $"Uploading pending replay: " +
                         $"UserId={replay.UserId}, " +
                         $"ScoreId={replay.ScoreId}, " +
-                        $"Level={replay.Level}, " +
-                        $"TimeMs={replay.TimeMs}");
+                        $"Level={replay.Level}");
+
+                    int replayTimeMs =
+                        ReplayRecorder.GetReplayFileTimeMs(
+                            filePath);
+
+                    Debug.Log(
+                        $"Replay final time: {replayTimeMs} ms");
 
                     UploadReplayResponse response =
                         await _replayApi.UploadReplayAsync(
                             replay.ScoreId,
-                            replay.TimeMs,
+                            replayTimeMs,
                             filePath);
 
                     Debug.Log(
                         $"Replay uploaded successfully. " +
                         $"ReplayId={response.ReplayId}");
 
-                    // Remove THIS specific replay.
                     _replayQueue.Remove(replay);
 
                     if (File.Exists(filePath))
@@ -110,11 +115,12 @@ namespace Server.Replay
                     {
                         File.Delete(filePath);
                     }
+
+                    // This replay was NOT successfully uploaded.
+                    allUploadsSuccessful = false;
                 }
                 catch (Exception ex)
                 {
-                    // Temporary error.
-                    // Keep the replay in the queue.
                     replay.RetryCount++;
 
                     _replayQueue.Update(replay);
@@ -127,9 +133,11 @@ namespace Server.Replay
 
                     Debug.LogException(ex);
 
-                    throw;
+                    return false;
                 }
             }
+
+            return allUploadsSuccessful;
         }
 
         public int PendingReplayCount =>

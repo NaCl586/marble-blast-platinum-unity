@@ -402,11 +402,16 @@ public class LeaderboardsPlayMission : PlayMissionManager
 
     private void SetWatchReplayButton()
     {
-        bool firstPlaceExists = firstPlaceScoreId > 0;
+        bool firstPlaceExists =
+            firstPlaceScoreId > 0;
 
         if (watchReplay != null)
         {
-            watchReplay.gameObject.SetActive(firstPlaceExists);
+            watchReplay.gameObject.SetActive(
+                firstPlaceExists);
+
+            watchReplay.interactable =
+                firstPlaceExists;
         }
     }
 
@@ -447,7 +452,7 @@ public class LeaderboardsPlayMission : PlayMissionManager
             yield break;
         }
 
-        JukeboxManager.instance.Stop();
+        JukeboxManager.instance.ForceStop();
         menu.blackout.SetActive(true);
 
         string replayPath = GetLeaderboardReplayPath();
@@ -495,20 +500,45 @@ public class LeaderboardsPlayMission : PlayMissionManager
         // Download failed
         if (downloadException != null)
         {
-            Debug.LogError("Failed to download leaderboard replay.");
+            Debug.LogError(
+                "Failed to download leaderboard replay.");
+
             Debug.LogException(downloadException);
+
+            // The server could not provide the replay.
+            // Disable the Watch Replay button.
+            if (watchReplay != null)
+            {
+                watchReplay.interactable = false;
+                watchReplay.gameObject.SetActive(false);
+            }
 
             menu.blackout.SetActive(false);
             menu.loadingMenu.SetActive(false);
+
+            JukeboxManager.instance.PlayMusic("Flanked");
+
             yield break;
         }
 
-        if (string.IsNullOrWhiteSpace(downloadedPath) || !File.Exists(downloadedPath))
+        if (string.IsNullOrWhiteSpace(downloadedPath) ||
+            !File.Exists(downloadedPath))
         {
-            Debug.LogError("Replay download completed, but the replay file does not exist.");
+            Debug.LogError(
+                "Replay download completed, " +
+                "but the replay file does not exist.");
+
+            if (watchReplay != null)
+            {
+                watchReplay.interactable = false;
+                watchReplay.gameObject.SetActive(false);
+            }
 
             menu.blackout.SetActive(false);
             menu.loadingMenu.SetActive(false);
+
+            JukeboxManager.instance.PlayMusic("Flanked");
+
             yield break;
         }
 

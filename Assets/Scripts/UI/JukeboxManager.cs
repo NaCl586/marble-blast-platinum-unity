@@ -301,6 +301,18 @@ public class JukeboxManager : MonoBehaviour
         PlayMusic(musics[selectedIndex].name);
     }
 
+    public void ForceStop()
+    {
+        isPlaying = false;
+        audioSource.Stop();
+        audioSource.clip = null;
+        currentlyPlayingMusic = null;
+        selectedAudioClip = null;
+        selectedIndex = 0;
+
+        musicInfo.text = string.Empty;
+    }
+
     public void PlayMusic(string name)
     {
         // Already playing this song, do nothing

@@ -59,7 +59,15 @@ public class LeaderboardsMenu : MonoBehaviour
         ReplayRecorder.loadReplay = false;
 
         if (PlayMissionManager.LevelLoadedFromLeaderboards)
-            StartCoroutine(FromGame()); 
+            StartCoroutine(FromGame());
+
+        UploadPendingScores();
+    }
+
+    async void UploadPendingScores()
+    {
+        await OnlineManager.Instance
+                .ProcessPendingOnlineDataAsync();
     }
 
     IEnumerator FromGame()
