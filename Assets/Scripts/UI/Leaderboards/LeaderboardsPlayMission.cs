@@ -93,7 +93,6 @@ public class LeaderboardsPlayMission : PlayMissionManager
     {
         if (difficulty == Type.custom)
         {
-            selectedGame = Game.gold;
             return MissionInfo.instance.missionsGoldCustom;
         }
 

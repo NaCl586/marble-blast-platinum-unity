@@ -372,7 +372,9 @@ public abstract class PlayMissionManager : MonoBehaviour
         if (next) next.interactable = (number < missions.Count - 1);
 
         int lastQualifiedLevel = Mathf.Min(number, qualifiedLevel);
-        PlayerPrefs.SetInt($"SelectedLevel{CapitalizeFirst(currentlySelectedType.ToString())}{CapitalizeFirst(selectedGame.ToString())}", lastQualifiedLevel);
+
+        string game = currentlySelectedType == Type.custom ? "Gold" : selectedGame.ToString();
+        PlayerPrefs.SetInt($"SelectedLevel{CapitalizeFirst(currentlySelectedType.ToString())}{CapitalizeFirst(game)}", lastQualifiedLevel);
 
         if (levelDescriptionText)
         {
@@ -388,7 +390,7 @@ public abstract class PlayMissionManager : MonoBehaviour
         }
 
         if (currentLevelText)
-            currentLevelText.text = $"{mission.levelName} - {CapitalizeFirst(currentlySelectedType.ToString())} Level {number + 1}";
+            currentLevelText.text = $"{mission.levelName} - {CapitalizeFirst(game)} Level {number + 1}";
 
         if (levelImage)
         {
@@ -419,13 +421,17 @@ public abstract class PlayMissionManager : MonoBehaviour
     protected virtual int GetQualifiedLevel()
     {
         if (debug || currentlySelectedType == Type.custom) return 9999;
-        return PlayerPrefs.GetInt($"QualifiedLevel{CapitalizeFirst(currentlySelectedType.ToString())}{CapitalizeFirst(selectedGame.ToString())}", 0);
+
+        string game = currentlySelectedType == Type.custom ? "Gold" : selectedGame.ToString();
+        return PlayerPrefs.GetInt($"QualifiedLevel{CapitalizeFirst(currentlySelectedType.ToString())}{CapitalizeFirst(game)}", 0);
     }
 
     private int ClampSelectedLevel()
     {
         int qualifiedLevel = GetQualifiedLevel();
-        int savedLevel = PlayerPrefs.GetInt($"SelectedLevel{CapitalizeFirst(currentlySelectedType.ToString())}{CapitalizeFirst(selectedGame.ToString())}", qualifiedLevel);
+
+        string game = currentlySelectedType == Type.custom ? "Gold" : selectedGame.ToString();
+        int savedLevel = PlayerPrefs.GetInt($"SelectedLevel{CapitalizeFirst(currentlySelectedType.ToString())}{CapitalizeFirst(game)}", qualifiedLevel);
 
         if (savedLevel < 0) return 0;
         if (missions != null && savedLevel >= missions.Count) return Mathf.Max(0, missions.Count - 1);
