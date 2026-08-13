@@ -169,10 +169,12 @@ public class GameManager : MonoBehaviour
     public static OnReachCheckpoint onReachCheckpoint = new OnReachCheckpoint();
 
     Coroutine alarmCoroutine;
+    bool isSubmitInProgress = false;
 
     void Start()
     {
         isPaused = false;
+        isSubmitInProgress = false;
 
         startTimer = false;
         timeTravelActive = false;
@@ -742,6 +744,11 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        isSubmitInProgress = true;
+
+        replayButton.interactable = false;
+        continueButton.interactable = false;
+
         GameUIManager.instance.SetLBStatus("Submitting your score to Leaderboards...");
 
         string level =
@@ -755,11 +762,21 @@ public class GameManager : MonoBehaviour
                 .SubmitScoreAsync(
                     level);
 
+            replayButton.interactable = true;
+            continueButton.interactable = true;
+
             GameUIManager.instance.SetLBStatus("Information sent successfully.");
+
+            isSubmitInProgress = false;
         }
         catch
         {
+            replayButton.interactable = true;
+            continueButton.interactable = true;
+
             GameUIManager.instance.SetLBStatus("There was an error submitting the information.");
+
+            isSubmitInProgress = false;
         }
     }
 
@@ -832,8 +849,11 @@ public class GameManager : MonoBehaviour
     {
         enterNameMenu.SetActive(false);
 
-        replayButton.interactable = true;
-        continueButton.interactable = true;
+        if (!isSubmitInProgress)
+        {
+            replayButton.interactable = true;
+            continueButton.interactable = true;
+        }
 
         if (pendingNamePosition >= 0 && pendingNamePosition < 3)
         {
@@ -854,8 +874,11 @@ public class GameManager : MonoBehaviour
 
     public void GenerateFinishUIText()
     {
-        replayButton.interactable = true;
-        continueButton.interactable = true;
+        if (!isSubmitInProgress)
+        {
+            replayButton.interactable = true;
+            continueButton.interactable = true;
+        }
 
         bool gold = elapsedTime < MissionInfo.instance.goldTime;
         bool ultimate = elapsedTime < MissionInfo.instance.ultimateTime;

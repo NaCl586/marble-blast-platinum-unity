@@ -38,6 +38,8 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] Image[] currentGem;
     [SerializeField] GameObject gemCountUI;
     [SerializeField] GameObject recordingIcon;
+    [SerializeField] private RectTransform bottomText_offline;
+    [SerializeField] private RectTransform bottomText_online;
 
     [Space]
 
@@ -150,6 +152,9 @@ public class GameUIManager : MonoBehaviour
         RectTransform fpsBoxRect =
             fpsBox.GetComponent<RectTransform>();
 
+        RectTransform bottomTextRect = 
+            bottomText.GetComponent<RectTransform>();
+
         if (OnlineManager.Instance != null &&
             OnlineManager.Instance.Chat != null &&
             !ReplayRecorder.loadReplay &&
@@ -164,6 +169,14 @@ public class GameUIManager : MonoBehaviour
             fpsBoxRect.sizeDelta = fpsBox_online.sizeDelta;
             fpsBoxRect.localRotation = fpsBox_online.localRotation;
             fpsBoxRect.localScale = fpsBox_online.localScale;
+
+            bottomTextRect.anchorMin = bottomText_online.anchorMin;
+            bottomTextRect.anchorMax = bottomText_online.anchorMax;
+            bottomTextRect.pivot = bottomText_online.pivot;
+            bottomTextRect.anchoredPosition = bottomText_online.anchoredPosition;
+            bottomTextRect.sizeDelta = bottomText_online.sizeDelta;
+            bottomTextRect.localRotation = bottomText_online.localRotation;
+            bottomTextRect.localScale = bottomText_online.localScale;
         }
         else
         {
@@ -176,6 +189,14 @@ public class GameUIManager : MonoBehaviour
             fpsBoxRect.sizeDelta = fpsBox_offline.sizeDelta;
             fpsBoxRect.localRotation = fpsBox_offline.localRotation;
             fpsBoxRect.localScale = fpsBox_offline.localScale;
+
+            bottomTextRect.anchorMin = bottomText_offline.anchorMin;
+            bottomTextRect.anchorMax = bottomText_offline.anchorMax;
+            bottomTextRect.pivot = bottomText_offline.pivot;
+            bottomTextRect.anchoredPosition = bottomText_offline.anchoredPosition;
+            bottomTextRect.sizeDelta = bottomText_offline.sizeDelta;
+            bottomTextRect.localRotation = bottomText_offline.localRotation;
+            bottomTextRect.localScale = bottomText_offline.localScale;
         }
     }
 

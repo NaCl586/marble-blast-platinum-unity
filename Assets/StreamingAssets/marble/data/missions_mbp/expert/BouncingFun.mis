@@ -651,7 +651,7 @@ new SimGroup(MissionGroup) {
          text = "Part 18: Tele-Bounce";
    };
    new Trigger() {
-      position = "-81.2449 24.4624 489.973";
+      position = "-81.2449 24.4624 489.223";
       rotation = "1 0 0 0";
       scale = "6 6 6";
       dataBlock = "TeleportTrigger";
