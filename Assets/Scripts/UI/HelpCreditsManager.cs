@@ -54,7 +54,7 @@ public class HelpCreditsManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            JukeboxManager.instance.PlayMusic("Pianoforte");
+            JukeboxManager.instance.PlayMusic("Pianoforte", true);
             SceneManager.LoadScene("MainMenu");
         }
     }
@@ -104,7 +104,7 @@ public class HelpCreditsManager : MonoBehaviour
         prev.onClick.AddListener(PrevPage);
         home.onClick.AddListener(() =>
         {
-            JukeboxManager.instance.PlayMusic("Pianoforte");
+            JukeboxManager.instance.PlayMusic("Pianoforte", true);
             SceneManager.LoadScene("MainMenu");
         });
 

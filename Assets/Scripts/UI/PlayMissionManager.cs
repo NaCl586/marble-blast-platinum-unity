@@ -175,7 +175,12 @@ public abstract class PlayMissionManager : MonoBehaviour
         BindButton(intermediateButton, () => LoadMissions(Type.intermediate, selectedGame));
         BindButton(advancedButton, () => LoadMissions(Type.advanced, selectedGame));
         BindButton(expertButton, () => LoadMissions(Type.expert, Game.platinum));
-        BindButton(customButton, () => LoadMissions(Type.custom, Game.gold));
+        BindButton(customButton, () => { 
+            if(this is LeaderboardsPlayMission)
+                LoadMissions(Type.custom, selectedGame); 
+            else
+                LoadMissions(Type.custom, Game.gold);
+        });
 
         if (switchGameButton) switchGameButton.GetComponent<Button>()?.onClick.AddListener(SwitchGame);
 
@@ -341,6 +346,7 @@ public abstract class PlayMissionManager : MonoBehaviour
                 case Type.intermediate: return MissionInfo.instance.missionsPlatinumIntermediate;
                 case Type.advanced: return MissionInfo.instance.missionsPlatinumAdvanced;
                 case Type.expert: return MissionInfo.instance.missionsPlatinumExpert;
+                case Type.custom: return MissionInfo.instance.missionsGoldCustom;
             }
         }
         return new List<Mission>();

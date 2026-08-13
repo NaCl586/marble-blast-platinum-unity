@@ -212,7 +212,7 @@ public class GameManager : MonoBehaviour
             {
                 if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
                 {
-                    JukeboxManager.instance.PlayMusic("Pianoforte");
+                    JukeboxManager.instance.PlayMusic("Pianoforte", true);
                     SceneManager.LoadScene("PLayMission");
                 }
                 else
@@ -322,21 +322,31 @@ public class GameManager : MonoBehaviour
         }
 
         //Handle Time travel timer
-        if (timeTravelActive)
+        if (timeTravelActive && !gameFinish)
         {
+            float elapsed = Time.time - timeTravelStartTime;
+            float remainingTime = timeTravelBonus - elapsed;
+
             bonusTime += Time.deltaTime * 1000f;
 
-            float elapsed = Time.time - timeTravelStartTime;
+            if(!gameFinish)
+                GameUIManager.instance.SetTimeTravelTimer(remainingTime * 1000f);
 
             if (elapsed >= timeTravelBonus)
             {
                 float overshoot = elapsed - timeTravelBonus;
 
-                // bonusTime is scaled by *1000f, so convert overshoot the same way
                 bonusTime -= overshoot * 1000f;
+
+                if (!gameFinish)
+                    GameUIManager.instance.SetTimeTravelTimer(-1);
 
                 Marble.instance.InactivateTimeTravel();
             }
+        }
+        else if (!timeTravelActive && !gameFinish)
+        {
+            GameUIManager.instance.SetTimeTravelTimer(-1);
         }
 
         if (GameUIManager.instance != null &&
@@ -774,7 +784,7 @@ public class GameManager : MonoBehaviour
         {
             if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
             {
-                JukeboxManager.instance.PlayMusic("Pianoforte");
+                JukeboxManager.instance.PlayMusic("Pianoforte", true);
                 SceneManager.LoadScene("ReplayMenu");
             }
             else
@@ -787,7 +797,7 @@ public class GameManager : MonoBehaviour
         {
             if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
             {
-                JukeboxManager.instance.PlayMusic("Pianoforte");
+                JukeboxManager.instance.PlayMusic("Pianoforte", true);
                 SceneManager.LoadScene("PLayMission");
             }
             else

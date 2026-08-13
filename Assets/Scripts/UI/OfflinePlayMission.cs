@@ -65,6 +65,9 @@ public class OfflinePlayMission : PlayMissionManager
             string name = PlayerPrefs.GetString($"{MissionInfo.instance.levelName}_Name_{i}", "Matan W.");
             float time = PlayerPrefs.GetFloat($"{MissionInfo.instance.levelName}_Time_{i}", -1);
 
+            if (string.IsNullOrEmpty(name))
+                name = "\t\t";
+
             sb.Append($"{i + 1}. {name}\t");
 
             if (time != -1 && selectedGame == Game.gold && currentlySelectedType != Type.custom && time < MissionInfo.instance.goldTime)

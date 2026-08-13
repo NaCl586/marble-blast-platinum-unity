@@ -13681,6 +13681,7 @@ MonoBehaviour:
   - {fileID: 1070497698}
   - {fileID: 248661560}
   okayButton: {fileID: 568913089}
+  loadingText: {fileID: 0}
   nextPage: {fileID: 0}
   prevPage: {fileID: 0}
   pages:

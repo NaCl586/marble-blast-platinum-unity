@@ -25,6 +25,10 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] Sprite[] numbersGreen;
     [SerializeField] Sprite[] numbersRed;
     [SerializeField] Image[] timerNumbers;
+    [SerializeField] GameObject timeTravelTimer;
+    [SerializeField] Image[] timeTravelNumbers;
+    [SerializeField] GameObject[] timeTravelSecTenth;
+    [SerializeField] GameObject[] timeTravelSecHundreth;
     [SerializeField] TextMeshProUGUI centerText;
     [SerializeField] TextMeshProUGUI bottomText;
     [SerializeField] TextMeshProUGUI fpsText;
@@ -89,6 +93,7 @@ public class GameUIManager : MonoBehaviour
     Tween bottomTextFade;
 
     Sprite[] timerColor;
+    Sprite[] timeTravelTimerColor;
     float timer = 0f;
 
     [HideInInspector] public bool isInitialized = false;
@@ -189,7 +194,7 @@ public class GameUIManager : MonoBehaviour
 
             if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
             {
-                JukeboxManager.instance.PlayMusic("Pianoforte");
+                JukeboxManager.instance.PlayMusic("Pianoforte", true);
                 SceneManager.LoadScene("PlayMission");
             }
             else
@@ -205,7 +210,7 @@ public class GameUIManager : MonoBehaviour
 
             if (OnlineManager.Instance == null || !OnlineManager.Instance.Auth.IsLoggedIn)
             {
-                JukeboxManager.instance.PlayMusic("Pianoforte");
+                JukeboxManager.instance.PlayMusic("Pianoforte", true);
                 SceneManager.LoadScene("PlayMission");
             }
             else
@@ -267,6 +272,16 @@ public class GameUIManager : MonoBehaviour
 
     private void HandleChatInput()
     {
+        // Chat cannot be opened while the replay menu is active.
+        if (saveReplayMenu.activeSelf)
+        {
+            if (chatInputOpen)
+                CancelChatInput();
+
+            return;
+        }
+
+        // Chat is currently closed.
         if (!chatInputOpen)
         {
             if (Input.GetKeyDown(KeyCode.T))
@@ -277,16 +292,14 @@ public class GameUIManager : MonoBehaviour
             return;
         }
 
+        // Chat is currently open.
         if (Input.GetKeyDown(KeyCode.Return))
         {
             SendChatInput();
-            return;
         }
-
-        if (Input.GetKeyDown(KeyCode.Escape))
+        else if (Input.GetKeyDown(KeyCode.Escape))
         {
             CancelChatInput();
-            return;
         }
     }
 
@@ -464,6 +477,65 @@ public class GameUIManager : MonoBehaviour
         timerNumbers[6].sprite = timerColor[milliseconds];
         timerNumbers[7].sprite = timerColor[10];
         timerNumbers[8].sprite = timerColor[11];
+    }
+
+    public void SetTimeTravelTimer(float timeMs, bool green = false)
+    {
+        timeTravelTimer.SetActive(timeMs >= 0);
+
+        timeMs = Mathf.Max(0, timeMs);
+
+        // Clamp only the displayed value, not the actual Time Travel value.
+        float displayMs = Mathf.Min(timeMs, 999999f);
+
+        int totalSeconds = Mathf.FloorToInt(displayMs / 1000f);
+
+        int seconds = totalSeconds % 10;
+        int tens = (totalSeconds / 10) % 10;
+        int hundreds = totalSeconds / 100;
+
+        int deciseconds = Mathf.FloorToInt(displayMs / 100f) % 10;
+        int centiseconds = Mathf.FloorToInt(displayMs / 10f) % 10;
+        int milliseconds = Mathf.FloorToInt(displayMs) % 10;
+
+        if (green)
+            timeTravelTimerColor = numbersGreen;
+        else
+            timeTravelTimerColor = numbers;
+
+        if (totalSeconds < 10)
+        {
+            // S.TTT
+            timeTravelNumbers[2].sprite = timeTravelTimerColor[seconds];
+            timeTravelNumbers[3].sprite = timeTravelTimerColor[deciseconds];
+            timeTravelNumbers[4].sprite = timeTravelTimerColor[centiseconds];
+            timeTravelNumbers[5].sprite = timeTravelTimerColor[milliseconds];
+        }
+        else if (totalSeconds < 100)
+        {
+            // SS.TTT
+            timeTravelNumbers[1].sprite = timeTravelTimerColor[tens];
+            timeTravelNumbers[2].sprite = timeTravelTimerColor[seconds];
+            timeTravelNumbers[3].sprite = timeTravelTimerColor[deciseconds];
+            timeTravelNumbers[4].sprite = timeTravelTimerColor[centiseconds];
+            timeTravelNumbers[5].sprite = timeTravelTimerColor[milliseconds];
+        }
+        else
+        {
+            // SSS.TTT
+            timeTravelNumbers[0].sprite = timeTravelTimerColor[hundreds];
+            timeTravelNumbers[1].sprite = timeTravelTimerColor[tens];
+            timeTravelNumbers[2].sprite = timeTravelTimerColor[seconds];
+            timeTravelNumbers[3].sprite = timeTravelTimerColor[deciseconds];
+            timeTravelNumbers[4].sprite = timeTravelTimerColor[centiseconds];
+            timeTravelNumbers[5].sprite = timeTravelTimerColor[milliseconds];
+        }
+
+        foreach (var g in timeTravelSecTenth)
+            g.SetActive(timeMs >= 10000);
+
+        foreach (var g in timeTravelSecHundreth)
+            g.SetActive(timeMs >= 100000);
     }
 
     public void SetCenterImage(int index)

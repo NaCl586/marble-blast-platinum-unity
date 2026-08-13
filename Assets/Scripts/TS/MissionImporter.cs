@@ -80,7 +80,7 @@ namespace TS
 
         void Start()
         {
-            if(!ReplayRecorder.loadReplay)
+            if (!ReplayRecorder.loadReplay)
                 MarbleInfo.instance.ApplyMesh();
 
             ImportMission();
@@ -175,7 +175,7 @@ namespace TS
                         gobj.name = "SuperJumpItem";
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var rotation = ConvertRotationPowerups(ParseVectorString(obj.GetField("rotation")));
                         var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
                         string showInfo = obj.GetField("showHelpOnPickup");
@@ -198,7 +198,7 @@ namespace TS
                         gobj.name = "SuperSpeedItem";
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var rotation = ConvertRotationPowerups(ParseVectorString(obj.GetField("rotation")));
                         var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
                         string showInfo = obj.GetField("showHelpOnPickup");
@@ -221,7 +221,7 @@ namespace TS
                         gobj.name = "SuperBounceItem";
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var rotation = ConvertRotationPowerups(ParseVectorString(obj.GetField("rotation")));
                         var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
                         string showInfo = obj.GetField("showHelpOnPickup");
@@ -244,7 +244,7 @@ namespace TS
                         gobj.name = "ShockAbsorberItem";
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var rotation = ConvertRotationPowerups(ParseVectorString(obj.GetField("rotation")));
                         var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
                         string showInfo = obj.GetField("showHelpOnPickup");
@@ -267,7 +267,7 @@ namespace TS
                         gobj.name = "HelicopterItem";
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var rotation = ConvertRotationPowerups(ParseVectorString(obj.GetField("rotation")));
                         var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
                         string showInfo = obj.GetField("showHelpOnPickup");
@@ -290,7 +290,7 @@ namespace TS
                         gobj.name = "TimeTravelItem";
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")), false);
+                        var rotation = ConvertRotationPowerups(ParseVectorString(obj.GetField("rotation")));
                         var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
                         var localScale = gobj.transform.localScale;
@@ -328,7 +328,7 @@ namespace TS
                         gobj.name = "RandomPowerUpItem";
 
                         var position = ConvertPoint(ParseVectorString(obj.GetField("position")));
-                        var rotation = ConvertRotation(ParseVectorString(obj.GetField("rotation")));
+                        var rotation = ConvertRotationPowerups(ParseVectorString(obj.GetField("rotation")));
                         var scale = ConvertScale(ParseVectorString(obj.GetField("scale")));
 
                         var localScale = gobj.transform.localScale;
@@ -361,7 +361,7 @@ namespace TS
                         Destroy(gobj.gameObject);
 
                     //if scale has component with 0 value, remove all colliders
-                    if(scale.x == 0 || scale.y == 0 || scale.z == 0)
+                    if (scale.x == 0 || scale.y == 0 || scale.z == 0)
                     {
                         MeshCollider[] meshColliders = gobj.GetComponentsInChildren<MeshCollider>(true);
                         foreach (var mc in meshColliders)
@@ -939,7 +939,7 @@ namespace TS
                     else
                     {
                         var shape = staticShapes.FirstOrDefault(go => go != null && go.name.ToLower() == objectName.ToLower());
-                        if(shape != null)
+                        if (shape != null)
                         {
                             var gobj = Instantiate(shape, transform, false);
                             gobj.name = objectName;
@@ -1029,7 +1029,7 @@ namespace TS
 
                         var polyhedronScale = PolyhedronToBoxSize(ParseVectorString(obj.GetField("polyhedron")));
 
-                        telObj.transform.localPosition = position;  
+                        telObj.transform.localPosition = position;
                         telObj.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f) * rotation;
 
                         var cameraPos = telObj.transform.Find("CameraPos");
@@ -1335,20 +1335,75 @@ namespace TS
             return new Vector3(p[0], p[2], p[1]);
         }
 
-        private Quaternion ConvertRotation(float[] torqueRotation, bool additionalRotate = true)
+        private Quaternion ConvertRotationPowerups(float[] torqueRotation)
         {
-            // Torque point is an angle axis in torquespace
+            float x = torqueRotation[0];
+            float y = torqueRotation[1];
+            float z = torqueRotation[2];
             float angle = torqueRotation[3];
-            Vector3 axis = new Vector3(torqueRotation[0], -torqueRotation[1], torqueRotation[2]);
-            Quaternion rot = Quaternion.AngleAxis(angle, axis);
 
-            if (additionalRotate)
-                rot = Quaternion.Euler(-90.0f, 0, 0) * rot;
+            Quaternion rot;
+
+            // =========================================================
+            // Hard-coded common Torque rotations
+            // =========================================================
+
+            // Torque X axis -> Unity X axis
+            if (Mathf.Approximately(y, 0f) &&
+                Mathf.Approximately(z, 0f) &&
+                !Mathf.Approximately(x, 0f))
+            {
+                rot = Quaternion.AngleAxis(angle * x, Vector3.right);
+            }
+
+            // Torque Y axis -> Unity Z axis
+            else if (Mathf.Approximately(x, 0f) &&
+                     Mathf.Approximately(z, 0f) &&
+                     !Mathf.Approximately(y, 0f))
+            {
+                rot = Quaternion.AngleAxis(angle * y, Vector3.forward);
+            }
+
+            // Torque Z axis -> Unity Y axis
+            else if (Mathf.Approximately(x, 0f) &&
+                     Mathf.Approximately(y, 0f) &&
+                     !Mathf.Approximately(z, 0f))
+            {
+                rot = Quaternion.AngleAxis(angle * z, Vector3.up);
+            }
+
+            // =========================================================
+            // Generic Torque axis-angle rotation
+            // =========================================================
+            else
+            {
+                Vector3 axis = new Vector3(
+                    x,
+                    z,
+                    -y
+                );
+
+                rot = Quaternion.AngleAxis(angle, axis);
+            }
 
             return rot;
         }
 
-        private Vector3 ConvertScale(float[] s)
+        private Quaternion ConvertRotation(float[] torqueRotation, bool additionalRotate = true)
+        {
+            // Torque point is an angle axis in torquespace 
+            float angle = torqueRotation[3];
+            Vector3 axis = new Vector3(torqueRotation[0], -torqueRotation[1], torqueRotation[2]);
+
+            Quaternion rot = Quaternion.AngleAxis(angle, axis); 
+
+            if (additionalRotate) 
+                rot = Quaternion.Euler(-90.0f, 0, 0) * rot; 
+
+            return rot; 
+        }
+
+            private Vector3 ConvertScale(float[] s)
         {
             return new Vector3(s[0], s[1], s[2]);
         }

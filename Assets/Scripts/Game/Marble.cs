@@ -91,7 +91,7 @@ public class Marble : MonoBehaviour
             }
             else
             {
-                JukeboxManager.instance.PlayMusic("Pianoforte");
+                JukeboxManager.instance.PlayMusic("Pianoforte", true);
                 SceneManager.LoadScene("PlayMission");
             }
         }
@@ -280,6 +280,15 @@ public class Marble : MonoBehaviour
 
     public void InactivateTimeTravel()
     {
+        if (GameManager.gameFinish)
+        {
+            float elapsed = Time.time - GameManager.instance.timeTravelStartTime;
+            float remainingTime = GameManager.instance.timeTravelBonus - elapsed;
+            GameUIManager.instance.SetTimeTravelTimer(remainingTime * 1000f, true);
+
+            Marble.instance.alarmSound.Stop();
+        }
+
         GameManager.instance.timeTravelBonus = 0f;
         GameManager.instance.timeTravelActive = false;
         StopSound(PowerupType.TimeTravel);

@@ -245,10 +245,9 @@ public class JukeboxManager : MonoBehaviour
 
         highlightedButton = null;
     }
-
     public void TogglePlayStop()
     {
-        if (isPlaying)
+        if (isPlaying && audioSource.isPlaying)
             Stop();
         else
             Play();
@@ -256,11 +255,13 @@ public class JukeboxManager : MonoBehaviour
 
     public void Stop()
     {
+        if (selectedAudioClip == null)
+            return;
+
         isPlaying = false;
         audioSource.Stop();
 
-        if (musicInfo.text.Contains("Playing"))
-            musicInfo.text = musicInfo.text.Replace("Playing", "Stopped");
+        musicInfo.text = $"Title: {selectedAudioClip.name}\nStopped";
     }
 
     public void Play()
@@ -269,10 +270,9 @@ public class JukeboxManager : MonoBehaviour
             return;
 
         isPlaying = true;
-        PlayMusic(selectedAudioClip.name);
 
-        if (musicInfo.text.Contains("Stopped"))
-            musicInfo.text = musicInfo.text.Replace("Stopped", "Playing");
+        // Play the selected song from the beginning.
+        PlayMusic(selectedAudioClip.name, true);
     }
 
     public void NextSong()
@@ -285,7 +285,7 @@ public class JukeboxManager : MonoBehaviour
         if (selectedIndex >= musics.Count)
             selectedIndex = 0;
 
-        PlayMusic(musics[selectedIndex].name);
+        PlayMusic(musics[selectedIndex].name, true);
     }
 
     public void PrevSong()
@@ -298,27 +298,25 @@ public class JukeboxManager : MonoBehaviour
         if (selectedIndex < 0)
             selectedIndex = musics.Count - 1;
 
-        PlayMusic(musics[selectedIndex].name);
+        PlayMusic(musics[selectedIndex].name, true);
     }
 
     public void ForceStop()
     {
-        isPlaying = false;
-        audioSource.Stop();
+        Stop();
+
         audioSource.clip = null;
         currentlyPlayingMusic = null;
         selectedAudioClip = null;
         selectedIndex = 0;
 
-        musicInfo.text = string.Empty;
+        ClearHighlight();
+
+        musicInfo.text = "No Music";
     }
 
-    public void PlayMusic(string name)
+    public void PlayMusic(string name, bool forceRestart = false)
     {
-        // Already playing this song, do nothing
-        if (currentlyPlayingMusic == name)
-            return;
-
         AudioClip selectedMusic = musics.FirstOrDefault(c =>
             c != null &&
             c.name.Equals(name, System.StringComparison.Ordinal));
@@ -333,14 +331,24 @@ public class JukeboxManager : MonoBehaviour
                 return;
         }
 
+        // Same song is already playing.
+        // Don't restart unless explicitly requested.
+        if (currentlyPlayingMusic == selectedMusic.name &&
+            audioSource.isPlaying &&
+            !forceRestart)
+        {
+            return;
+        }
+
         currentlyPlayingMusic = selectedMusic.name;
+        selectedAudioClip = selectedMusic;
+        selectedIndex = GetClipIndexByName(selectedMusic.name);
 
         audioSource.Stop();
         audioSource.clip = selectedMusic;
         audioSource.Play();
 
-        selectedIndex = GetClipIndexByName(name);
-        selectedAudioClip = selectedMusic;
+        isPlaying = true;
 
         for (int i = 0; i < content.childCount; i++)
         {
@@ -348,14 +356,14 @@ public class JukeboxManager : MonoBehaviour
                 .Find("Text")
                 .GetComponent<TextMeshProUGUI>();
 
-            if (text.text.Equals(name))
+            if (text.text.Equals(selectedMusic.name))
             {
                 HighlightButton(content.GetChild(i).GetComponent<Button>());
                 break;
             }
         }
 
-        musicInfo.text = $"Title: {name}\nPlaying";
+        musicInfo.text = $"Title: {selectedMusic.name}\nPlaying";
     }
 
     public void PlayRandomMusic()
