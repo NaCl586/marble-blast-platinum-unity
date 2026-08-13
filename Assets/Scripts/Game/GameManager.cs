@@ -233,6 +233,13 @@ public class GameManager : MonoBehaviour
         onReachCheckpoint.AddListener(ReachCheckpoint);
         useCheckpoint = false;
 
+        if ((OnlineManager.Instance != null && OnlineManager.Instance.Auth.IsLoggedIn) && !ReplayRecorder.loadReplay && !LeaderboardsMenu.ReplayCenterLoadedFromLeaderboards)
+        {
+            OnlineManager.Instance.Chat
+                .SetStatus("Playing")
+                .Forget();
+        }
+
         gameStart = false;
         gameFinish = false;
         alarmCoroutineStarted = false;
@@ -330,6 +337,12 @@ public class GameManager : MonoBehaviour
 
                 Marble.instance.InactivateTimeTravel();
             }
+        }
+
+        if (GameUIManager.instance != null &&
+            GameUIManager.instance.IsChatInputOpen)
+        {
+            return;
         }
 
         //pause
@@ -779,6 +792,10 @@ public class GameManager : MonoBehaviour
             }
             else
             {
+                OnlineManager.Instance.Chat
+                .SetStatus("Level Select")
+                .Forget();
+
                 JukeboxManager.instance.PlayMusic("Flanked");
                 SceneManager.LoadScene("LBPlayMission");
             }

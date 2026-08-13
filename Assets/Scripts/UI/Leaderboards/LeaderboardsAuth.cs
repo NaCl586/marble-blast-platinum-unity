@@ -57,9 +57,19 @@ public class LeaderboardsAuth : MonoBehaviour
 
     private bool isProcessing;
 
-    void OnDestroy()
+    private void OnDestroy()
     {
-        scrollbar.onValueChanged.RemoveListener(OnScrollbarValueChanged);
+        scrollbar.onValueChanged.RemoveListener(
+            OnScrollbarValueChanged);
+
+        if (OnlineManager.Instance != null)
+        {
+            OnlineManager.Instance.Chat.ConnectionLost -=
+                OnChatConnectionLost;
+
+            OnlineManager.Instance.Chat.ForceLoggedOut -=
+                OnForceLoggedOut;
+        }
     }
 
     private void Start()
@@ -71,7 +81,44 @@ public class LeaderboardsAuth : MonoBehaviour
         InitializeUI();
         LoadRememberedCredentials();
 
+        if (OnlineManager.Instance != null)
+        {
+            OnlineManager.Instance.Chat.ConnectionLost +=
+                OnChatConnectionLost;
+
+            OnlineManager.Instance.Chat.ForceLoggedOut +=
+                OnForceLoggedOut;
+        }
+
         StartCoroutine(ShowLoginAfterDelay());
+    }
+
+    private void OnChatConnectionLost()
+    {
+        if (!isProcessing)
+            return;
+
+        HideLoading();
+
+        isProcessing = false;
+
+        ShowError(
+            "Connection Failed",
+            "The connection to the online server was lost.");
+    }
+
+    private void OnForceLoggedOut()
+    {
+        if (!isProcessing)
+            return;
+
+        HideLoading();
+
+        isProcessing = false;
+
+        ShowError(
+            "Session Ended",
+            "Your account was logged in from another session.");
     }
 
     private IEnumerator ShowLoginAfterDelay()
@@ -158,6 +205,36 @@ public class LeaderboardsAuth : MonoBehaviour
                 username,
                 password,
                 rememberPasswordCheck.isOn);
+
+            if (string.IsNullOrEmpty(
+                    OnlineManager.Instance.Auth.AccessToken))
+            {
+                ShowError(
+                    "Login Failed",
+                    "Authentication succeeded, but no access token was received.");
+
+                isProcessing = false;
+                HideLoading();
+
+                return;
+            }
+
+            bool chatConnected =
+                await OnlineManager.Instance.Chat.Connect(
+                    OnlineManager.Instance.Auth.AccessToken);
+
+            if (!chatConnected)
+            {
+                ShowError(
+                    "Connection Failed",
+                    OnlineManager.Instance.Chat.LastError ??
+                    "Unable to connect to the online server.");
+
+                isProcessing = false;
+                HideLoading();
+
+                return;
+            }
 
             // Authentication succeeded.
             // Now it is safe to process pending online data.
@@ -384,10 +461,10 @@ public class LeaderboardsAuth : MonoBehaviour
         if (isProcessing)
             return;
 
-        StartCoroutine(ReturnToMainMenu());
+        ReturnToMainMenuAsync().Forget();
     }
 
-    private IEnumerator ReturnToMainMenu()
+    private async UniTask ReturnToMainMenuAsync()
     {
         errorMenu.SetActive(false);
 
@@ -397,12 +474,17 @@ public class LeaderboardsAuth : MonoBehaviour
 
         blackout.SetActive(true);
 
-        yield return new WaitForSeconds(blackoutDuration);
+        await UniTask.Delay(
+            TimeSpan.FromSeconds(blackoutDuration)
+        );
 
         if (OnlineManager.Instance != null)
-            OnlineManager.Instance.Shutdown();
+        {
+            await OnlineManager.Instance.ShutdownAsync();
+        }
 
         JukeboxManager.instance.Play();
+
         SceneManager.LoadScene("MainMenu");
     }
 
@@ -485,7 +567,7 @@ public class LeaderboardsAuth : MonoBehaviour
         if (isProcessing)
             return;
 
-        StartCoroutine(ReturnToMainMenu());
+        ReturnToMainMenuAsync().Forget();
     }
 
 

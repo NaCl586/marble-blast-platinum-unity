@@ -5,6 +5,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Server;
+using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 
 public class GameUIManager : MonoBehaviour
 {
@@ -14,8 +16,11 @@ public class GameUIManager : MonoBehaviour
         instance = this;
         UpdateHUDMaterial();
     }
+    [Header("Other References")]
     [SerializeField] Canvas canvas;
+
     [Space]
+
     [SerializeField] Sprite[] numbers;
     [SerializeField] Sprite[] numbersGreen;
     [SerializeField] Sprite[] numbersRed;
@@ -29,19 +34,27 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] Image[] currentGem;
     [SerializeField] GameObject gemCountUI;
     [SerializeField] GameObject recordingIcon;
+
     [Space]
+
     [SerializeField] GameObject readyImage;
     [SerializeField] GameObject setImage;
     [SerializeField] GameObject goImage;
     [SerializeField] GameObject outOfBoundsImage;
+
     [Space]
+
     [SerializeField] TextMeshProUGUI lbStatusText;
+
     [Space]
+
     public GameObject oobInsultMenu;
     [SerializeField] TextMeshProUGUI oobInsultTitleText;
     [SerializeField] TextMeshProUGUI oobInsultCaptionText;
     [SerializeField] Button oobInsultCloseButton;
+
     [Space]
+
     public GameObject saveReplayMenu;
     [SerializeField] TMP_InputField replayMenuName;
     [SerializeField] TMP_InputField replayMenuAuthor;
@@ -53,6 +66,24 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] private Button scrollUpButton;
     [SerializeField] private Button scrollDownButton;
     [SerializeField] private float step = 0.1f;
+
+    [Space]
+
+    [Header("Global Chat")]
+    [SerializeField] private GameObject globalChat;
+    [SerializeField] private TextMeshProUGUI globalChatText;
+    [SerializeField] private TMP_InputField globalChatInput;
+    [SerializeField] private GameObject fpsBox;
+    [SerializeField] private RectTransform fpsBox_offline;
+    [SerializeField] private RectTransform fpsBox_online;
+
+    private const int MaxChatLines = 8;
+
+    private readonly List<string> chatLines =
+        new List<string>();
+
+    private bool chatInputOpen;
+    public bool IsChatInputOpen => chatInputOpen && !ReplayRecorder.loadReplay && Time.timeScale > 0;
 
     Tween centerTextFade;
     Tween bottomTextFade;
@@ -95,6 +126,52 @@ public class GameUIManager : MonoBehaviour
         scrollDownButton.onClick.AddListener(ScrollDown);
 
         recordingIcon.SetActive(ReplayRecorder.recordReplay);
+
+        if (OnlineManager.Instance != null &&
+            OnlineManager.Instance.Chat != null)
+        {
+            OnlineManager.Instance.Chat.MessageReceived +=
+                OnChatMessageReceived;
+
+            OnlineManager.Instance.Chat.SystemMessageReceived +=
+                OnSystemMessageReceived;
+
+            OnlineManager.Instance.Chat.RecentMessagesReceived +=
+                OnRecentMessagesReceived;
+
+            LoadChatHistory();
+        }
+
+        RectTransform fpsBoxRect =
+            fpsBox.GetComponent<RectTransform>();
+
+        if (OnlineManager.Instance != null &&
+            OnlineManager.Instance.Chat != null &&
+            !ReplayRecorder.loadReplay &&
+            !LeaderboardsMenu.ReplayCenterLoadedFromLeaderboards)
+        {
+            globalChat.SetActive(true);
+
+            fpsBoxRect.anchorMin = fpsBox_online.anchorMin;
+            fpsBoxRect.anchorMax = fpsBox_online.anchorMax;
+            fpsBoxRect.pivot = fpsBox_online.pivot;
+            fpsBoxRect.anchoredPosition = fpsBox_online.anchoredPosition;
+            fpsBoxRect.sizeDelta = fpsBox_online.sizeDelta;
+            fpsBoxRect.localRotation = fpsBox_online.localRotation;
+            fpsBoxRect.localScale = fpsBox_online.localScale;
+        }
+        else
+        {
+            globalChat.SetActive(false);
+
+            fpsBoxRect.anchorMin = fpsBox_offline.anchorMin;
+            fpsBoxRect.anchorMax = fpsBox_offline.anchorMax;
+            fpsBoxRect.pivot = fpsBox_offline.pivot;
+            fpsBoxRect.anchoredPosition = fpsBox_offline.anchoredPosition;
+            fpsBoxRect.sizeDelta = fpsBox_offline.sizeDelta;
+            fpsBoxRect.localRotation = fpsBox_offline.localRotation;
+            fpsBoxRect.localScale = fpsBox_offline.localScale;
+        }
     }
 
     public void SetLBStatus(string text)
@@ -182,6 +259,34 @@ public class GameUIManager : MonoBehaviour
                 fpsText.text = "FPS: " + RoundSmart((float)(1 / Time.unscaledDeltaTime));
                 timer = 0f;
             }
+        }
+
+        if(!ReplayRecorder.loadReplay && Time.timeScale > 0)
+            HandleChatInput();
+    }
+
+    private void HandleChatInput()
+    {
+        if (!chatInputOpen)
+        {
+            if (Input.GetKeyDown(KeyCode.T))
+            {
+                OpenChatInput();
+            }
+
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return))
+        {
+            SendChatInput();
+            return;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            CancelChatInput();
+            return;
         }
     }
 
@@ -395,5 +500,240 @@ public class GameUIManager : MonoBehaviour
         // Disable when limits reached
         scrollUpButton.interactable = value < 1f;
         scrollDownButton.interactable = value > 0f;
+    }
+
+    private void OnChatMessageReceived(
+    string username,
+    string message,
+    string status)
+    {
+        string displayName =
+            string.IsNullOrEmpty(status)
+                ? username
+                : $"{username} ({status})";
+
+        AddChatLine(
+            $"<color=#9D0000>{displayName}:</color> " +
+            $"<color=#000000>{message}</color>");
+    }
+
+    private void OnSystemMessageReceived(
+    string message)
+    {
+        AddSystemChatMessage(
+            message);
+    }
+
+    private void OnRecentMessagesReceived(
+    IReadOnlyList<ChatMessage> messages)
+    {
+        chatLines.Clear();
+
+        foreach (ChatMessage message in messages)
+        {
+            if (message.IsSystem)
+            {
+                AddSystemChatMessage(
+                    message.Message);
+            }
+            else
+            {
+                AddNormalChatMessage(
+                    message.Username,
+                    message.Message,
+                    message.Status);
+            }
+        }
+    }
+
+    private void AddChatLine(string line)
+    {
+        chatLines.Add(line);
+
+        if (chatLines.Count > MaxChatLines)
+            chatLines.RemoveAt(0);
+
+        globalChatText.text =
+            string.Join("\n", chatLines);
+    }
+
+    private void AddNormalChatMessage(
+    string username,
+    string message,
+    string status)
+    {
+        string displayName =
+            string.IsNullOrEmpty(status)
+                ? username
+                : $"{username} ({status})";
+
+        AddChatLine(
+            $"<color=#9D0000>{displayName}:</color> " +
+            $"<color=#000000>{message}</color>");
+    }
+
+    private void AddSystemChatMessage(
+    string message)
+    {
+        AddChatLine(
+            $"<color=#939612>{message}</color>");
+    }
+
+    private void LoadChatHistory()
+    {
+        chatLines.Clear();
+
+        IReadOnlyList<ChatMessage> messages =
+            OnlineManager.Instance.Chat.GetRecentMessages();
+
+        foreach (ChatMessage message in messages)
+        {
+            if (message.IsSystem)
+            {
+                AddSystemChatMessage(
+                    message.Message);
+            }
+            else
+            {
+                AddNormalChatMessage(
+                    message.Username,
+                    message.Message,
+                    message.Status);
+            }
+        }
+    }
+
+    private void OpenChatInput()
+    {
+        if (chatInputOpen)
+            return;
+
+        if (OnlineManager.Instance == null)
+            return;
+
+        if (OnlineManager.Instance.Chat == null)
+            return;
+
+        if (!OnlineManager.Instance.Chat.IsConnected)
+            return;
+
+        if (globalChatInput == null)
+        {
+            Debug.LogError(
+                "GameUIManager: Global Chat Input is not assigned!"
+            );
+
+            return;
+        }
+
+        chatInputOpen = true;
+
+        globalChatInput.gameObject.SetActive(true);
+
+        globalChatInput.text = string.Empty;
+
+        globalChatInput.ActivateInputField();
+        globalChatInput.Select();
+    }
+
+    private void SendChatInput()
+    {
+        if (!chatInputOpen)
+            return;
+
+        if (globalChatInput == null)
+        {
+            Debug.LogError(
+                "GameUIManager: Global Chat Input is not assigned!"
+            );
+
+            return;
+        }
+
+        string message =
+            globalChatInput.text.Trim();
+
+        if (!string.IsNullOrEmpty(message))
+        {
+            if (OnlineManager.Instance != null &&
+                OnlineManager.Instance.Chat != null)
+            {
+                OnlineManager.Instance.Chat
+                    .SendChat(message)
+                    .Forget();
+            }
+        }
+
+        CloseChatInput();
+    }
+
+    private void CancelChatInput()
+    {
+        if (!chatInputOpen)
+            return;
+
+        CloseChatInput();
+    }
+
+    private void CloseChatInput()
+    {
+        chatInputOpen = false;
+
+        if (globalChatInput == null)
+        {
+            Debug.LogError(
+                "GameUIManager: Global Chat Input is not assigned!"
+            );
+
+            return;
+        }
+
+        globalChatInput.text = string.Empty;
+
+        globalChatInput.DeactivateInputField();
+
+        globalChatInput.gameObject.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        if (OnlineManager.Instance == null ||
+            OnlineManager.Instance.Chat == null)
+            return;
+
+        OnlineManager.Instance.Chat.MessageReceived -=
+            OnChatMessageReceived;
+
+        OnlineManager.Instance.Chat.SystemMessageReceived -=
+            OnSystemMessageReceived;
+
+        OnlineManager.Instance.Chat.RecentMessagesReceived -=
+            OnRecentMessagesReceived;
+    }
+
+    private string GetChatUsername(
+        string username)
+    {
+        if (OnlineManager.Instance == null ||
+            OnlineManager.Instance.Chat == null)
+        {
+            return username;
+        }
+
+        IReadOnlyList<OnlinePlayer> players =
+            OnlineManager.Instance.Chat.GetOnlinePlayers();
+
+        foreach (OnlinePlayer player in players)
+        {
+            if (player.Username != username)
+                continue;
+
+            if (string.IsNullOrEmpty(player.Status))
+                return username;
+
+            return $"{username} ({player.Status})";
+        }
+
+        return username;
     }
 }

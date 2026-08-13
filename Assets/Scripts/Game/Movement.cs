@@ -60,6 +60,12 @@ public class Movement : MonoBehaviour
 	public float marbleRadius;
 	private Vector2 inputMovement()
 	{
+		if (GameUIManager.instance != null &&
+			GameUIManager.instance.IsChatInputOpen)
+		{
+			return Vector2.zero;
+		}
+
 		Vector2 movement = fakeInput;
 		if (canSpin && !ReplayRecorder.loadReplay)
         {
@@ -75,6 +81,12 @@ public class Movement : MonoBehaviour
 
 	private bool Jump()
 	{
+		if (GameUIManager.instance != null &&
+			GameUIManager.instance.IsChatInputOpen)
+		{
+			return false;
+		}
+
 		if (!ReplayRecorder.loadReplay)
 			return Input.GetKey(ControlBinding.instance.jump);
 		else

@@ -8,6 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using DG.Tweening;
+using Server;
 
 public class ReplayMenuManager : MonoBehaviour
 {
@@ -50,12 +51,16 @@ public class ReplayMenuManager : MonoBehaviour
     private Replay currentReplay;
     private Button selectedButton;
 
+    LeaderboardsMenu lm;
+
     public void Start()
     {
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
         ReplayRecorder.loadReplay = false;
+        lm = null;
+        lm = GetComponent<LeaderboardsMenu>();
 
         descScrollbar.onValueChanged.AddListener(OnDescScrollbarValueChanged);
         OnDescScrollbarValueChanged(descScrollbar.value);
@@ -65,7 +70,10 @@ public class ReplayMenuManager : MonoBehaviour
 
         homeButton.onClick.AddListener(() => 
         {
-            SceneManager.LoadScene("MainMenu");
+            if (lm != null)
+                lm.CloseReplayMenu();
+            else
+                SceneManager.LoadScene("MainMenu");
         });
 
         playReplayButton.onClick.AddListener(() => 
@@ -155,6 +163,24 @@ public class ReplayMenuManager : MonoBehaviour
         skyboxName = string.IsNullOrEmpty(skyboxName) ? "intermediate_sky" : skyboxName;
         MissionInfo.instance.skybox = Application.CanStreamedLevelBeLoaded(skyboxName) ? skyboxName : "intermediate_sky";
 
+        LeaderboardsMenu.ReplayCenterLoadedFromLeaderboards = false;
+
+        if (lm != null)
+            StartCoroutine(LoadReplayLeaderboard(lm));
+        else
+            SceneManager.LoadScene("Loading");
+    }
+
+    IEnumerator LoadReplayLeaderboard(LeaderboardsMenu lm)
+    {
+        LeaderboardsMenu.ReplayCenterLoadedFromLeaderboards = true;
+
+        JukeboxManager.instance.ForceStop();
+        lm.blackout.SetActive(true);
+
+        lm.ShowLoading("Loading Replay...");
+        yield return new WaitForSecondsRealtime(1f);
+
         SceneManager.LoadScene("Loading");
     }
 
@@ -170,7 +196,8 @@ public class ReplayMenuManager : MonoBehaviour
     {
         selectedButton?.Select();
 
-        if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene("MainMenu");
+        if(lm == null)
+            if (Input.GetKeyDown(KeyCode.Escape)) SceneManager.LoadScene("MainMenu");
     }
 
     public void InitReplayList()

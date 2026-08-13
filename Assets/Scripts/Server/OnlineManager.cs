@@ -75,6 +75,12 @@ namespace Server
             private set;
         }
 
+        public ChatManager Chat
+        {
+            get;
+            private set;
+        }
+
         private ApiClient _apiClient;
 
         private void Awake()
@@ -92,8 +98,13 @@ namespace Server
             InitializeServices();
         }
 
-        public void Shutdown()
+        public async UniTask ShutdownAsync()
         {
+            if (Chat != null)
+                await Chat.Disconnect();
+
+            Auth?.Logout();
+
             Instance = null;
             Destroy(gameObject);
         }
@@ -160,7 +171,12 @@ namespace Server
 
             Integrity =
                 new IntegrityApi(_apiClient);
+
+            Chat =
+                new ChatManager(
+                    serverConfig);
         }
+
 
         public async UniTask ProcessPendingOnlineDataAsync()
         {

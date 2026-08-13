@@ -52,9 +52,6 @@ namespace Server.API
         {
             request.timeout = _config.Timeout;
 
-            Debug.Log(
-                $"Authenticated: {HasToken}");
-
             if (!string.IsNullOrWhiteSpace(Token))
             {
                 request.SetRequestHeader(
@@ -67,9 +64,6 @@ namespace Server.API
     UnityWebRequest request)
         {
             ApplyHeaders(request);
-
-            Debug.Log(
-                $"--> {request.method} {request.url}");
 
             try
             {
@@ -91,8 +85,29 @@ namespace Server.API
                 return;
             }
 
-            Debug.LogError(
-                $"<-- {(int)request.responseCode} {request.error}");
+            if (request.result ==
+                UnityWebRequest.Result.Success)
+            {
+                Debug.Log(
+                    $"<-- {(int)request.responseCode} " +
+                    $"{request.method} success");
+
+                return;
+            }
+
+            if (request.responseCode != 404)
+            {
+                Debug.LogError(
+                    $"<-- {(int)request.responseCode} {request.error}");
+            }
+
+            if (request.responseCode != 0)
+            {
+                ThrowHttpException(request);
+            }
+
+            throw new NetworkException(
+                request.error);
 
             if (request.responseCode != 0)
             {
