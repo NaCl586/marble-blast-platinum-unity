@@ -25,6 +25,8 @@ public class Marble : MonoBehaviour
     public GameObject glowBounce;
 
     public GameObject bounceParticle;
+    [SerializeField] private ParticleSystem trailParticle;
+    [SerializeField] private float trailSpeedThreshold = 10f;
 
     public Movement movement;
     public GameObject normalMesh;
@@ -66,6 +68,22 @@ public class Marble : MonoBehaviour
              GameUIManager.instance.saveReplayMenu.activeSelf))
         {
             return;
+        }
+
+        float speed = movement.marbleVelocity.magnitude;
+
+        if (speed > trailSpeedThreshold)
+        {
+            if (!trailParticle.isPlaying)
+                trailParticle.Play();
+        }
+        else
+        {
+            if (trailParticle.isPlaying)
+                trailParticle.Stop(
+                    true,
+                    ParticleSystemStopBehavior.StopEmitting
+                );
         }
 
         if (Input.GetKeyDown(KeyCode.R) && !GameManager.gameFinish && !ReplayRecorder.loadReplay)

@@ -6,5 +6,6 @@ namespace Server
         public string Message { get; set; } = string.Empty;
         public string Status { get; set; } = string.Empty;
         public bool IsSystem { get; set; }
+        public string Type { get; set; } = "Normal";
     }
 }

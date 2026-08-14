@@ -26,8 +26,10 @@ namespace Server.Score
             _replayUpload = replayUpload;
         }
 
-        public async UniTask SubmitScoreAsync(
-            string level)
+        public async UniTask<SubmitScoreResponse?>
+            SubmitScoreAsync(
+                string level,
+                string levelName)
         {
             if (OnlineManager.Instance == null ||
                 !OnlineManager.Instance.Auth.IsLoggedIn)
@@ -36,7 +38,7 @@ namespace Server.Score
                     "Player is offline. " +
                     "Score will not be submitted.");
 
-                return;
+                return null;
             }
 
             int? userId =
@@ -48,7 +50,7 @@ namespace Server.Score
                     "Cannot submit score. " +
                     "Authenticated UserId is unavailable.");
 
-                return;
+                return null;
             }
 
             string? username =
@@ -60,7 +62,7 @@ namespace Server.Score
                     "Cannot submit score. " +
                     "Username is unavailable.");
 
-                return;
+                return null;
             }
 
             // Get the actual time from the replay.
@@ -94,6 +96,7 @@ namespace Server.Score
                         new SubmitScoreRequest
                         {
                             Level = level,
+                            LevelName = levelName,
                             TimeMs = replayTimeMs
                         });
 
@@ -102,7 +105,8 @@ namespace Server.Score
                     $"ScoreId={response.ScoreId}, " +
                     $"PB={response.IsNewPersonalBest}, " +
                     $"WR={response.IsWorldRecord}, " +
-                    $"Time={response.TimeMs}");
+                    $"Time={response.TimeMs}, " +
+                    $"Rating={response.Rating}");
 
                 if (response.IsWorldRecord)
                 {
@@ -116,6 +120,8 @@ namespace Server.Score
                 {
                     DeleteReplay(replayFileName);
                 }
+
+                return response;
             }
             catch (Exception ex)
             {
@@ -131,11 +137,13 @@ namespace Server.Score
                     {
                         UserId = userId.Value,
                         Level = level,
+                        LevelName = levelName,
                         ReplayFileName = replayFileName,
                         RetryCount = 0
                     };
 
-                _scoreUpload.QueueScore(pendingScore);
+                _scoreUpload.QueueScore(
+                    pendingScore);
 
                 Debug.Log(
                     $"Pending score queued. " +
@@ -143,6 +151,11 @@ namespace Server.Score
                     $"Replay={pendingScore.ReplayFileName}");
 
                 Debug.LogException(ex);
+
+                // The score was not submitted now.
+                // Therefore there is no server rating
+                // available for the current level-complete screen.
+                return null;
             }
         }
 

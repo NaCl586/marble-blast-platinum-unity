@@ -85,29 +85,11 @@ namespace Server.API
                 return;
             }
 
-            if (request.result ==
-                UnityWebRequest.Result.Success)
-            {
-                Debug.Log(
-                    $"<-- {(int)request.responseCode} " +
-                    $"{request.method} success");
-
-                return;
-            }
-
             if (request.responseCode != 404)
             {
                 Debug.LogError(
                     $"<-- {(int)request.responseCode} {request.error}");
             }
-
-            if (request.responseCode != 0)
-            {
-                ThrowHttpException(request);
-            }
-
-            throw new NetworkException(
-                request.error);
 
             if (request.responseCode != 0)
             {

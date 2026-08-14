@@ -91,6 +91,7 @@ namespace Server.Score
                             new SubmitScoreRequest
                             {
                                 Level = score.Level,
+                                LevelName = score.LevelName,
                                 TimeMs = replayTimeMs
                             });
 

@@ -86,100 +86,219 @@ public class AchievementManager : MonoBehaviour
 
         await LoadUserLeaderboardData();
 
+        // =========================================================
+        // ACHIEVEMENTS UNLOCKED
+        // =========================================================
+
+        List<int> unlockedAchievementIds =
+            new List<int>();
+
         // 1. Find any Easter Egg.
-        int totalEasterEgg = PlayerPrefs.GetInt("EasterEggCollected", 0);
+        int totalEasterEgg =
+            PlayerPrefs.GetInt(
+                "EasterEggCollected",
+                0);
 
         if (totalEasterEgg >= 1)
-            achievImage[0].sprite = achievSprite[0];
+        {
+            achievImage[0].sprite =
+                achievSprite[0];
+
+            unlockedAchievementIds.Add(1);
+        }
 
         // 2. Find all Easter Eggs.
         const int totalEasterEggs = 120;
 
         if (totalEasterEgg >= totalEasterEggs)
-            achievImage[1].sprite = achievSprite[1];
+        {
+            achievImage[1].sprite =
+                achievSprite[1];
+
+            unlockedAchievementIds.Add(2);
+        }
 
         // 3. Beat any level with a specified par time.
         if (HasAnySpecifiedParTime())
-            achievImage[2].sprite = achievSprite[2];
+        {
+            achievImage[2].sprite =
+                achievSprite[2];
+
+            unlockedAchievementIds.Add(3);
+        }
 
         // 4. Learn the Time Modifier < 1.75 seconds.
         if (HasTime("Learn the Time Modifier", 1.75f))
-            achievImage[3].sprite = achievSprite[3];
+        {
+            achievImage[3].sprite =
+                achievSprite[3];
+
+            unlockedAchievementIds.Add(4);
+        }
 
         // 5. Arch Acropolis < 7 seconds.
         if (HasTime("Arch Acropolis", 7f))
-            achievImage[4].sprite = achievSprite[4];
+        {
+            achievImage[4].sprite =
+                achievSprite[4];
+
+            unlockedAchievementIds.Add(5);
+        }
 
         // 6. King of the Mountain < 9 seconds.
         if (HasTime("King of the Mountain", 9f))
-            achievImage[5].sprite = achievSprite[5];
+        {
+            achievImage[5].sprite =
+                achievSprite[5];
+
+            unlockedAchievementIds.Add(6);
+        }
 
         // 7. Pinball Wizard < 10 seconds.
         if (HasTime("Pinball Wizard", 10f))
-            achievImage[6].sprite = achievSprite[6];
+        {
+            achievImage[6].sprite =
+                achievSprite[6];
+
+            unlockedAchievementIds.Add(7);
+        }
 
         // 8. Ramps Reloaded < 15 seconds.
         if (HasTime("Ramps Reloaded", 15f))
-            achievImage[7].sprite = achievSprite[7];
+        {
+            achievImage[7].sprite =
+                achievSprite[7];
+
+            unlockedAchievementIds.Add(8);
+        }
 
         // 9. Dive! < 17 seconds.
         if (HasTime("Dive!", 17f))
-            achievImage[8].sprite = achievSprite[8];
+        {
+            achievImage[8].sprite =
+                achievSprite[8];
+
+            unlockedAchievementIds.Add(9);
+        }
 
         // 10. Acrobat < 18 seconds.
         if (HasTime("Acrobat", 18f))
-            achievImage[9].sprite = achievSprite[9];
+        {
+            achievImage[9].sprite =
+                achievSprite[9];
+
+            unlockedAchievementIds.Add(10);
+        }
 
         // 11. Icarus < 20 seconds.
         if (HasTime("Icarus", 20f))
-            achievImage[10].sprite = achievSprite[10];
+        {
+            achievImage[10].sprite =
+                achievSprite[10];
+
+            unlockedAchievementIds.Add(11);
+        }
 
         // 12. Airwalk < 25 seconds.
         if (HasTime("Airwalk", 25f))
-            achievImage[11].sprite = achievSprite[11];
+        {
+            achievImage[11].sprite =
+                achievSprite[11];
+
+            unlockedAchievementIds.Add(12);
+        }
 
         // 13. Pathways < 30 seconds.
         if (HasTime("Pathways", 30f))
-            achievImage[12].sprite = achievSprite[12];
+        {
+            achievImage[12].sprite =
+                achievSprite[12];
+
+            unlockedAchievementIds.Add(13);
+        }
 
         // 14. Siege < 40 seconds.
         if (HasTime("Siege", 40f))
-            achievImage[13].sprite = achievSprite[13];
+        {
+            achievImage[13].sprite =
+                achievSprite[13];
+
+            unlockedAchievementIds.Add(14);
+        }
 
         // 15. Tightrope's gold time.
         if (HasBeatenGoldTime("Tightrope"))
-            achievImage[14].sprite = achievSprite[14];
+        {
+            achievImage[14].sprite =
+                achievSprite[14];
+
+            unlockedAchievementIds.Add(15);
+        }
 
         // 16. Combo Course < 60 seconds.
         if (HasTime("Combo Course", 60f))
-            achievImage[15].sprite = achievSprite[15];
+        {
+            achievImage[15].sprite =
+                achievSprite[15];
+
+            unlockedAchievementIds.Add(16);
+        }
 
         // 17. Thief < 60 seconds.
         if (HasTime("Thief", 60f))
-            achievImage[16].sprite = achievSprite[16];
+        {
+            achievImage[16].sprite =
+                achievSprite[16];
+
+            unlockedAchievementIds.Add(17);
+        }
 
         // 18. Space Station's Ultimate Time.
         if (HasBeatenUltimateTime("Space Station"))
-            achievImage[17].sprite = achievSprite[17];
+        {
+            achievImage[17].sprite =
+                achievSprite[17];
+
+            unlockedAchievementIds.Add(18);
+        }
 
         // 19. Battlecube Finale's Ultimate Time.
         if (HasBeatenUltimateTime("Battlecube Finale"))
-            achievImage[18].sprite = achievSprite[18];
+        {
+            achievImage[18].sprite =
+                achievSprite[18];
+
+            unlockedAchievementIds.Add(19);
+        }
 
         // 20. Battlecube Finale < 8:30 = 510 seconds.
         if (HasTime("Battlecube Finale", 510f))
-            achievImage[19].sprite = achievSprite[19];
-
-        // 21. Catwalks Ultimate + Slowropes Ultimate.
-        if (HasBeatenUltimateTime("Catwalks") && HasBeatenUltimateTime("Slowropes"))
         {
-            achievImage[20].sprite = achievSprite[20];
+            achievImage[19].sprite =
+                achievSprite[19];
+
+            unlockedAchievementIds.Add(20);
         }
 
-        // 22. Learn the Super Jump < 3.50 AND There and Back Again < 10.00.
-        if (HasTime("Learn the Super Jump", 3.50f) && HasTime("There and Back Again", 10f))
+        // 21. Catwalks Ultimate + Slowropes Ultimate.
+        if (HasBeatenUltimateTime("Catwalks") &&
+            HasBeatenUltimateTime("Slowropes"))
         {
-            achievImage[21].sprite = achievSprite[21];
+            achievImage[20].sprite =
+                achievSprite[20];
+
+            unlockedAchievementIds.Add(21);
+        }
+
+        // 22. Learn the Super Jump < 3.50 AND
+        // There and Back Again < 10.00.
+        if (HasTime("Learn the Super Jump", 3.50f) &&
+            HasTime("There and Back Again", 10f))
+        {
+            achievImage[21].sprite =
+                achievSprite[21];
+
+            unlockedAchievementIds.Add(22);
         }
 
         // 23. All three times required.
@@ -187,7 +306,10 @@ public class AchievementManager : MonoBehaviour
             HasTime("Monster Speedway Qualifying", 20f) &&
             HasTime("Monster Speedway", 15f))
         {
-            achievImage[22].sprite = achievSprite[22];
+            achievImage[22].sprite =
+                achievSprite[22];
+
+            unlockedAchievementIds.Add(23);
         }
 
         // 24. All four times required.
@@ -196,25 +318,146 @@ public class AchievementManager : MonoBehaviour
             HasTime("Daedalus", 15f) &&
             HasTime("Tango", 14f))
         {
-            achievImage[23].sprite = achievSprite[23];
+            achievImage[23].sprite =
+                achievSprite[23];
+
+            unlockedAchievementIds.Add(24);
         }
 
         // 25. ANY TWO of the six required times.
         int achievement25Count = 0;
 
-        if (HasTime("Skyscraper", 60f)) achievement25Count++;
-        if (HasTime("Survival of the Fittest", 30f)) achievement25Count++;
-        if (HasTime("Great Divide Revisited", 30f)) achievement25Count++;
-        if (HasTime("Tower Maze", 20f)) achievement25Count++;
-        if (HasTime("Battlements", 17f)) achievement25Count++;
-        if (HasTime("Natural Selection", 20f)) achievement25Count++;
+        if (HasTime("Skyscraper", 60f))
+            achievement25Count++;
+
+        if (HasTime("Survival of the Fittest", 30f))
+            achievement25Count++;
+
+        if (HasTime("Great Divide Revisited", 30f))
+            achievement25Count++;
+
+        if (HasTime("Tower Maze", 20f))
+            achievement25Count++;
+
+        if (HasTime("Battlements", 17f))
+            achievement25Count++;
+
+        if (HasTime("Natural Selection", 20f))
+            achievement25Count++;
 
         if (achievement25Count >= 2)
-            achievImage[24].sprite = achievSprite[24];
+        {
+            achievImage[24].sprite =
+                achievSprite[24];
+
+            unlockedAchievementIds.Add(25);
+        }
 
         // 26. First place on any leaderboard.
         if (HasFirstPlaceOnAnyLeaderboard())
-            achievImage[25].sprite = achievSprite[25];
+        {
+            achievImage[25].sprite =
+                achievSprite[25];
+
+            unlockedAchievementIds.Add(26);
+        }
+
+        // =========================================================
+        // RATING-BASED ACHIEVEMENTS
+        //
+        // These achievements have 0 rating value and therefore
+        // are NOT sent to the achievement rating sync.
+        // =========================================================
+
+        GlobalRatingResponse? myRating = null;
+
+        if (OnlineManager.Instance != null &&
+            OnlineManager.Instance.Auth != null &&
+            OnlineManager.Instance.Auth.IsLoggedIn &&
+            OnlineManager.Instance.Rating != null)
+        {
+            try
+            {
+                myRating =
+                    await OnlineManager.Instance.Rating
+                        .GetMyRatingAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning(
+                    "Failed to load player rating " +
+                    "for rating-based achievements.");
+
+                Debug.LogException(ex);
+            }
+        }
+
+        // 27. Reach 7 million points on your ranking for the MBG Leaderboards.
+        if (myRating != null &&
+            myRating.MbgRating >= 7_000_000)
+        {
+            achievImage[26].sprite =
+                achievSprite[26];
+        }
+
+        // 28. Reach 12 million points on your ranking for the MBP Leaderboards.
+        if (myRating != null &&
+            myRating.MbpRating >= 12_000_000)
+        {
+            achievImage[27].sprite =
+                achievSprite[27];
+        }
+
+        // 29. Achieve 30 million points on your username
+        //     from the total of all leaderboards.
+        if (myRating != null &&
+            myRating.GlobalRating >= 30_000_000)
+        {
+            achievImage[28].sprite =
+                achievSprite[28];
+        }
+
+        // 30. Achieve 75 million points on your username
+        //     from the total of all leaderboards.
+        if (myRating != null &&
+            myRating.GlobalRating >= 75_000_000)
+        {
+            achievImage[29].sprite =
+                achievSprite[29];
+        }
+
+        // =========================================================
+        // SEND ACHIEVEMENT IDS TO SERVER
+        // =========================================================
+
+        Debug.Log(
+            $"Unlocked achievements: " +
+            $"{string.Join(", ", unlockedAchievementIds)}");
+
+        if (OnlineManager.Instance != null &&
+            OnlineManager.Instance.Auth != null &&
+            OnlineManager.Instance.Auth.IsLoggedIn &&
+            OnlineManager.Instance.Rating != null)
+        {
+            try
+            {
+                SyncAchievementsResponse response =
+                await OnlineManager.Instance.Rating
+                    .SyncAchievementsAsync(
+                        unlockedAchievementIds);
+
+                Debug.Log(
+                    $"Achievement Rating: " +
+                    $"{response.AchievementRating}");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning(
+                    "Failed to sync achievements with server.");
+
+                Debug.LogException(ex);
+            }
+        }
 
         loadingText.SetActive(false);
         ShowCurrentPage();

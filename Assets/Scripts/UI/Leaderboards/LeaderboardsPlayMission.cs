@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using Cysharp.Threading.Tasks;
 using Server;
+using Server.DTOs.Requests;
 using Server.DTOs.Responses;
 using Server.Replay;
 using TMPro;
@@ -16,6 +17,7 @@ public class LeaderboardsPlayMission : PlayMissionManager
     [Header("Leaderboard UI References")]
     public TextMeshProUGUI globalRecordsNameText;
     public TextMeshProUGUI globalRecordsTimesText;
+    public TextMeshProUGUI globalRecordsRatingText;
     public TextMeshProUGUI personalRecordsText;
     public TextMeshProUGUI gameName;
     public Button watchReplay;
@@ -109,7 +111,7 @@ public class LeaderboardsPlayMission : PlayMissionManager
         currentLeaderboardPage = 1;
         totalLeaderboardPages = 1;
 
-        UpdatePersonalRecords();
+        UpdatePersonalRecordsAsync();
 
         ShowLeaderboardRequestingData();
 
@@ -120,7 +122,7 @@ public class LeaderboardsPlayMission : PlayMissionManager
     }
 
     private async void UpdateGlobalRecordsFromDatabase(
-        int requestId)
+    int requestId)
     {
         leaderboardLoading = true;
 
@@ -156,7 +158,7 @@ public class LeaderboardsPlayMission : PlayMissionManager
             Debug.Log(
                 $"Requesting leaderboard for: {level}");
 
-            var response =
+            LeaderboardResponse response =
                 await OnlineManager.Instance
                     .Leaderboard
                     .GetLeaderboardAsync(
@@ -164,8 +166,10 @@ public class LeaderboardsPlayMission : PlayMissionManager
                         currentLeaderboardPage,
                         10);
 
-            // A newer level has already been selected.
-            // Ignore this old request.
+            // =====================================================
+            // Ignore an outdated request.
+            // =====================================================
+
             if (requestId != leaderboardRequestId)
             {
                 Debug.Log(
@@ -188,11 +192,22 @@ public class LeaderboardsPlayMission : PlayMissionManager
                     1,
                     response.TotalPages);
 
+            // =====================================================
+            // Build UI text
+            // =====================================================
+
             string namesText =
                 "  \tPLAYER\n";
 
             string timesText =
                 "TIME\n";
+
+            string ratingsText =
+                "RATING\n";
+
+            // =====================================================
+            // Process scores
+            // =====================================================
 
             foreach (ScoreResponse score
                 in response.Scores)
@@ -200,7 +215,10 @@ public class LeaderboardsPlayMission : PlayMissionManager
                 if (score == null)
                     continue;
 
-                // Save first place information.
+                // -------------------------------------------------
+                // Save first-place information for replay viewing.
+                // -------------------------------------------------
+
                 if (firstPlaceScoreId <= 0 &&
                     score.Rank == 1)
                 {
@@ -214,28 +232,56 @@ public class LeaderboardsPlayMission : PlayMissionManager
                         score.TimeMs;
                 }
 
-                bool isGold =
-                    score.TimeMs <
-                    MissionInfo.instance.goldTime;
-
-                bool isUltimate =
-                    score.TimeMs <
-                    MissionInfo.instance.ultimateTime;
+                // -------------------------------------------------
+                // Time formatting
+                // -------------------------------------------------
 
                 float time =
                     score.TimeMs;
+
+                bool isGold =
+                    time <
+                    MissionInfo.instance.goldTime;
+
+                bool isUltimate =
+                    time <
+                    MissionInfo.instance.ultimateTime;
+
+                string formattedTime =
+                    FormatRecordTime(
+                        time,
+                        isGold,
+                        isUltimate);
+
+                if (formattedTime == "Empty")
+                    formattedTime = string.Empty;
+
+                // -------------------------------------------------
+                // Player
+                // -------------------------------------------------
 
                 namesText +=
                     $"{score.Rank}. " +
                     $"{score.PlayerName}\n";
 
+                // -------------------------------------------------
+                // Time
+                // -------------------------------------------------
+
                 timesText +=
-                    FormatRecordTime(
-                        time,
-                        isGold,
-                        isUltimate) +
-                    "\n";
+                    $"{formattedTime}\n";
+
+                // -------------------------------------------------
+                // Rating
+                // -------------------------------------------------
+
+                ratingsText +=
+                    $"{score.Rating:N0}\n";
             }
+
+            // =====================================================
+            // Update UI
+            // =====================================================
 
             if (globalRecordsNameText != null)
             {
@@ -247,6 +293,12 @@ public class LeaderboardsPlayMission : PlayMissionManager
             {
                 globalRecordsTimesText.text =
                     timesText;
+            }
+
+            if (globalRecordsRatingText != null)
+            {
+                globalRecordsRatingText.text =
+                    ratingsText;
             }
 
             Debug.Log(
@@ -287,7 +339,7 @@ public class LeaderboardsPlayMission : PlayMissionManager
                 leaderboardLoading = false;
 
                 HideLeaderboardRequestingData();
-
+                UpdatePageButtons();
                 SetWatchReplayButton();
             }
         }
@@ -351,23 +403,152 @@ public class LeaderboardsPlayMission : PlayMissionManager
     // PERSONAL RECORDS
     // ============================================================
 
-    private void UpdatePersonalRecords()
+    private async void UpdatePersonalRecordsAsync()
     {
-        string personalText = "  \tTIME\n";
+        List<int> timesMs =
+            new List<int>();
+
+        // =========================================================
+        // Read personal records from PlayerPrefs
+        // =========================================================
 
         for (int i = 0; i < 10; i++)
         {
-            float time = PlayerPrefs.GetFloat($"{MissionInfo.instance.levelName}_Time_{i}", -1);
+            float time =
+                PlayerPrefs.GetFloat(
+                    $"{MissionInfo.instance.levelName}_Time_{i}",
+                    -1);
 
-            bool isGold = time != -1 && time < MissionInfo.instance.goldTime;
-            bool isUltimate = time != -1 && time < MissionInfo.instance.ultimateTime;
+            int timeMs =
+                time < 0
+                    ? -1
+                    : Mathf.RoundToInt(time);
 
-            personalText += $"{i + 1}.\t{FormatRecordTime(time, isGold, isUltimate)}\n";
+            timesMs.Add(timeMs);
+        }
+
+        try
+        {
+            // =====================================================
+            // Request ratings from server
+            // =====================================================
+
+            if (OnlineManager.Instance == null ||
+                OnlineManager.Instance.Auth == null ||
+                !OnlineManager.Instance.Auth.IsLoggedIn)
+            {
+                BuildPersonalRecordsText(
+                    timesMs,
+                    null);
+
+                return;
+            }
+
+            string level =
+                Path.ChangeExtension(
+                    MissionInfo.instance.MissionPath,
+                    null);
+
+            CalculateRatingsResponse response =
+                await OnlineManager.Instance.Rating
+                    .CalculateRatingsAsync(
+                        new CalculateRatingsRequest
+                        {
+                            Level = level,
+                            TimesMs = timesMs
+                        });
+
+            if (response == null ||
+                response.Ratings == null)
+            {
+                Debug.LogWarning(
+                    "Rating response was empty.");
+
+                BuildPersonalRecordsText(
+                    timesMs,
+                    null);
+
+                return;
+            }
+
+            BuildPersonalRecordsText(
+                timesMs,
+                response.Ratings);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogError(
+                "Failed to calculate personal ratings.");
+
+            Debug.LogException(ex);
+
+            // Still show the personal times even if the
+            // rating request fails.
+            BuildPersonalRecordsText(
+                timesMs,
+                null);
+        }
+    }
+
+    private void BuildPersonalRecordsText(
+    List<int> timesMs,
+    List<int?> ratings)
+    {
+        string personalText =
+            "  \tTIME\t\tRATING\n";
+
+        for (int i = 0;
+             i < timesMs.Count;
+             i++)
+        {
+            int timeMs =
+                timesMs[i];
+
+            if (timeMs < 0)
+            {
+                personalText +=
+                    $"{i + 1}.\tEmpty\t-\n";
+
+                continue;
+            }
+
+            float time =
+                timeMs;
+
+            bool isGold =
+                time < MissionInfo.instance.goldTime;
+
+            bool isUltimate =
+                time < MissionInfo.instance.ultimateTime;
+
+            string formattedTime =
+                FormatRecordTime(
+                    time,
+                    isGold,
+                    isUltimate);
+
+            string ratingText = string.Empty;
+
+            if (ratings != null &&
+                i < ratings.Count &&
+                ratings[i].HasValue)
+            {
+                ratingText =
+                    ratings[i]
+                        .Value
+                        .ToString("N0");
+            }
+
+            personalText +=
+                $"{i + 1}.\t" +
+                $"{formattedTime}\t" +
+                $"{ratingText}\n";
         }
 
         if (personalRecordsText != null)
         {
-            personalRecordsText.text = personalText;
+            personalRecordsText.text =
+                personalText;
         }
     }
 
@@ -379,12 +560,20 @@ public class LeaderboardsPlayMission : PlayMissionManager
     {
         if (globalRecordsNameText != null)
         {
-            globalRecordsNameText.text = "  \tPLAYER\n";
+            globalRecordsNameText.text =
+                "  \tPLAYER\n";
         }
 
         if (globalRecordsTimesText != null)
         {
-            globalRecordsTimesText.text = "TIME\n";
+            globalRecordsTimesText.text =
+                "TIME\n";
+        }
+
+        if (globalRecordsRatingText != null)
+        {
+            globalRecordsRatingText.text =
+                "RATING\n";
         }
     }
 
@@ -684,50 +873,77 @@ public class LeaderboardsPlayMission : PlayMissionManager
     // FORMAT TIME
     // ============================================================
 
-    private string FormatRecordTime(float time, bool isGold, bool isUltimate)
+    private string FormatRecordTime(
+    float time,
+    bool isGold,
+    bool isUltimate)
     {
-        if (time == -1)
+        if (time < 0)
             return "Empty";
 
-        string formattedTime = Utils.FormatTime(time);
+        string formattedTime =
+            Utils.FormatTime(time);
 
-        if (selectedGame == Game.gold)
+        // =========================================================
+        // ULTIMATE
+        // =========================================================
+
+        if (isUltimate)
         {
-            if (currentlySelectedType == Type.custom)
-            {
-                if (isUltimate)
-                {
-                    return $"<color=#FFCC33>{formattedTime}</color>";
-                }
+            return
+                $"<color=#FFCC33>" +
+                $"{formattedTime}" +
+                $"</color>";
+        }
 
-                if (isGold)
-                {
-                    return $"<color=#CCCCCC>{formattedTime}</color>";
-                }
+        // =========================================================
+        // PLATINUM
+        // =========================================================
 
-                return formattedTime;
-            }
-
+        if (selectedGame == Game.platinum)
+        {
+            // In Platinum, "goldTime" internally represents
+            // the Platinum time and is displayed in gray.
             if (isGold)
             {
-                return $"<color=#FFEE11>{formattedTime}</color>";
+                return
+                    $"<color=#CCCCCC>" +
+                    $"{formattedTime}" +
+                    $"</color>";
             }
 
             return formattedTime;
         }
 
-        if (selectedGame == Game.platinum)
+        // =========================================================
+        // GOLD
+        // =========================================================
+
+        if (selectedGame == Game.gold)
         {
-            if (isUltimate)
+            // Gold custom missions display Gold time in gray.
+            if (currentlySelectedType == Type.custom &&
+                isGold)
             {
-                return $"<color=#FFCC33>{formattedTime}</color>";
+                return
+                    $"<color=#CCCCCC>" +
+                    $"{formattedTime}" +
+                    $"</color>";
             }
 
+            // Normal Gold missions display Gold time in yellow.
             if (isGold)
             {
-                return $"<color=#CCCCCC>{formattedTime}</color>";
+                return
+                    $"<color=#FFEE11>" +
+                    $"{formattedTime}" +
+                    $"</color>";
             }
         }
+
+        // =========================================================
+        // NORMAL
+        // =========================================================
 
         return formattedTime;
     }

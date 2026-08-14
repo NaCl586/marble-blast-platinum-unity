@@ -115,6 +115,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] Button restartButton;
     [SerializeField] Button okayButton;
     [SerializeField] TMP_InputField nameInputField;
+    [SerializeField] GameObject ratingGameObject;
+    [SerializeField] TextMeshProUGUI ratingText;
 
     public Transform activeCheckpoint;
     public Vector3 activeCheckpointGravityDir;
@@ -170,6 +172,7 @@ public class GameManager : MonoBehaviour
 
     Coroutine alarmCoroutine;
     bool isSubmitInProgress = false;
+    private int? serverRating;
 
     void Start()
     {
@@ -324,7 +327,7 @@ public class GameManager : MonoBehaviour
         }
 
         //Handle Time travel timer
-        if (timeTravelActive && !gameFinish)
+        if (timeTravelActive && (!gameFinish || !gameStart))
         {
             float elapsed = Time.time - timeTravelStartTime;
             float remainingTime = timeTravelBonus - elapsed;
@@ -623,6 +626,7 @@ public class GameManager : MonoBehaviour
         startTimer = false;
         UpdateGem(0);
         elapsedTime = bonusTime = 0;
+        serverRating = null;
 
         foreach (Gem gem in gems)
             gem.gameObject.SetActive(true);
@@ -749,7 +753,8 @@ public class GameManager : MonoBehaviour
         replayButton.interactable = false;
         continueButton.interactable = false;
 
-        GameUIManager.instance.SetLBStatus("Submitting your score to Leaderboards...");
+        GameUIManager.instance.SetLBStatus(
+            "Submitting your score to Leaderboards...");
 
         string level =
             Path.ChangeExtension(
@@ -758,25 +763,53 @@ public class GameManager : MonoBehaviour
 
         try
         {
-            await OnlineManager.Instance.OnlineScore
-                .SubmitScoreAsync(
-                    level);
+            SubmitScoreResponse? response =
+                await OnlineManager.Instance.OnlineScore
+                    .SubmitScoreAsync(
+                        level,
+                        MissionInfo.instance.levelName);
+
+            if (response != null)
+            {
+                serverRating =
+                    response.Rating;
+
+                Debug.Log(
+                    $"Server rating received: " +
+                    $"{response.Rating}");
+
+                if (finishMenu.activeSelf)
+                {
+                    ratingText.text =
+                        response.Rating.ToString("N0");
+                }
+            }
+            else
+            {
+                serverRating = null;
+            }
 
             replayButton.interactable = true;
             continueButton.interactable = true;
 
-            GameUIManager.instance.SetLBStatus("Information sent successfully.");
+            GameUIManager.instance.SetLBStatus(
+                "Information sent successfully.");
 
             isSubmitInProgress = false;
         }
-        catch
+        catch (System.Exception ex)
         {
+            serverRating = null;
+
             replayButton.interactable = true;
             continueButton.interactable = true;
 
-            GameUIManager.instance.SetLBStatus("There was an error submitting the information.");
+            GameUIManager.instance.SetLBStatus(
+                "There was an error submitting the information.");
 
             isSubmitInProgress = false;
+
+            Debug.LogException(ex);
         }
     }
 
@@ -886,6 +919,22 @@ public class GameManager : MonoBehaviour
                          elapsedTime >= MissionInfo.instance.time);
 
         finalTime.text = Utils.FormatTime(elapsedTime);
+
+        if (OnlineManager.Instance != null &&
+            OnlineManager.Instance.Auth.IsLoggedIn && 
+            !ReplayRecorder.loadReplay)
+        {
+            ratingGameObject.SetActive(true);
+
+            ratingText.text =
+                serverRating.HasValue
+                    ? serverRating.Value.ToString("N0")
+                    : "-";
+        }
+        else
+        {
+            ratingGameObject.SetActive(false);
+        }
 
         // Determine where this time would be placed in the TOP 10.
         int pos = DeterminePosition(elapsedTime);

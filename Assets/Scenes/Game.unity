@@ -372,6 +372,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetAspect: 1.7777778
+--- !u!114 &1387622902 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8892408889752474120, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+    type: 3}
+  m_PrefabInstance: {fileID: 178892578877145493}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1387622903 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7943674398044441986, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+    type: 3}
+  m_PrefabInstance: {fileID: 178892578877145493}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1466247737
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,6 +456,8 @@ MonoBehaviour:
   restartButton: {fileID: 2617693736340851840}
   okayButton: {fileID: 2617693737883535015}
   nameInputField: {fileID: 2617693737463561565}
+  ratingGameObject: {fileID: 1387622903}
+  ratingText: {fileID: 1387622902}
   activeCheckpoint: {fileID: 0}
   activeCheckpointGravityDir: {x: 0, y: 0, z: 0}
   recentGems: []

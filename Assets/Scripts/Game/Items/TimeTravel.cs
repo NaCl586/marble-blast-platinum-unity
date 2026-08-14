@@ -14,6 +14,32 @@ public class TimeTravel : Powerups
         bottomTextMsg = "You picked up a " + timeBonus.ToString("0.###") + " second Time Modifier Bonus!";
     }
 
+    public override void PickupItem()
+    {
+        if (isActive)
+        {
+            if (autoUse)
+            {
+                UsePowerup();
+            }
+            else
+            {
+                GameManager.instance.activePowerup = powerupType;
+                GameUIManager.instance.SetPowerupIcon(powerupType);
+            }
+
+            Deactivate();
+
+            if (showHelpOnPickup)
+                GameUIManager.instance.SetCenterText("Press the <func:bind mouseFire> to use the " + powerupName);
+
+            if (timeBonus >= 0)
+                GameUIManager.instance.DisplayTimeTravelMessage(timeBonus, 1);
+            else
+                GameUIManager.instance.DisplayTimePenaltyMessage(timeBonus, -1);
+        }
+    }
+
     protected override void UsePowerup()
     {
         Marble.instance.ActivateTimeTravel(timeBonus);

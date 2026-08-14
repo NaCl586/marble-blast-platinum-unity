@@ -16,11 +16,15 @@ public class LeaderboardsMenu : MonoBehaviour
     public Button logout;
     public Button play;
     public Button replay;
+    public Button total;
+    public Button general;
 
     [Header("Windows")]
     public GameObject playMissionWindow;
     public GameObject replayWindow;
     public GameObject raycastBlocker;
+    public GameObject totalWindow;
+    public GameObject generalWindow;
 
     [Header("Menu")]
     public GameObject gameWindow;
@@ -91,6 +95,9 @@ public class LeaderboardsMenu : MonoBehaviour
 
             OnlineManager.Instance.Chat.SystemMessageReceived -=
                 OnSystemMessageReceived;
+
+            OnlineManager.Instance.Chat.WorldRecordReceived -=
+                OnWorldRecordReceived;
         }
     }
 
@@ -148,6 +155,14 @@ public class LeaderboardsMenu : MonoBehaviour
         play.onClick.AddListener(OnPlayClicked);
         logout.onClick.AddListener(OnLogoutClicked);
         replay.onClick.AddListener(OnReplayClicked);
+        total.onClick.AddListener(() => {
+            GetComponent<RatingViewManager>().ShowTotal();
+            raycastBlocker.SetActive(true);
+        });
+        general.onClick.AddListener(() => {
+            GetComponent<RatingViewManager>().ShowGeneral();
+            raycastBlocker.SetActive(true);
+        });
 
         yahooButton.onClick.AddListener(OnCloseErrorClicked);
 
@@ -177,6 +192,9 @@ public class LeaderboardsMenu : MonoBehaviour
 
             OnlineManager.Instance.Chat.SystemMessageReceived +=
                 OnSystemMessageReceived;
+
+            OnlineManager.Instance.Chat.WorldRecordReceived +=
+                OnWorldRecordReceived;
 
             RefreshOnlinePlayers();
             RefreshChatHistory();
@@ -615,6 +633,18 @@ public class LeaderboardsMenu : MonoBehaviour
         RefreshChatTextSize().Forget();
     }
 
+    private void OnWorldRecordReceived(
+    string message)
+    {
+        if (globalChatText == null)
+            return;
+
+        globalChatText.text +=
+            $"<color=#006400>{message}</color>\n";
+
+        RefreshChatTextSize().Forget();
+    }
+
     private async UniTask RefreshOnlinePlayerSize()
     {
         await UniTask.Yield();
@@ -667,7 +697,12 @@ public class LeaderboardsMenu : MonoBehaviour
 
         foreach (ChatMessage message in messages)
         {
-            if (message.IsSystem)
+            if (message.Type == "WorldRecord")
+            {
+                globalChatText.text +=
+                    $"<color=#006400>{message.Message}</color>\n";
+            }
+            else if (message.IsSystem)
             {
                 globalChatText.text +=
                     $"<color=#939612>{message.Message}</color>\n";

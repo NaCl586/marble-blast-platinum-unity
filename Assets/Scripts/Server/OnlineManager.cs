@@ -81,6 +81,12 @@ namespace Server
             private set;
         }
 
+        public RatingApi Rating
+        {
+            get;
+            private set;
+        }
+
         private ApiClient _apiClient;
 
         private void Awake()
@@ -175,6 +181,9 @@ namespace Server
             Chat =
                 new ChatManager(
                     serverConfig);
+
+            Rating =
+                new RatingApi(_apiClient);
         }
 
 

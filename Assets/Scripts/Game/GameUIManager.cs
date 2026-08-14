@@ -25,10 +25,6 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] Sprite[] numbersGreen;
     [SerializeField] Sprite[] numbersRed;
     [SerializeField] Image[] timerNumbers;
-    [SerializeField] GameObject timeTravelTimer;
-    [SerializeField] Image[] timeTravelNumbers;
-    [SerializeField] GameObject[] timeTravelSecTenth;
-    [SerializeField] GameObject[] timeTravelSecHundreth;
     [SerializeField] TextMeshProUGUI centerText;
     [SerializeField] TextMeshProUGUI bottomText;
     [SerializeField] TextMeshProUGUI fpsText;
@@ -38,8 +34,25 @@ public class GameUIManager : MonoBehaviour
     [SerializeField] Image[] currentGem;
     [SerializeField] GameObject gemCountUI;
     [SerializeField] GameObject recordingIcon;
-    [SerializeField] private RectTransform bottomText_offline;
-    [SerializeField] private RectTransform bottomText_online;
+    [SerializeField] RectTransform bottomText_offline;
+    [SerializeField] RectTransform bottomText_online;
+
+    [Space]
+
+    [SerializeField] RectTransform pickupPopupContainer;
+    [SerializeField] TextMeshProUGUI pickupPopupPrefab;
+    [SerializeField] GameObject timeTravelTimer;
+    [SerializeField] Image[] timeTravelNumbers;
+    [SerializeField] GameObject[] timeTravelSecTenth;
+    [SerializeField] GameObject[] timeTravelSecHundreth;
+    private static readonly Color TimeTravelMessageColor =
+    new Color32(153, 255, 153, 255); // #99FF99
+
+    private static readonly Color TimeTravelZeroMessageColor =
+        new Color32(204, 204, 204, 255); // #CCCCCC
+
+    private static readonly Color TimePenaltyMessageColor =
+        new Color32(255, 153, 153, 255); // #FF9999
 
     [Space]
 
@@ -142,6 +155,9 @@ public class GameUIManager : MonoBehaviour
 
             OnlineManager.Instance.Chat.SystemMessageReceived +=
                 OnSystemMessageReceived;
+
+            OnlineManager.Instance.Chat.WorldRecordReceived +=
+                OnWorldRecordReceived;
 
             OnlineManager.Instance.Chat.RecentMessagesReceived +=
                 OnRecentMessagesReceived;
@@ -559,6 +575,89 @@ public class GameUIManager : MonoBehaviour
             g.SetActive(timeMs >= 100000);
     }
 
+    public void DisplayGemMessage(string amount, Color color)
+    {
+        if (pickupPopupPrefab == null || pickupPopupContainer == null)
+        {
+            Debug.LogError("GameUIManager: Pickup popup references are not assigned!");
+            return;
+        }
+
+        TextMeshProUGUI popup =
+            Instantiate(pickupPopupPrefab, pickupPopupContainer);
+
+        RectTransform rect = popup.rectTransform;
+
+        // Start exactly at the center of the popup container.
+        rect.anchoredPosition = Vector2.zero;
+
+        popup.text = amount;
+        popup.color = color;
+
+        // Equivalent to Torque's shadow("1 1", "0000007f")
+        Shadow shadow = popup.GetComponent<Shadow>();
+
+        if (shadow == null)
+            shadow = popup.gameObject.AddComponent<Shadow>();
+
+        shadow.effectColor = new Color(0f, 0f, 0f, 0.5f);
+        shadow.effectDistance = new Vector2(1f, -1f);
+
+        // Make sure it starts fully visible.
+        Color startColor = popup.color;
+        startColor.a = 1f;
+        popup.color = startColor;
+
+        // Torque:
+        // 60 updates × 10ms
+        // Move 1 pixel upward each update
+        // = 60 pixels over 600ms.
+        rect.DOAnchorPosY(
+            rect.anchoredPosition.y + 60f,
+            0.6f
+        )
+        .SetEase(Ease.Linear)
+        .SetUpdate(true);
+
+        // Torque starts fading after update 30 (~300ms)
+        // and reaches zero at update 60 (~600ms).
+        popup.DOFade(0f, 0.3f)
+            .SetDelay(0.3f)
+            .SetEase(Ease.Linear)
+            .SetUpdate(true);
+
+        // Torque deletes the object at 700ms.
+        Destroy(popup.gameObject, 0.7f);
+    }
+
+    public void DisplayTimeTravelMessage(float bonusSeconds, float timeMultiplier)
+    {
+        string sign = timeMultiplier > 0f ? "-" : "+";
+
+        Color color = Mathf.Approximately(bonusSeconds, 0f)
+            ? TimeTravelZeroMessageColor
+            : TimeTravelMessageColor;
+
+        string amount =
+            $"{sign} {Mathf.Abs(bonusSeconds):0.###} s";
+
+        DisplayGemMessage(amount, color);
+    }
+
+    public void DisplayTimePenaltyMessage(float penaltySeconds, float timeMultiplier)
+    {
+        string sign = timeMultiplier > 0f ? "+" : "-";
+
+        Color color = Mathf.Approximately(penaltySeconds, 0f)
+            ? TimeTravelZeroMessageColor
+            : TimePenaltyMessageColor;
+
+        string amount =
+            $"{sign} {Mathf.Abs(penaltySeconds):0.###} s";
+
+        DisplayGemMessage(amount, color);
+    }
+
     public void SetCenterImage(int index)
     {
         readyImage.SetActive(false);
@@ -617,6 +716,13 @@ public class GameUIManager : MonoBehaviour
             message);
     }
 
+    private void OnWorldRecordReceived(
+    string message)
+    {
+        AddWorldRecordChatMessage(
+            message);
+    }
+
     private void OnRecentMessagesReceived(
     IReadOnlyList<ChatMessage> messages)
     {
@@ -624,7 +730,12 @@ public class GameUIManager : MonoBehaviour
 
         foreach (ChatMessage message in messages)
         {
-            if (message.IsSystem)
+            if (message.Type == "WorldRecord")
+            {
+                AddWorldRecordChatMessage(
+                    message.Message);
+            }
+            else if (message.IsSystem)
             {
                 AddSystemChatMessage(
                     message.Message);
@@ -672,6 +783,13 @@ public class GameUIManager : MonoBehaviour
             $"<color=#939612>{message}</color>");
     }
 
+    private void AddWorldRecordChatMessage(
+    string message)
+    {
+        AddChatLine(
+            $"<color=#006400>{message}</color>");
+    }
+
     private void LoadChatHistory()
     {
         chatLines.Clear();
@@ -681,7 +799,12 @@ public class GameUIManager : MonoBehaviour
 
         foreach (ChatMessage message in messages)
         {
-            if (message.IsSystem)
+            if (message.Type == "WorldRecord")
+            {
+                AddWorldRecordChatMessage(
+                    message.Message);
+            }
+            else if (message.IsSystem)
             {
                 AddSystemChatMessage(
                     message.Message);
@@ -802,6 +925,9 @@ public class GameUIManager : MonoBehaviour
 
         OnlineManager.Instance.Chat.RecentMessagesReceived -=
             OnRecentMessagesReceived;
+
+        OnlineManager.Instance.Chat.WorldRecordReceived -=
+                OnWorldRecordReceived;
     }
 
     private string GetChatUsername(

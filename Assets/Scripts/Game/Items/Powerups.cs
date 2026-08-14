@@ -21,7 +21,7 @@ public class Powerups : MonoBehaviour
 {
     [SerializeField] public PowerupType powerupType;
     [SerializeField] protected string powerupName;
-    [SerializeField] bool autoUse;
+    [SerializeField] protected bool autoUse;
     [SerializeField] protected float respawnTime = 7f;
     [SerializeField] protected AudioClip pickupSound;
     [SerializeField] protected AudioClip useSound;
@@ -48,7 +48,7 @@ public class Powerups : MonoBehaviour
         rotateMesh = mesh;
     }
 
-    public void PickupItem()
+    public virtual void PickupItem()
     {
         if (isActive)
         {

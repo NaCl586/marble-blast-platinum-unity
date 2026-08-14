@@ -38,7 +38,7 @@ namespace Server
             RecentMessagesReceived;
 
         public event Action<string> SystemMessageReceived;
-
+        public event Action<string> WorldRecordReceived;
         public string? LastError { get; private set; }
 
         private string ChatUrl =>
@@ -219,6 +219,11 @@ namespace Server
                 OnSystemMessage
             );
 
+            connection.On<string>(
+                "WorldRecord",
+                OnWorldRecord
+            );
+
             connection.On<string, string, string>(
                 "ReceiveMessage",
                 OnReceiveMessage
@@ -247,6 +252,37 @@ namespace Server
             );
 
             SystemMessageReceived?.Invoke(
+                message
+            );
+        }
+
+        private void OnWorldRecord(
+            string message)
+        {
+            Debug.Log(
+                $"[WORLD RECORD] {message}"
+            );
+
+            ChatMessage chatMessage =
+                new ChatMessage
+                {
+                    Username = string.Empty,
+                    Message = message,
+                    Status = string.Empty,
+                    IsSystem = true,
+                    Type = "WorldRecord"
+                };
+
+            recentMessages.Add(chatMessage);
+
+            const int maxRecentMessages = 20;
+
+            while (recentMessages.Count > maxRecentMessages)
+            {
+                recentMessages.RemoveAt(0);
+            }
+
+            WorldRecordReceived?.Invoke(
                 message
             );
         }
