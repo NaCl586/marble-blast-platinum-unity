@@ -173,6 +173,7 @@ public class GameManager : MonoBehaviour
     Coroutine alarmCoroutine;
     bool isSubmitInProgress = false;
     private int? serverRating;
+    bool canPressEnter = true;
 
     void Start()
     {
@@ -376,7 +377,7 @@ public class GameManager : MonoBehaviour
         {
             if (enterNameMenu.activeSelf && Input.GetKeyDown(KeyCode.Return))
                 CloseEnterNameWindow();
-            else if (finishMenu.activeSelf && Input.GetKeyDown(KeyCode.Return))
+            else if (finishMenu.activeSelf && Input.GetKeyDown(KeyCode.Return) && canPressEnter)
                 ReturnToMenu();
         }
     }
@@ -703,10 +704,11 @@ public class GameManager : MonoBehaviour
                 FinishRoutine();
 
                 if (ReplayRecorder.recordReplay || ReplayRecorder.leaderboardRecording)
-                    Invoke(
-                        nameof(StopRecordingAfterFinish),
-                        0.0625f + Time.fixedDeltaTime);
-
+                {
+                    canPressEnter = false;
+                    Invoke(nameof(StopRecordingAfterFinish), 0.0625f + Time.fixedDeltaTime);
+                }
+                
                 Invoke(nameof(ShowFinishUI), 2f);
             }   
         }
@@ -748,6 +750,7 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        canPressEnter = false;
         isSubmitInProgress = true;
 
         replayButton.interactable = false;
@@ -811,6 +814,8 @@ public class GameManager : MonoBehaviour
 
             Debug.LogException(ex);
         }
+
+        canPressEnter = true;
     }
 
     void StopMarbleMovement()
