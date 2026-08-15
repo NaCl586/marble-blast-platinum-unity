@@ -34,9 +34,9 @@ public class TimeTravel : Powerups
                 GameUIManager.instance.SetCenterText("Press the <func:bind mouseFire> to use the " + powerupName);
 
             if (timeBonus >= 0)
-                GameUIManager.instance.DisplayTimeTravelMessage(timeBonus, 1);
+                GameUIManager.instance.DisplayTimeTravelMessage(timeBonus);
             else
-                GameUIManager.instance.DisplayTimePenaltyMessage(timeBonus, -1);
+                GameUIManager.instance.DisplayTimePenaltyMessage(timeBonus);
         }
     }
 

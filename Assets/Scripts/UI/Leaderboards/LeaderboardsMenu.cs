@@ -274,6 +274,7 @@ public class LeaderboardsMenu : MonoBehaviour
 
         yield return new WaitForSeconds(blackoutDuration);
 
+        raycastBlocker.SetActive(true);
         blackout.SetActive(false);
     }
 
@@ -285,6 +286,7 @@ public class LeaderboardsMenu : MonoBehaviour
 
         yield return new WaitForSeconds(blackoutDuration);
 
+        raycastBlocker.SetActive(true);
         blackout.SetActive(false);
     }
 

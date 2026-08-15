@@ -630,9 +630,9 @@ public class GameUIManager : MonoBehaviour
         Destroy(popup.gameObject, 0.7f);
     }
 
-    public void DisplayTimeTravelMessage(float bonusSeconds, float timeMultiplier)
+    public void DisplayTimeTravelMessage(float bonusSeconds)
     {
-        string sign = timeMultiplier > 0f ? "-" : "+";
+        string sign = "-";
 
         Color color = Mathf.Approximately(bonusSeconds, 0f)
             ? TimeTravelZeroMessageColor
@@ -644,9 +644,9 @@ public class GameUIManager : MonoBehaviour
         DisplayGemMessage(amount, color);
     }
 
-    public void DisplayTimePenaltyMessage(float penaltySeconds, float timeMultiplier)
+    public void DisplayTimePenaltyMessage(float penaltySeconds)
     {
-        string sign = timeMultiplier > 0f ? "+" : "-";
+        string sign = "+";
 
         Color color = Mathf.Approximately(penaltySeconds, 0f)
             ? TimeTravelZeroMessageColor
