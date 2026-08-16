@@ -57,6 +57,9 @@ public class JukeboxManager : MonoBehaviour
     public Transform content;
     public Button buttonInstance;
 
+    [Space]
+    public GameObject raycastBlocker;
+
     [SerializeField] private Scrollbar scrollbar;
     public ScrollRect scrollRect;
     [SerializeField] private Button scrollUpButton;
@@ -76,6 +79,7 @@ public class JukeboxManager : MonoBehaviour
         {
             jukeboxWindowOpen = !jukeboxWindowOpen;
             jukeboxWindow.SetActive(jukeboxWindowOpen);
+            raycastBlocker.SetActive(jukeboxWindowOpen);
         }
 
         if (Input.GetKeyDown(KeyCode.F6))

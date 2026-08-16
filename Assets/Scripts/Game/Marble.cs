@@ -268,32 +268,54 @@ public class Marble : MonoBehaviour
     {
         PlaySound(PowerupType.TimeTravel);
 
-        if(_timeBonus > 0)
+        if (_timeBonus > 0)
         {
             if (!GameManager.instance.timeTravelActive)
             {
                 GameManager.instance.timeTravelStartTime = Time.time;
                 GameManager.instance.timeTravelActive = true;
             }
+
             GameManager.instance.timeTravelBonus += _timeBonus;
         }
         else
         {
             if (GameManager.instance.timeTravelActive)
             {
-                GameManager.instance.timeTravelBonus += _timeBonus;
-                if (GameManager.instance.timeTravelBonus < 0)
+                float elapsed = Time.time - GameManager.instance.timeTravelStartTime;
+                float remainingTime = GameManager.instance.timeTravelBonus - elapsed;
+                float penalty = -_timeBonus;
+
+                if (penalty >= remainingTime)
                 {
-                    GameManager.instance.elapsedTime -= GameManager.instance.timeTravelBonus * 1000f;
+                    // Consume all remaining Time Travel.
+                    // Anything left over becomes an actual time penalty.
+                    float leftoverPenalty = penalty - remainingTime;
+
+                    GameManager.instance.elapsedTime += leftoverPenalty * 1000f;
+
                     GameManager.instance.timeTravelBonus = 0;
+                    GameManager.instance.timeTravelActive = false;
+
+                    if (!GameManager.gameFinish)
+                        GameUIManager.instance.SetTimeTravelTimer(-1);
+
+                    InactivateTimeTravel();
+                }
+                else
+                {
+                    // Penalty is smaller than the remaining Time Travel.
+                    // Just reduce the total Time Travel duration.
+                    GameManager.instance.timeTravelBonus -= penalty;
                 }
             }
             else
             {
-                GameManager.instance.elapsedTime -= _timeBonus * 1000f;
+                // No Time Travel remaining, so the entire penalty
+                // goes directly onto the elapsed time.
+                GameManager.instance.elapsedTime += (-_timeBonus) * 1000f;
             }
         }
-        
     }
 
     public void InactivateTimeTravel()
