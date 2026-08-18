@@ -137,6 +137,7 @@ public class GameManager : MonoBehaviour
     int totalGems;
     [HideInInspector] public int currentGems;
     Gem[] gems;
+    public Gem[] Gems => gems;
 
     [HideInInspector] public PowerupType activePowerup;
     [HideInInspector] public bool superBounceIsActive = false;

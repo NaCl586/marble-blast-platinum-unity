@@ -372,6 +372,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetAspect: 1.7777778
+--- !u!223 &1262224841 stripped
+Canvas:
+  m_CorrespondingSourceObject: {fileID: 1535437742724973689, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+    type: 3}
+  m_PrefabInstance: {fileID: 178892578877145493}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &1387622902 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8892408889752474120, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
@@ -820,9 +826,34 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
         type: 3}
+      propertyPath: m_Aperture
+      value: 16.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
+        type: 3}
+      propertyPath: field of view
+      value: 70.00001
+      objectReference: {fileID: 0}
+    - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
+        type: 3}
+      propertyPath: m_FocalLength
+      value: 17.137775
+      objectReference: {fileID: 0}
+    - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
+        type: 3}
+      propertyPath: m_LensShift.y
+      value: 0.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
+        type: 3}
       propertyPath: m_TargetTexture
       value: 
-      objectReference: {fileID: 8400000, guid: f21921ffe81057845995a7ddb4d72caa, type: 2}
+      objectReference: {fileID: 0}
+    - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
+        type: 3}
+      propertyPath: m_projectionMatrixMode
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
         type: 3}
       propertyPath: m_NormalizedViewPortRect.x
@@ -831,7 +862,7 @@ PrefabInstance:
     - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
         type: 3}
       propertyPath: m_NormalizedViewPortRect.y
-      value: 0.00027352571
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
         type: 3}
@@ -841,7 +872,7 @@ PrefabInstance:
     - target: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
         type: 3}
       propertyPath: m_NormalizedViewPortRect.height
-      value: 0.99945295
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 136209974850031515, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
         type: 3}
@@ -931,6 +962,12 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 976207757}
   m_SourcePrefab: {fileID: 100100000, guid: 3f1d3f3ef37264c33ab8a76e916ef291, type: 3}
+--- !u!20 &136209974964789995 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 136209974850031513, guid: 3f1d3f3ef37264c33ab8a76e916ef291,
+    type: 3}
+  m_PrefabInstance: {fileID: 136209974964789994}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &178892578877145493
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1049,8 +1086,96 @@ PrefabInstance:
       propertyPath: scrollRect
       value: 
       objectReference: {fileID: 2002545911}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: canvas
+      value: 
+      objectReference: {fileID: 1262224841}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: endPadIcon
+      value: 
+      objectReference: {fileID: 21300000, guid: 0eb3b2ad214cd3242a817fb3fafb95db,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: pointerIcon
+      value: 
+      objectReference: {fileID: 21300000, guid: cfcb92afec6ebad49a11063f25b15b5a,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: playerCamera
+      value: 
+      objectReference: {fileID: 136209974964789995}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.size
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[0]
+      value: 
+      objectReference: {fileID: 21300000, guid: ddd2c92e4c2994d46a1a4fa841034837,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[1]
+      value: 
+      objectReference: {fileID: 21300000, guid: 39d559d2418b3f946911b40c1e83a237,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[2]
+      value: 
+      objectReference: {fileID: 21300000, guid: 6cdc70be85f7d8f40bc76b98e91d5dcc,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[3]
+      value: 
+      objectReference: {fileID: 21300000, guid: fa26a3d40e045a244b58fe5cff2dd8a7,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[4]
+      value: 
+      objectReference: {fileID: 21300000, guid: f2a606c208e308d48beb6e627060431d,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[5]
+      value: 
+      objectReference: {fileID: 21300000, guid: 8d3c50df94ba55a41b74e0265ded8d10,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[6]
+      value: 
+      objectReference: {fileID: 21300000, guid: dc962707841382642abf3c5c24cacb4d,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[7]
+      value: 
+      objectReference: {fileID: 21300000, guid: 4182ea28677424b4f9a8aa7c0ff2ad94,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[8]
+      value: 
+      objectReference: {fileID: 21300000, guid: 770614bf0c9ce52438a7ae7dff632049,
+        type: 3}
+    - target: {fileID: 7268528037935466010, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec,
+        type: 3}
+      propertyPath: gemRadarIcons.Array.data[9]
+      value: 
+      objectReference: {fileID: 21300000, guid: e004e082c57d7dc438891d7c8b555e8a,
+        type: 3}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6599114714050565682, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 90bfd7c6cf135de4bb2bd8a855d5ceec, type: 3}
