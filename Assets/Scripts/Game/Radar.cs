@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +8,13 @@ public class Radar : MonoBehaviour
     [Header("References")]
     [SerializeField] private Camera playerCamera;
     [SerializeField] private Canvas canvas;
+
+    [Header("Radar Limits & Filtering")]
+    [Tooltip("Maximum distance from the camera a gem can be to show up on the radar.")]
+    [SerializeField] private float maxRadarDistance = 500f;
+
+    [Tooltip("Maximum number of closest gems to show on the radar at once (like original MB $Radar::MaxDots = 25). Set to 0 for unlimited.")]
+    [SerializeField] private int maxVisibleGems = 25;
 
     [Header("Radar Icons")]
     [Tooltip("Must match the order of Gem.gemColors.")]
@@ -42,9 +50,13 @@ public class Radar : MonoBehaviour
         public Gem gem;
         public Image icon;
         public Image pointer;
+        public float distanceSqr; // Used for distance sorting
     }
 
     private readonly List<GemMarker> gemMarkers =
+        new List<GemMarker>();
+
+    private readonly List<GemMarker> validGemsBuffer =
         new List<GemMarker>();
 
     private Image endPadIconImage;
@@ -105,11 +117,6 @@ public class Radar : MonoBehaviour
             canvas == null)
             return;
 
-        /*
-         * GameManager initializes its gem array during
-         * its own initialization. Wait until it exists
-         * before creating our radar markers.
-         */
         if (!initialized)
         {
             if (GameManager.instance.Gems == null)
@@ -127,10 +134,6 @@ public class Radar : MonoBehaviour
             return;
         }
 
-        /*
-         * Don't call CheckForAllGems() every frame.
-         * GameManager already tracks these values.
-         */
         bool allGemsCollected = GameManager.instance.CheckForAllGems();
 
         if (allGemsCollected)
@@ -242,42 +245,69 @@ public class Radar : MonoBehaviour
         if (showingEndPad)
         {
             HideEndPad();
-
             showingEndPad = false;
         }
 
+        Vector3 cameraPos = playerCamera.transform.position;
+        float maxDistSqr = maxRadarDistance * maxRadarDistance;
+
+        validGemsBuffer.Clear();
+
+        // Step 1: Collect uncollected gems within the maximum radar distance
         foreach (GemMarker marker in gemMarkers)
         {
-            Gem gem =
-                marker.gem;
+            Gem gem = marker.gem;
 
-            if (gem == null)
+            if (gem == null || !gem.gameObject.activeInHierarchy)
             {
                 HideMarker(marker);
                 continue;
             }
 
-            /*
-             * PickupItem() disables the entire Gem.
-             */
-            if (!gem.gameObject.activeInHierarchy)
+            Vector3 gemPos = GetGemWorldPosition(gem);
+            float distSqr = (gemPos - cameraPos).sqrMagnitude;
+
+            // Distance filter check
+            if (distSqr > maxDistSqr)
             {
                 HideMarker(marker);
                 continue;
             }
 
-            int index =
-                gem.gemColorIndex;
+            marker.distanceSqr = distSqr;
+            validGemsBuffer.Add(marker);
+        }
 
-            if (index < 0 ||
-                index >= gemRadarIcons.Length)
+        // Step 2: Sort candidates by proximity (closest gems first)
+        validGemsBuffer.Sort((a, b) => a.distanceSqr.CompareTo(b.distanceSqr));
+
+        // Step 3: Enforce maximum dot cap (e.g., 25 limit)
+        int gemsToRenderCount = validGemsBuffer.Count;
+        if (maxVisibleGems > 0 && gemsToRenderCount > maxVisibleGems)
+        {
+            // Hide excess markers outside the cap
+            for (int i = maxVisibleGems; i < gemsToRenderCount; i++)
+            {
+                HideMarker(validGemsBuffer[i]);
+            }
+            gemsToRenderCount = maxVisibleGems;
+        }
+
+        // Step 4: Render active markers within limits
+        for (int i = 0; i < gemsToRenderCount; i++)
+        {
+            GemMarker marker = validGemsBuffer[i];
+            Gem gem = marker.gem;
+
+            int index = gem.gemColorIndex;
+
+            if (index < 0 || index >= gemRadarIcons.Length)
             {
                 HideMarker(marker);
                 continue;
             }
 
-            Sprite gemIcon =
-                gemRadarIcons[index];
+            Sprite gemIcon = gemRadarIcons[index];
 
             if (gemIcon == null)
             {
@@ -285,12 +315,7 @@ public class Radar : MonoBehaviour
                 continue;
             }
 
-            /*
-             * The pointer color comes directly from
-             * the Gem script.
-             */
-            Color pointerColor =
-                gem.gemColor;
+            Color pointerColor = gem.gemColor;
 
             UpdateTarget(
                 GetGemWorldPosition(gem),
@@ -303,11 +328,9 @@ public class Radar : MonoBehaviour
         }
     }
 
-    private Vector3 GetGemWorldPosition(
-        Gem gem)
+    private Vector3 GetGemWorldPosition(Gem gem)
     {
-        Collider collider =
-            gem.GetComponent<Collider>();
+        Collider collider = gem.GetComponent<Collider>();
 
         if (collider != null)
             return collider.bounds.center;
@@ -324,12 +347,10 @@ public class Radar : MonoBehaviour
         if (!showingEndPad)
         {
             HideAllGemMarkers();
-
             showingEndPad = true;
         }
 
-        GameObject finishPad =
-            GameManager.instance.finishPad;
+        GameObject finishPad = GameManager.instance.finishPad;
 
         if (finishPad == null)
         {
@@ -337,21 +358,19 @@ public class Radar : MonoBehaviour
             return;
         }
 
-        /*
-         * Original Haxe radar uses:
-         *
-         * 0xE6E6E6
-         */
-        Color endPadPointerColor =
-            new Color32(
-                0xE6,
-                0xE6,
-                0xE6,
-                0xFF
-            );
+        // Distance Check for End Pad
+        Vector3 padPos = finishPad.transform.position;
+        float distSqr = (padPos - playerCamera.transform.position).sqrMagnitude;
+        if (distSqr > maxRadarDistance * maxRadarDistance)
+        {
+            HideEndPad();
+            return;
+        }
+
+        Color endPadPointerColor = new Color32(0xE6, 0xE6, 0xE6, 0xFF);
 
         UpdateTarget(
-            finishPad.transform.position,
+            padPos,
             endPadIcon,
             endPadPointerColor,
             endPadIconImage,
@@ -374,34 +393,13 @@ public class Radar : MonoBehaviour
     {
         if (icon == null)
         {
-            iconImage.gameObject.SetActive(
-                false
-            );
-
-            pointerImage.gameObject.SetActive(
-                false
-            );
-
+            iconImage.gameObject.SetActive(false);
+            pointerImage.gameObject.SetActive(false);
             return;
         }
 
-        /*
-         * WorldToScreenPoint gives us the actual
-         * screen position.
-         */
-        Vector3 screenPosition =
-            playerCamera.WorldToScreenPoint(
-                worldPosition
-            );
-
-        /*
-         * WorldToViewportPoint gives us a cheap
-         * on-screen/off-screen test.
-         */
-        Vector3 viewport =
-            playerCamera.WorldToViewportPoint(
-                worldPosition
-            );
+        Vector3 screenPosition = playerCamera.WorldToScreenPoint(worldPosition);
+        Vector3 viewport = playerCamera.WorldToViewportPoint(worldPosition);
 
         bool visible =
             viewport.z > 0f &&
@@ -419,15 +417,11 @@ public class Radar : MonoBehaviour
                 iconSize
             );
 
-            pointerImage.gameObject.SetActive(
-                false
-            );
+            pointerImage.gameObject.SetActive(false);
         }
         else
         {
-            iconImage.gameObject.SetActive(
-                false
-            );
+            iconImage.gameObject.SetActive(false);
 
             ShowPointer(
                 pointerImage,
@@ -447,26 +441,14 @@ public class Radar : MonoBehaviour
         Vector3 screenPosition,
         Vector2 size)
     {
-        image.sprite =
-            sprite;
+        image.sprite = sprite;
+        image.color = Color.white;
+        image.rectTransform.sizeDelta = size;
 
-        image.color =
-            Color.white;
+        SetUIPosition(image.rectTransform, screenPosition);
 
-        image.rectTransform.sizeDelta =
-            size;
-
-        SetUIPosition(
-            image.rectTransform,
-            screenPosition
-        );
-
-        image.rectTransform.rotation =
-            Quaternion.identity;
-
-        image.gameObject.SetActive(
-            true
-        );
+        image.rectTransform.rotation = Quaternion.identity;
+        image.gameObject.SetActive(true);
     }
 
     // ==================================================
@@ -478,33 +460,16 @@ public class Radar : MonoBehaviour
         Vector3 screenPosition,
         Color pointerColor)
     {
-        Vector2 screenSize =
-            new Vector2(
-                Screen.width,
-                Screen.height
-            );
+        Vector2 screenSize = new Vector2(Screen.width, Screen.height);
+        Vector2 screenCenter = screenSize * 0.5f;
+        Vector2 projectedPosition = new Vector2(screenPosition.x, screenPosition.y);
+        Vector2 direction = projectedPosition - screenCenter;
 
-        Vector2 screenCenter =
-            screenSize * 0.5f;
+        bool behindCamera = screenPosition.z < 0f;
 
-        Vector2 projectedPosition =
-            new Vector2(
-                screenPosition.x,
-                screenPosition.y
-            );
-
-        Vector2 direction =
-            projectedPosition -
-            screenCenter;
-
-        bool behindCamera =
-            screenPosition.z < 0f;
-
-        if (direction.sqrMagnitude <
-            0.0001f)
+        if (direction.sqrMagnitude < 0.0001f)
         {
-            direction =
-                Vector2.up;
+            direction = Vector2.up;
         }
         else
         {
@@ -514,71 +479,29 @@ public class Radar : MonoBehaviour
         if (behindCamera)
             direction *= -1f;
 
-        float theta =
-            Mathf.Atan2(
-                direction.y,
-                direction.x
-            );
+        float theta = Mathf.Atan2(direction.y, direction.x);
 
-        /*
-         * Same ellipse calculation as the Haxe radar.
-         */
-        Vector2 ellipsePosition =
-            new Vector2(
-                screenSize.x *
-                (
-                    ellipseScreenFraction.x *
-                    Mathf.Cos(theta) +
-                    1f
-                ) / 2f,
-
-                screenSize.y *
-                (
-                    ellipseScreenFraction.y *
-                    Mathf.Sin(theta) +
-                    1f
-                ) / 2f
-            );
-
-        /*
-         * Pointer.png is assumed to point right
-         * at 0 degrees.
-         */
-        float angle =
-            Mathf.Atan2(
-                direction.y,
-                direction.x
-            ) * Mathf.Rad2Deg;
-
-        pointer.sprite =
-            pointerIcon;
-
-        pointer.color =
-            new Color(
-                pointerColor.r,
-                pointerColor.g,
-                pointerColor.b,
-                pointerAlpha
-            );
-
-        pointer.rectTransform.sizeDelta =
-            pointerSize;
-
-        SetUIPosition(
-            pointer.rectTransform,
-            ellipsePosition
+        Vector2 ellipsePosition = new Vector2(
+            screenSize.x * (ellipseScreenFraction.x * Mathf.Cos(theta) + 1f) / 2f,
+            screenSize.y * (ellipseScreenFraction.y * Mathf.Sin(theta) + 1f) / 2f
         );
 
-        pointer.rectTransform.rotation =
-            Quaternion.Euler(
-                0f,
-                0f,
-                angle
-            );
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
-        pointer.gameObject.SetActive(
-            true
+        pointer.sprite = pointerIcon;
+        pointer.color = new Color(
+            pointerColor.r,
+            pointerColor.g,
+            pointerColor.b,
+            pointerAlpha
         );
+
+        pointer.rectTransform.sizeDelta = pointerSize;
+
+        SetUIPosition(pointer.rectTransform, ellipsePosition);
+
+        pointer.rectTransform.rotation = Quaternion.Euler(0f, 0f, angle);
+        pointer.gameObject.SetActive(true);
     }
 
     // ==================================================
@@ -589,27 +512,20 @@ public class Radar : MonoBehaviour
         RectTransform rect,
         Vector3 screenPosition)
     {
-        Camera uiCamera =
-            null;
+        Camera uiCamera = null;
 
-        if (canvas.renderMode !=
-            RenderMode.ScreenSpaceOverlay)
+        if (canvas.renderMode != RenderMode.ScreenSpaceOverlay)
         {
-            uiCamera =
-                canvas.worldCamera;
+            uiCamera = canvas.worldCamera;
         }
 
-        Vector2 localPoint;
-
-        if (RectTransformUtility
-            .ScreenPointToLocalPointInRectangle(
+        if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 canvasRect,
                 screenPosition,
                 uiCamera,
-                out localPoint))
+                out Vector2 localPoint))
         {
-            rect.anchoredPosition =
-                localPoint;
+            rect.anchoredPosition = localPoint;
         }
     }
 
@@ -617,16 +533,10 @@ public class Radar : MonoBehaviour
     // HIDING
     // ==================================================
 
-    private void HideMarker(
-        GemMarker marker)
+    private void HideMarker(GemMarker marker)
     {
-        marker.icon.gameObject.SetActive(
-            false
-        );
-
-        marker.pointer.gameObject.SetActive(
-            false
-        );
+        marker.icon.gameObject.SetActive(false);
+        marker.pointer.gameObject.SetActive(false);
     }
 
     private void HideAllGemMarkers()
@@ -641,16 +551,12 @@ public class Radar : MonoBehaviour
     {
         if (endPadIconImage != null)
         {
-            endPadIconImage.gameObject.SetActive(
-                false
-            );
+            endPadIconImage.gameObject.SetActive(false);
         }
 
         if (endPadPointerImage != null)
         {
-            endPadPointerImage.gameObject.SetActive(
-                false
-            );
+            endPadPointerImage.gameObject.SetActive(false);
         }
     }
 
@@ -670,33 +576,26 @@ public class Radar : MonoBehaviour
         {
             if (marker.icon != null)
             {
-                Destroy(
-                    marker.icon.gameObject
-                );
+                Destroy(marker.icon.gameObject);
             }
 
             if (marker.pointer != null)
             {
-                Destroy(
-                    marker.pointer.gameObject
-                );
+                Destroy(marker.pointer.gameObject);
             }
         }
 
         gemMarkers.Clear();
+        validGemsBuffer.Clear();
 
         if (endPadIconImage != null)
         {
-            Destroy(
-                endPadIconImage.gameObject
-            );
+            Destroy(endPadIconImage.gameObject);
         }
 
         if (endPadPointerImage != null)
         {
-            Destroy(
-                endPadPointerImage.gameObject
-            );
+            Destroy(endPadPointerImage.gameObject);
         }
     }
 }
