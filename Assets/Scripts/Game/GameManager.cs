@@ -519,6 +519,10 @@ public class GameManager : MonoBehaviour
         GameUIManager.instance.saveReplayMenu.SetActive(false);
         finishMenu.SetActive(false);
 
+        activeCheckpoint = startPad.transform.Find("Spawn");
+        activeCheckpointGravityDir = Vector3.down;
+        useCheckpoint = false;
+
         Marble.onRespawn?.Invoke();
     }
 
