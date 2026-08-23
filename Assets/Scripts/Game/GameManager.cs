@@ -619,9 +619,12 @@ public class GameManager : MonoBehaviour
         recentGems.Clear();
         Marble.instance.RevertMaterial();
         Marble.instance.ToggleGyrocopterBlades(false);
+
         if (gyrocopterIsActive)
             Marble.instance.CancelGyrocopter();
-        Marble.instance.InactivateTimeTravel();
+
+        if (!useCheckpoint)
+            Marble.instance.InactivateTimeTravel();
     }
 
 
