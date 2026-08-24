@@ -266,10 +266,9 @@ public class Marble : MonoBehaviour
 
     public void ActivateTimeTravel(float _timeBonus)
     {
-        PlaySound(PowerupType.TimeTravel);
-
         if (_timeBonus > 0)
         {
+            PlaySound(PowerupType.TimeTravel);
             if (!GameManager.instance.timeTravelActive)
             {
                 GameManager.instance.timeTravelStartTime = Time.time;
